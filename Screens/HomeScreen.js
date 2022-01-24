@@ -1,12 +1,12 @@
 import React from "react";
 import { SafeAreaView, Text, View } from "react-native";
-import { Card } from "../components/Card";
+import { OtpVerify } from "./OtpVerify";
  
 
 export  const HomeScreen = () => {
     return(
         <View>
-            <Card/>
+            <OtpVerify/>
        </View>
     ); 
 

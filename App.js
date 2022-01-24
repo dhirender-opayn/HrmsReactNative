@@ -1,17 +1,18 @@
 import React from 'react';
 import { SafeAreaView, Text } from 'react-native';
-import { Forget } from './Screens/Forget';
-import { HomeScreen } from './Screens/HomeScreen';
+import { MyStack } from './components/MyStack';
+import { OtpVerify } from './Screens/OtpVerify';
+ 
 
  const App = () => {
    
   return (
     <SafeAreaView style = {{flex:1,  }}>
-      <Forget/>
+      {/* <MyStack/> */}
+      <OtpVerify/>
     </SafeAreaView>
     
   );
 };
  
-
 export default App;

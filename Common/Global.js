@@ -19,8 +19,8 @@ module.exports = {
             maincolor:'black',
             headerTitleColor:'#ED7D7979',
             alertColor:'#ff1e46',
-            mainFontFamily:'This is'
-            //etc
+            title:'Opayn HRMS',
+
         },
     }
    
