@@ -6,7 +6,7 @@ export const Forget =()=>{
     return(
         <View style ={{flex :1}}>
             
-            <Text style={{color:'black'}}>{Global.dummy}</Text>
+            <Text style={{color:'black'}}>{Global.projct.android.mainFontFamily}</Text>
             {/* <Text>Enter the email associated </Text> */}
         </View>
     );
