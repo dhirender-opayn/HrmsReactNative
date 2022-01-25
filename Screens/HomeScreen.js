@@ -3,11 +3,13 @@ import { SafeAreaView, Text, View } from "react-native";
 import { OtpVerify } from "./OtpVerify";
  
 
-export  const HomeScreen = () => {
+ const HomeScreen = ({navigation=useNavigation()}) => {
     return(
         <View>
             <OtpVerify/>
        </View>
     ); 
 
- }
+ };
+
+ export default HomeScreen;
