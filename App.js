@@ -7,10 +7,10 @@ import { OtpVerify } from './Screens/OtpVerify';
  const App = () => {
    
   return (
-    <SafeAreaView style = {{flex:1,  }}>
-      {/* <MyStack/> */}
-      <OtpVerify/>
-    </SafeAreaView>
+    //<SafeAreaView style = {{flex:1,  }}>
+      <MyStack/>
+      
+   // </SafeAreaView>
     
   );
 };

@@ -24,24 +24,25 @@ export const OtpVerify = ({ navigation, route }) => {
     return (
         <SafeAreaView style={AuthStyle.mainContainer}>
             <View style={{ marginTop: 80 }}>
-                <Text style={AuthStyle.text} >{String.strings.title}</Text>
+                <Text style={AuthStyle.text}>{strings.title}</Text>
                 <View style={{ height: 20 }} />
-                <Text style={AuthStyle.subText} >{String.strings.optmsg}</Text>
-                <View style={{ height: 30 }} />
-            //Card Container//
+                    <Text style={AuthStyle.subText}>{strings.optmsg}</Text>
+                    <View style={{ height: 30 }} />
+                
+                 {/* Card Container */}
                 <View style={AuthStyle.CardmainContainer}>
                     <Text style={AuthStyle.Cardtext}>{strings.enter_code}</Text>
                     <View style={{ marginTop: 10 }}>
                         <TextInput onChangeText={(otp) => setOtp(otp)} value={otp} style={AuthStyle.CardinputText} placeholder={strings.enterOtp} placeholderTextColor={color.gray} />
                         <TextInput onChangeText={(new_pass) => setPassword(new_pass)} value={password} style={AuthStyle.CardinputText} placeholder={strings.newPassword} placeholderTextColor={color.gray} />
                         <TextInput onChangeText={(comfirm_pass) => setComfirmPassword(comfirm_pass)} value={comfirmPassword} style={AuthStyle.CardinputText} placeholder={strings.comfirmPassword} placeholderTextColor={color.gray} />
-                        <TouchableOpacity >
+                        <TouchableOpacity>
                             <MainButton text={strings.submit} onPress={buttonPress} />
                         </TouchableOpacity>
                     </View>
-                    <View style={{ height: 30 }} />
-
+                        <View style={{ height: 30 }} />
                 </View>
+
 
             </View>
         </SafeAreaView>

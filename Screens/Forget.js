@@ -4,9 +4,10 @@ import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { MainButton } from "../components/mainButton";
 import { EmailValidation } from "../helper/Validation";
 import String from "../Common/String";
+import { useNavigation } from "@react-navigation/native";
  
 
-export const Forget = ({navigation}) => {
+export const Forget = ({navigation = useNavigation()}) => {
     const [email, setEmail] = useState();
  
     const onButtonPress = () => {
@@ -22,7 +23,6 @@ export const Forget = ({navigation}) => {
     return (
         <SafeAreaView style={AuthStyle.mainContainer}>
             <View>
-
                 <View style={{ marginTop: 60 }}>
                     <Text style={AuthStyle.text} >{String.strings.title}</Text>
                     <Text style={AuthStyle.subText} >{String.strings.forgetMsg}</Text>
