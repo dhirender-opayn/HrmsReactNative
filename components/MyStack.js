@@ -12,7 +12,6 @@ export const MyStack = () => {
                 <Stack.Screen name="Forget" component={Forget} options={{title:'Forget'}}/>
                 <Stack.Screen name="OtpVerify" component={OtpVerify} />
             </Stack.Navigator>
-
         </NavigationContainer>
     );
 }
