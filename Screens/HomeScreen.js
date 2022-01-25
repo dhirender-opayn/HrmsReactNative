@@ -1,13 +1,15 @@
 import React from "react";
 import { SafeAreaView, Text, View } from "react-native";
-import { Card } from "../components/Card";
- 
+ import { useNavigation } from "@react-navigation/native";
+ import UserData from "../Common/UserData";
 
-export  const HomeScreen = () => {
+ const HomeScreen = ({navigation=useNavigation()}) => {
     return(
         <View>
-            <Card/>
+            <Text>UserData.userData.user.name</Text>
        </View>
     ); 
 
- }
+ };
+
+ export default HomeScreen;
