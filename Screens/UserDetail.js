@@ -9,6 +9,7 @@ import { useState } from "react/cjs/react.development";
      const [data, setData] = useState({});
      const [isLoad, setLoad] = useState(true)
     var detail =  "";
+    
     // detail = JSON.parse(detail); // {foo:'foo', bar:'bar'}; 
     //     console.warn(detail)
 

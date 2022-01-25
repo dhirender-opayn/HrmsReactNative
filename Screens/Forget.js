@@ -5,20 +5,48 @@ import { MainButton } from "../components/mainButton";
 import { EmailValidation } from "../helper/Validation";
 import String from "../Common/String";
 import { useNavigation } from "@react-navigation/native";
+import Global, { projct } from "../Common/Global";
  
 
-export const Forget = ({navigation = useNavigation()}) => {
+export const Forget = ({ navigation = useNavigation() }) => {
     const [email, setEmail] = useState();
- 
+    const [message, setMsg] = useState("");
+    const [data, setData] = useState({});
+    let formData = new FormData()
+
     const onButtonPress = () => {
         console.log("check value")
-       navigation.navigate('OtpVerify');
+
         if (!EmailValidation(email)) {
-          
-           
             console.log("Email   valid ")
+            forgetApi();
+
         }
     }
+    console.log("message now : ", message)
+    console.log("data ===> ", data);
+
+    const forgetApi = async () => {
+        formData.append('email', email);
+
+        const request = new Request(Global.projct.android.BASE_URL + Global.projct.android.forgetpassword, {
+            method: 'POST', headers: {
+                Accept: 'application/json',
+            }, body: formData
+        });
+        try {
+            const response = await fetch(request)
+            const json = await response.json();
+            setMsg(json.message);
+            setData(json.data);
+            const object = JSON.stringify(json.data);
+            navigation.navigate('OtpVerify');
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView style={AuthStyle.mainContainer}>
@@ -33,11 +61,10 @@ export const Forget = ({navigation = useNavigation()}) => {
                 <View style={{ marginTop: 60 }}>
                     <TextInput onChangeText={(text) => setEmail(text)} value={email} style={AuthStyle.inputText} placeholder="Enter Your E-mail" placeholderTextColor={'white'} />
                     <TouchableOpacity>
-                        <MainButton  text={'submit'} onPress={onButtonPress}/>
+                        <MainButton text={'submit'} onPress={onButtonPress} />
                         {/* <Text style={AuthStyle.mainButtonText}>Submit </Text> */}
                     </TouchableOpacity>
                 </View>
-
             </View>
         </SafeAreaView>
 

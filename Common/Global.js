@@ -8,7 +8,14 @@ module.exports = {
             maincolor:'black',
             headerTitleColor:'#ED7D7979',
             alertColor:'#ff1e46',
-            mainFontFamily:''
+            mainFontFamily:'',
+
+            RESETPASSWORD : "reset-possword",
+
+            forgetpassword:'forget-password',
+            code:'code',
+            password:"password",
+            confirm_password:"confirm_password",
             //etc
 
         },
@@ -21,6 +28,13 @@ module.exports = {
             alertColor:'#ff1e46',
             title:'Opayn HRMS',
 
+            RESETPASSWORD : "reset-possword",
+
+            forgetpassword:'forget-password',
+            code:'code',
+            password:"password",
+            confirm_password:"confirm_password",
+          
         },
         appColors:{
             red:"#FF1E46",

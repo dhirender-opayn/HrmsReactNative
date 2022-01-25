@@ -64,7 +64,7 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                     placeholder="Email"
                     onChangeText={pswrd => setPswrd(pswrd)}
                     defaultValue={password}
-                    secureTextEntry="true"
+                    
                 />
                 <TextInput
                     style={styles.TextfieldContainer}
@@ -77,7 +77,7 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                     placeholder="Subject"
                     onChangeText={pswrd => setPswrd(pswrd)}
                     defaultValue={password}
-                    secureTextEntry="true"
+                  
                 />
                 <TextInput
                     style={{borderWidth:1, 
@@ -91,7 +91,7 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                     placeholder="Description"
                     onChangeText={pswrd => setPswrd(pswrd)}
                     defaultValue={password}
-                    secureTextEntry="true"
+                   
                 />
                 
                 <TouchableOpacity onPress={() => {onsubmit()}}>
