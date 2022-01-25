@@ -6,6 +6,7 @@ import { OtpVerify } from "../Screens/OtpVerify";
 import LoginView from '../Screens/Login';
 import UserDetail from '../Screens/UserDetail';
 import ContactAdminView from '../Screens/ContactAdmin';
+import ProfileView from "../Screens/Profile";
  
 const Stack = createNativeStackNavigator();
 export const MyStack = () => {
@@ -21,6 +22,8 @@ export const MyStack = () => {
                  component={UserDetail}/>
                 <Stack.Screen name="ContactAdmin"
                   component={ContactAdminView}/>
+                  <Stack.Screen name="Profile"
+                  component={ProfileView}/>
             </Stack.Navigator>
 
         </NavigationContainer>

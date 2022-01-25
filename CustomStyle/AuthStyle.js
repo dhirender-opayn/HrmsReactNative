@@ -28,13 +28,15 @@ export const AuthStyle = StyleSheet.create({
         marginTop: 20
     },
     inputText: {
-        marginHorizontal: 10,
-        borderWidth: 1,
-        borderColor: Colors.color.borderLineColor,
-        marginTop: 10,
-        paddingStart:10,
         color:'white',
-        fontSize:16
+        fontSize:16,
+        height: 50, 
+        borderWidth:1, 
+        borderColor:Colors.color.lightGray, 
+        borderRadius: 8, 
+        padding: 8,
+        marginBottom: 16,
+        fontSize: 16
     },
     mainButtonContainer: {
         borderColor:'red',
@@ -57,10 +59,12 @@ export const AuthStyle = StyleSheet.create({
         padding:15,
         marginHorizontal:25,
         backgroundColor:'white',
-        borderColor:'white',
         borderWidth:1,
-        borderRadius:10,
-        // backgroundColor:'#eeeeee'
+        borderRadius: 12,
+        borderColor: Colors.color.lightGray,
+        paddingVertical: 24, 
+        paddingHorizontal: 16,
+        margin: 16
     },
     Cardtext: {
         fontSize: 24,

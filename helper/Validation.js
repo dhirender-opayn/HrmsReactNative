@@ -1,8 +1,8 @@
  module.exports = {
       EmailValidation : email => {
         const re = /\S+@\S+\.\S+/;
-        if (!email) return "Email can't be empty."
-        if (!re.test(email)) return 'Ooops! We need a valid email address.'
+        if (!email) return "Please enter email."
+        if (!re.test(email)) return 'Please enter a valid email.'
         return ''
     },
     NameValidation:name =>{
