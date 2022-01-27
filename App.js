@@ -1,17 +1,22 @@
 import React from 'react';
 import { SafeAreaView, Text } from 'react-native';
-import { Forget } from './Screens/Forget';
-import { HomeScreen } from './Screens/HomeScreen';
+import { MyStack } from './components/MyStack';
+import { OtpVerify } from './Screens/OtpVerify';
+
 
  const App = () => {
    
   return (
-    <SafeAreaView style = {{flex:1,  }}>
-      <Forget/>
-    </SafeAreaView>
+    //<SafeAreaView style = {{flex:1,  }}>
+      <MyStack/>
+      
+   // </SafeAreaView>
     
+    // <SafeAreaView style = {{flex:1,  }}>
+    //   <Forget/>
+    // </SafeAreaView>
+   
   );
 };
  
-
 export default App;

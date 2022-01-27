@@ -50,14 +50,12 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
             </View>
             <View style={{ marginTop: 10 }}>
                {
-                  isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.name }</Text>)
+                  isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.name}</Text>)
                }
             </View>
- 
- 
+
          </View>
       </OverlayContainer>
-
    );
 
 };
