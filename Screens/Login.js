@@ -36,7 +36,7 @@ const LoginView = ({navigation = useNavigation()}) => {
             const object = JSON.stringify(json.data);
            // setEmail(json)
             await AsyncStorage.setItem('userData',object);
-            navigation.navigate('Profile');
+            navigation.navigate('HomeScreen');
             }
             else{
               toast.show(json.message, {duration:4000});
@@ -71,16 +71,16 @@ const LoginView = ({navigation = useNavigation()}) => {
                     style={styles.TextfieldContainer}
                     placeholder="Enter Email"
                     onChangeText={Id => setEmail(Id)}
-                    defaultValue={emailId}
+                    defaultValue ={"dhirender@opayn.com"}
+                    // defaultValue={emailId}
                 />
                 <TextInput
                     style={styles.TextfieldContainer}
                     placeholder="Enters Password"
                     onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue={password}
-                    secureTextEntry="true"
+                    defaultValue="123456"
+                    // defaultValue={password}
                 />
-                
                 <TouchableOpacity onPress={() => {onsubmit()}}>
                   <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
                     <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Login</Text>

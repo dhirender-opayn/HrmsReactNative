@@ -8,6 +8,8 @@ import UserDetail from '../Screens/UserDetail';
 import ContactAdminView from '../Screens/ContactAdmin';
 import HomeScreen from "../Screens/HomeScreen";
 import ProfileView from "../Screens/Profile";
+import { CalendarScreen } from "../Screens/CalendarScreen";
+import { RequestLeaveScreen } from "../Screens/RequestLeaveScreen";
  
 const Stack = createNativeStackNavigator();
 export const MyStack = () => {
@@ -20,9 +22,10 @@ export const MyStack = () => {
                 <Stack.Screen name="OtpVerify" component={OtpVerify} />
                 <Stack.Screen name="ContactAdmin" component={ContactAdminView}/>               
                 <Stack.Screen name="User" component={UserDetail}/>
-                  <Stack.Screen name="Profile" component={ProfileView}/>
+                <Stack.Screen name="Profile" component={ProfileView}/>
+                <Stack.Screen name="CalendarScreen" component={CalendarScreen}/>
+                <Stack.Screen name="RequestLeaveScreen" component = {RequestLeaveScreen}/>
             </Stack.Navigator>
-
         </NavigationContainer>
     );
 }

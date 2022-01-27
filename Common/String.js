@@ -10,5 +10,18 @@ module.exports = {
              comfirmPassword:"Comfirm Password",
              submit:"Submit",
              enter_code:"Enter Your Code",
+             checkin : "Checkin",
+             checkout : "Check out",
+             qr_code_scanner : "Scan QR Code",
+             leave : "Leave",
+             attendance_list : "Attendance List",
+             calendar:"Calendar",
+             request_leave : "Request Leave",
+             announcement : "Announcement",
+             work_history : "Work History",
+             
+
+                        
+
     }
 }
