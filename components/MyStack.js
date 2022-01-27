@@ -7,6 +7,7 @@ import LoginView from '../Screens/Login';
 import UserDetail from '../Screens/UserDetail';
 import ContactAdminView from '../Screens/ContactAdmin';
 import HomeScreen from "../Screens/HomeScreen";
+import ProfileView from "../Screens/Profile";
  
 const Stack = createNativeStackNavigator();
 export const MyStack = () => {
@@ -17,9 +18,9 @@ export const MyStack = () => {
                 <Stack.Screen options={{headerShown:false}}  name="HomeScreen" component={HomeScreen}/>
                 <Stack.Screen name="Forget" component={Forget} options={{title:'Forget'}}/>
                 <Stack.Screen name="OtpVerify" component={OtpVerify} />
+                <Stack.Screen name="ContactAdmin" component={ContactAdminView}/>               
                 <Stack.Screen name="User" component={UserDetail}/>
-                <Stack.Screen name="ContactAdmin" component={ContactAdminView}/>
-               
+                  <Stack.Screen name="Profile" component={ProfileView}/>
             </Stack.Navigator>
 
         </NavigationContainer>
