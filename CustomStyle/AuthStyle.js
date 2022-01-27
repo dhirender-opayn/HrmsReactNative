@@ -28,11 +28,9 @@ export const AuthStyle = StyleSheet.create({
         marginTop: 20
     },
     inputText: {
-        color:'white',
-        fontSize:16,
         height: 50, 
         borderWidth:1, 
-        borderColor:Colors.color.lightGray, 
+        borderColor: Colors.color.lightGray, 
         borderRadius: 8, 
         padding: 8,
         marginBottom: 16,
@@ -82,5 +80,6 @@ export const AuthStyle = StyleSheet.create({
         color:'black',
         fontSize:16
     },
+    
    
 });

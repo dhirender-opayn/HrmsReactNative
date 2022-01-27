@@ -39,6 +39,7 @@ module.exports = {
         apiSuffix:{
             login: "login",
             addTicket: "ticket",
+            changePassword: "change-password"
         }
       
     }

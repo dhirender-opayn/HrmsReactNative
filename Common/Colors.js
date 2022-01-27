@@ -10,6 +10,7 @@ module.exports = {
         backgroundGray: "#F2F2F2",
         green: "#00CB00",
         titleBlack: "#151526",
-        subtitleBlack: "#222537"
+        subtitleBlack: "#222537",
+        backgroundBlack: "#28282B"
     }
 }
