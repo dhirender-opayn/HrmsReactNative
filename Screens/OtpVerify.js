@@ -7,7 +7,9 @@ import Colors, { color } from "../Common/Colors";
 import { MainButton } from "../components/mainButton";
 import { OtpValidation, PasswordValidation } from "../helper/Validation";
 import Global from "../Common/Global";
- 
+import { OverlayContainer } from "../Common/OverlayContainer";
+import AppBackgorund from "./BackgroundView";
+
 
 export const OtpVerify = ({ navigation, route }) => {
 
@@ -23,19 +25,19 @@ export const OtpVerify = ({ navigation, route }) => {
         if (!OtpValidation(otp) && !PasswordValidation(password) && !PasswordValidation(comfirmPassword) && password.match(comfirmPassword)) {
             console.log("Success OTp Phase");
             OtpApiCall();
-        }  else {
+        } else {
             console.log("UnSuccess OTp Phase");
         }
     }
-    const OtpApiCall = async() => {
+    const OtpApiCall = async () => {
         formdata.append(Global.projct.android.code, otp);
-        formdata.append(Global.projct.password,password);
-        formdata.append(Global.projct.android.confirm_password,comfirmPassword);
+        formdata.append(Global.projct.password, password);
+        formdata.append(Global.projct.android.confirm_password, comfirmPassword);
 
-        const request = new Request(Global.projct.android.BASE_URL+Global.projct.android.RESETPASSWORD,{
-            method:'POST', headers:{
+        const request = new Request(Global.projct.android.BASE_URL + Global.projct.android.RESETPASSWORD, {
+            method: 'POST', headers: {
                 Accept: 'application/json',
-            },body:formdata
+            }, body: formdata
         });
         try {
             const response = await fetch(request)
@@ -44,38 +46,40 @@ export const OtpVerify = ({ navigation, route }) => {
             setData(json.data);
             const object = JSON.stringify(json.data);
             navigation.navigate('Login');
-        }catch(error){
+        } catch (error) {
             console.error(error);
-        }finally{
+        } finally {
             setLoading(false);
         }
 
     };
 
     return (
-        <SafeAreaView style={AuthStyle.mainContainer}>
-            <View style={{ marginTop: 80 }}>
-                <Text style={AuthStyle.text}>{strings.title}</Text>
-                <View style={{ height: 20 }} />
-                <Text style={AuthStyle.subText}>{strings.optmsg}</Text>
-                <View style={{ height: 30 }} />
+        <OverlayContainer>
+            <AppBackgorund />
 
-                {/* Card Container */}
-                <View style={AuthStyle.CardmainContainer}>
-                    <Text style={AuthStyle.Cardtext}>{strings.enter_code}</Text>
-                    <View style={{ marginTop: 10 }}>
-                        <TextInput onChangeText={(otp) => setOtp(otp)} value={otp} style={AuthStyle.CardinputText} keyboardType="number-pad" placeholder={strings.enterOtp} placeholderTextColor={color.gray} />
-                        <TextInput onChangeText={(new_pass) => setPassword(new_pass)} value={password} style={AuthStyle.CardinputText} placeholder={strings.newPassword} placeholderTextColor={color.gray} />
-                        <TextInput onChangeText={(comfirm_pass) => setComfirmPassword(comfirm_pass)} value={comfirmPassword} style={AuthStyle.CardinputText} placeholder={strings.comfirmPassword} placeholderTextColor={color.gray} />
-                        <TouchableOpacity>
-                            <MainButton text={strings.submit} onPress={() => buttonPress()} />
-                        </TouchableOpacity>
-                    </View>
+            <SafeAreaView style={AuthStyle.mainContainer}>
+                <View style={{ marginTop: 60 }}>
+                    <Text style={AuthStyle.text}>{strings.title}</Text>
+                    <View style={{ height: 20 }} />
+                    <Text style={AuthStyle.subText}>{strings.optmsg}</Text>
                     <View style={{ height: 30 }} />
+
+                    {/* Card Container */}
+                    <View style={AuthStyle.CardmainContainer}>
+                        <Text style={AuthStyle.Cardtext}>{strings.enter_code}</Text>
+                        <View style={{ marginTop: 10 }}>
+                            <TextInput onChangeText={(otp) => setOtp(otp)} value={otp} style={AuthStyle.CardinputText} keyboardType="number-pad" placeholder={strings.enterOtp} placeholderTextColor={color.gray} />
+                            <TextInput onChangeText={(new_pass) => setPassword(new_pass)} value={password} style={AuthStyle.CardinputText} placeholder={strings.newPassword} placeholderTextColor={color.gray} />
+                            <TextInput onChangeText={(comfirm_pass) => setComfirmPassword(comfirm_pass)} value={comfirmPassword} style={AuthStyle.CardinputText} placeholder={strings.comfirmPassword} placeholderTextColor={color.gray} />
+                            <TouchableOpacity>
+                                <MainButton text={strings.submit} onPress={() => buttonPress()} />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={{ height: 30 }} />
+                    </View>
                 </View>
-
-
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
+        </OverlayContainer>
     );
 }

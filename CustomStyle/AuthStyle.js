@@ -5,7 +5,7 @@ export const AuthStyle = StyleSheet.create({
     mainContainer: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: 'black',
+    
         padding:10,
     },
     text: {
@@ -17,7 +17,6 @@ export const AuthStyle = StyleSheet.create({
     textTitile: {
         fontWeight: 'bold',
         fontSize: 24,
-        color: 'white',
         alignSelf: 'center',
         
     },
@@ -39,7 +38,6 @@ export const AuthStyle = StyleSheet.create({
     mainButtonContainer: {
         borderColor:'red',
         backgroundColor: 'red',
-        marginHorizontal: 10,
         marginTop: 20,
         borderRadius: 5,
         borderWidth: 1,

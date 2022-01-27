@@ -15,6 +15,8 @@ import Splash from "../Screens/Slash";
 import { color } from "../Common/Colors";
 import ChangePasswordView from "../Screens/ChangePassword";
 import AddTicketView from "../Screens/AddTicket";
+import { CalendarScreen } from "../Screens/CalendarScreen";
+import { RequestLeaveScreen } from "../Screens/RequestLeaveScreen";
  
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -72,6 +74,8 @@ export const MyStack = () => {
                     <Stack.Screen name="AddTicket" component={AddTicketView} options={{headerStyle: {
                         backgroundColor: "#28282B"//color.backgroundColor
                     }, headerTitleStyle:{color:"white"}}}/>
+                    <Stack.Screen name="CalendarScreen" component={CalendarScreen}/>
+                <Stack.Screen name="RequestLeaveScreen" component = {RequestLeaveScreen}/>
                 </Stack.Navigator>
             </NavigationContainer>
         // }
@@ -90,6 +94,7 @@ const AppTabViews = () => {
                         backgroundColor: "#28282B"//color.backgroundColor
                     }, headerTitleStyle:{color:"white"}}}/>
         </Tab.Navigator>
+       
     );
   };
   

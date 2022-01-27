@@ -71,16 +71,16 @@ const LoginView = ({navigation = useNavigation()}) => {
                     style={AuthStyle.inputText}
                     placeholder="Enter Email"
                     onChangeText={Id => setEmail(Id)}
-                    defaultValue={emailId}
+                    defaultValue ={"dhirender@opayn.com"}
+                    // defaultValue={emailId}
                 />
                 <TextInput
                     style={AuthStyle.inputText}
                     placeholder="Enters Password"
                     onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue={password}
-                    secureTextEntry="true"
+                    defaultValue="123456"
+                    // defaultValue={password}
                 />
-                
                 <TouchableOpacity onPress={() => {onsubmit()}}>
                   <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
                     <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Login</Text>
