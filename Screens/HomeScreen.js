@@ -41,9 +41,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
       <OverlayContainer>
          <AppBackgorund />
          <View>
-
             <Text style={{ marginBottom: 30, fontSize: 30, color: "#fff", textAlign: 'center' }}>{strings.home}</Text>
-
             <Image style={CustomStyling.imageThumb} source={require('../images/userwhite.png')} />
             <View style={{ marginTop: 40 }}>
                {
@@ -52,25 +50,18 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
             </View>
             <View style={{ marginTop: 10 }}>
                {
-                  isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.name}</Text>)
-
+                  isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.name }</Text>)
                }
             </View>
-
-           
-            <View style={AuthStyle.CardmainContainer}>
-               <Image style={CustomStyling.imageThumb} source={require('../images/userwhite.png')} />
-               <Text style={CustomStyling.textcontainer} >Checkin</Text>
-            </View>
-
-
-
-
-
-
-
+ 
 
          </View>
+
+
+
+
+
+
 
       </OverlayContainer>
 
