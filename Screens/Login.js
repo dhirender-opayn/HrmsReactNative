@@ -13,8 +13,8 @@ import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
 
 const LoginView = ({navigation = useNavigation()}) => {
-    const [emailId, setEmail] = useState("");
-    const [password, setPswrd] = useState("");
+    const [emailId, setEmail] = useState("simran.sharma@opayn.com");
+    const [password, setPswrd] = useState("123456");
     const [message, setMsg] = useState("");
     const [data, setData] = useState({});
     const toast = useToast();
@@ -36,7 +36,7 @@ const LoginView = ({navigation = useNavigation()}) => {
             const object = JSON.stringify(json.data);
            // setEmail(json)
             await AsyncStorage.setItem('userData',object);
-            navigation.navigate('Profile');
+            navigation.navigate('TabView');
             }
             else{
               toast.show(json.message, {duration:4000});
@@ -68,13 +68,13 @@ const LoginView = ({navigation = useNavigation()}) => {
             <View style={AuthStyle.CardmainContainer}> 
                 <Text style={{paddingTop: 0, paddingBottom: 32, alignSelf: "center", fontSize: 32, fontWeight: "bold"}}>Opayn HRMS</Text>
                 <TextInput
-                    style={styles.TextfieldContainer}
+                    style={AuthStyle.inputText}
                     placeholder="Enter Email"
                     onChangeText={Id => setEmail(Id)}
                     defaultValue={emailId}
                 />
                 <TextInput
-                    style={styles.TextfieldContainer}
+                    style={AuthStyle.inputText}
                     placeholder="Enters Password"
                     onChangeText={pswrd => setPswrd(pswrd)}
                     defaultValue={password}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { ActivityIndicator, SafeAreaView, Text, View, StyleSheet, BackgroundView } from "react-native";
-import Colors from "../Common/Colors";
+import Colors, { color } from "../Common/Colors";
 import { Dimensions } from "react-native";
  
  const AppBackgorund = () => {
@@ -18,13 +18,13 @@ import { Dimensions } from "react-native";
  const styles = StyleSheet.create({
 	parent : {
         backgroundColor: "transparent",
-        height : '40%',
+        height : '50%',
         width : '100%',
         transform : [ { scaleX : 1.5 } ],
         borderBottomStartRadius : 1000,
         borderBottomEndRadius : 1000,
         borderWidth: 0,
-        borderColor: "#000",
+        borderColor: color.backgroundBlack,
         overflow : "hidden"
     }
 });
