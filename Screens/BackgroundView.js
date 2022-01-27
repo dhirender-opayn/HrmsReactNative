@@ -15,7 +15,7 @@ import { Dimensions } from "react-native";
  const styles = StyleSheet.create({
     parent : {
         backgroundColor: "transparent",
-        height : '55%',
+        height : '35%',
         width : '100%',
         transform : [ { scaleX : 1.5 } ],
         borderBottomStartRadius : 1000,

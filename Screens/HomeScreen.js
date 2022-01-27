@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, FlatList, Image, SafeAreaView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, SafeAreaView, Text, View, ViewBase } from "react-native";
 import { OtpVerify } from "./OtpVerify";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
@@ -17,6 +17,14 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
    const [data, setData] = useState({});
    const [isLoad, setLoad] = useState(true)
    var detail = "";
+   let dummydata = [{
+      key: "Hello1",
+      key: "Hello2",
+      key: "Hello3",
+      key: "Hello4",
+      key: "Hello5",
+      key: "Hello6",
+   }]
 
    const retrieveData = async () => {
       try {
@@ -50,10 +58,26 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
             </View>
             <View style={{ marginTop: 10 }}>
                {
-                  isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.name }</Text>)
+                  isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.name}</Text>)
                }
             </View>
- 
+
+
+            <FlatList
+               horizontal
+               data={[  
+                  { key: 'Checkin' }, { key: 'Check out' }, { key: 'Scan QR Code' }
+               ]}
+               renderItem={({ item }) =>
+                  <View>
+                     <View style = {AuthStyle.CardmainContainer}>
+                     <Image style={CustomStyling.imageThumb} source={require('../images/userwhite.png')} />
+                     <Text> {item.key}</Text>
+                     </View>
+                  </View>
+               }
+            />
+
 
          </View>
 
