@@ -1,17 +1,31 @@
 module.exports = {
-    EmailValidation : email => {
+     EmailValidation : email => {
       const re = /\S+@\S+\.\S+/;
-      if (!email) return "Email can't be empty."
-      if (!re.test(email)) return 'Ooops! We need a valid email address.'
+      if (!email) return "Please enter email."
+      if (!re.test(email)) return 'Please enter a valid email.'
       return ''
-  },
-  NameValidation:name =>{
-      if(!name) return "Name Can't Be Empty."
+    },
+    MobileValidation : mobile => {
+        const reg = /^[0]?[6789]\d{9}$/;
+        if (!mobile) return "Please enter mobile number."
+        if (!reg.test(mobile)) return 'Please enter a valid mobile number.'
+        return ''
+    },
+    PasswordValidation: password =>{
+      if(!password) return "Please enter password."
+      if(password.length < 5) return "Please enter a valid passworder of atleast 5 charaters."
       return ''
-  },
-  PasswordValidation: password =>{
-      if(!password) return "Password Can't Be Empty."
-      if(password.length < 5) return "Password Should be Grater then 5 Charaters Long."
+    },
+    NameValidation:name =>{
+      if(!name) return "Please enter name."
       return ''
-  }
+    },
+    SubjectValidation:subject =>{
+        if(!subject) return "Please enter subject."
+        return ''
+    },
+    DescriptonValidation:description => {
+        if (!description) return "Please enter description."
+        return ''
+    }
 }

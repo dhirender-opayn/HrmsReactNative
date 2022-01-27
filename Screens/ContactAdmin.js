@@ -2,86 +2,116 @@ import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
-import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
-import { Colors } from "react-native/Libraries/NewAppScreen";
+import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import  Colors  from "../Common/Colors";
 import Validations from "../Common/Validations";
 import UserData, { userData } from "../Common/UserData";
+import { OverlayContainer } from "../Common/OverlayContainer";
+import AppBackgorund from "./BackgroundView";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthStyle } from "../CustomStyle/AuthStyle";
+import { useToast } from "react-native-toast-notifications";
 
 const ContactAdminView = ({navigation = useNavigation()}) => {
+    const [isLoading, setLoading] = useState(false);
+    const [name, setName] = useState("");
     const [emailId, setEmail] = useState("");
-    const [password, setPswrd] = useState("");
+    const [mobile, setMobile] = useState("");
+    const [subject, setSubject] = useState("");
+    const [description, setDescription] = useState("");
     const [message, setMsg] = useState("");
     const [data, setData] = useState({});
+    const toast = useToast();
+
     let formData = new FormData()
     
     
-    const LoginApi = async() => {
+    const ContactAdminAPI = async() => {
+      formData.append('user_id', '');
+      formData.append('name', name)
       formData.append('email', emailId);
-      formData.append('password', password);
-      const request = new Request(Global.projct.ios.BASE_URL+'login', {method: 'POST', headers: {
+      formData.append('mobile', mobile);
+      formData.append('subject', subject);
+      formData.append('description', description);
+      const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.addTicket, {method: 'POST', headers: {
         Accept: 'application/json',
         }, body: formData});
         try{
             const response = await fetch(request)
             const json = await response.json();
             setMsg(json.message);
-            setData(json.data);
-            const object = JSON.stringify(json.data);
-           // setEmail(json)
-            await AsyncStorage.setItem('userData',object);
-            navigation.navigate('User');
+             //setData(json.data);
+
+             toast.show(json.message, {duration: 4000});
+             setName("");
+             setEmail("");
+             setMobile("");
+             setSubject("");
+             setDescription("");
+            //  navigation.goBack();
         } catch (error) {
         console.error(error);
+        toast.show(error, {duration: 3000})
         } finally {
         setLoading(false);
         }
     };
     const onsubmit = () => {
-      if (Validations.EmailValidation(emailId)){
-        console.error(Validations.EmailValidation(emailId));
+      if (Validations.NameValidation(name)){
+        toast.show(Validations.NameValidation(name), {duration: 3000});
       }
-      else if (Validations.PasswordValidation(password)){
-        console.error(Validations.PasswordValidation(password));
+      else if (Validations.EmailValidation(emailId)){
+        toast.show(Validations.EmailValidation(emailId), {duration: 3000});
+      }
+      else if (Validations.MobileValidation(mobile)){
+        toast.show(Validations.MobileValidation(mobile), {duration: 3000});
+      }
+      else if (Validations.SubjectValidation(subject)){
+        toast.show(Validations.SubjectValidation(subject), {duration: 3000});
+      }
+      else if (Validations.DescriptonValidation(description)){
+        toast.show(Validations.DescriptonValidation(description), {duration: 3000});
       }
       else{
-        LoginApi();
+        setLoading(true);
+        ContactAdminAPI();
       }
     }
     return(
+      <OverlayContainer>
+            <AppBackgorund />
       <ScrollView>
-        <View style={{padding: 16, justifyContent: "center"}}>
-            <Text style={{alignSelf:"center", fontWeight:"bold", fontSize: 40, marginTop: 48}}>Contact Admin</Text>
-            <View style={styles.shadowBottonContainerStyle}> 
+        <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
+            <Text style={AuthStyle.textTitile}>Contact Admin</Text>
+            <View style={AuthStyle.CardmainContainer}> 
                 <TextInput
                     style={styles.TextfieldContainer}
                     placeholder="Name"
-                    onChangeText={Id => setEmail(Id)}
-                    defaultValue={emailId}
+                    onChangeText={Id => setName(Id)}
+                    defaultValue={name}
                 />
                 <TextInput
                     style={styles.TextfieldContainer}
                     placeholder="Email"
-                    onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue={password}
-                    
-                />
-                <TextInput
-                    style={styles.TextfieldContainer}
-                    placeholder="Mobile"
-                    onChangeText={Id => setEmail(Id)}
+                    onChangeText={pswrd => setEmail(pswrd)}
                     defaultValue={emailId}
                 />
                 <TextInput
                     style={styles.TextfieldContainer}
+                    keyboardType='phone-pad'
+                    placeholder="Mobile"
+                    onChangeText={mobile => setMobile(mobile)}
+                    defaultValue={mobile}
+                />
+                <TextInput
+                    style={styles.TextfieldContainer}
                     placeholder="Subject"
-                    onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue={password}
-                  
+                    onChangeText={subject => setSubject(subject)}
+                    defaultValue={subject}
                 />
                 <TextInput
                     style={{borderWidth:1, 
-                      borderColor:Global.projct.appColors.lightGray, 
+                      borderColor:Colors.color.lightGray, 
                       borderRadius: 8, 
                       padding: 8,
                       marginBottom: 16,
@@ -89,32 +119,35 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                     multiline={true}
                     numberOfLines={4}
                     placeholder="Description"
-                    onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue={password}
-                   
+                    onChangeText={decription => setDescription(decription)}
+                    defaultValue={description}
                 />
                 
-                <TouchableOpacity onPress={() => {onsubmit()}}>
-                  <View style={{backgroundColor:Global.projct.appColors.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
-                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Login</Text>
+                <TouchableOpacity onPress={() => {
+                  onsubmit()
+                //navigation.navigate('User');
+                }}>
+                  <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
+                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Make Request</Text>
+                    {isLoading ? <ActivityIndicator /> : null}
                   </View>
                 </TouchableOpacity>
                 <View style={{padding:0, flexDirection:"row", alignItems:"center", alignSelf:"center"}}>
-              <Text style={{color:Global.projct.appColors.darkGray, fontSize: 16}}>Already Approved </Text>
-              <TouchableOpacity onPress = {() => {
-                  //navigation.navigate('Home', { name: Id , pswrd: pswrd})
-                  navigation.goBack()
-                }}>
-                <Text style={{fontSize: 16, fontWeight: "bold", color: Global.projct.appColors.red}}>Logiin</Text>
+                  <Text style={{color:Colors.color.darkGray, fontSize: 16}}>Already Approved </Text>
+                  <TouchableOpacity onPress = {() => {
+                     // navigation.navigate('Home', { name: Id , pswrd: pswrd})
+                      navigation.goBack()
+                  }}>
+                    <Text style={{fontSize: 16, fontWeight: "bold", color: Colors.color.red}}>Login</Text>
 
-                </TouchableOpacity >
+                  </TouchableOpacity >
             </View>
-              
                 
             </View>
             
         </View>
         </ScrollView>
+        </OverlayContainer>
     );
 };
 
@@ -122,7 +155,7 @@ const styles = StyleSheet.create({
     TextfieldContainer: {
         height: 50, 
         borderWidth:1, 
-        borderColor:Global.projct.appColors.lightGray, 
+        borderColor:Colors.color.lightGray, 
         borderRadius: 8, 
         padding: 8,
         marginBottom: 16,
@@ -147,7 +180,7 @@ const styles = StyleSheet.create({
   
     shadowContainerStyle: {   //<--- Style with elevation
      
-      shadowColor: Colors.primary,
+      shadowColor: Colors.color.darkGray,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 1,
       shadowRadius: 3,
@@ -156,7 +189,7 @@ const styles = StyleSheet.create({
     shadowBottonContainerStyle: {    //<--- Style without elevation
       borderWidth: 1,
       borderRadius: 16,
-      borderColor: Global.projct.appColors.lightGray,
+      borderColor: Colors.color.lightGray,
       borderBottomWidth: 1,
       //shadowColor: Colors.red,
       shadowOffset: { width: 0, height: 0 },

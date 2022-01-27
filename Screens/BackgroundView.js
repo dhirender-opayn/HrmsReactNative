@@ -10,12 +10,15 @@ import { Dimensions } from "react-native";
             <View style={{position: 'absolute', top: 0, width: "67%", bottom: 0, justifyContent: "flex-end", backgroundColor:"#222", alignSelf: "center"}}></View>
   </View>
 </View>
-    );
+
+    ); 
+
  };
+
  const styles = StyleSheet.create({
-    parent : {
+	parent : {
         backgroundColor: "transparent",
-        height : '55%',
+        height : '40%',
         width : '100%',
         transform : [ { scaleX : 1.5 } ],
         borderBottomStartRadius : 1000,
@@ -25,4 +28,6 @@ import { Dimensions } from "react-native";
         overflow : "hidden"
     }
 });
+
  export default AppBackgorund;
+
