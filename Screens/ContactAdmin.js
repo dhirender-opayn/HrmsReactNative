@@ -40,7 +40,7 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
             const response = await fetch(request)
             const json = await response.json();
             setMsg(json.message);
-             setData(json.data);
+             //setData(json.data);
 
              toast.show(json.message, {duration: 4000});
              setName("");

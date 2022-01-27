@@ -31,11 +31,17 @@ const LoginView = ({navigation = useNavigation()}) => {
             const response = await fetch(request)
             const json = await response.json();
             setMsg(json.message);
+            if (json.hasOwnProperty("data")){
             setData(json.data);
             const object = JSON.stringify(json.data);
            // setEmail(json)
             await AsyncStorage.setItem('userData',object);
             navigation.navigate('Profile');
+            }
+            else{
+              toast.show(json.message, {duration:4000});
+            }
+            
         } catch (error) {
         console.error(error);
         toast.show(error, {duration: 3000})
