@@ -80,15 +80,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
 
 
          </View>
-
-
-
-
-
-
-
       </OverlayContainer>
-
    );
 
 };
