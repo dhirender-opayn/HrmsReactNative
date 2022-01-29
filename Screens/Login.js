@@ -36,6 +36,8 @@ const LoginView = ({navigation = useNavigation()}) => {
             const object = JSON.stringify(json.data);
            // setEmail(json)
             await AsyncStorage.setItem('userData',object);
+            const tokennow = object.token
+            console.log("token =====>>>>>>>> " ,tokennow)
             navigation.navigate('HomeScreen');
             }
             else{
@@ -52,9 +54,11 @@ const LoginView = ({navigation = useNavigation()}) => {
     const onsubmit = () => {
       if (Validations.EmailValidation(emailId)){
         toast.show(Validations.EmailValidation(emailId), {duration: 3000});
+        return
       }
-      else if (Validations.PasswordValidation(password)){
+        if (Validations.PasswordValidation(password)){
         toast.show(Validations.PasswordValidation(password), {duration: 3000});
+        return
       }
       else{
         LoginApi();
@@ -71,15 +75,14 @@ const LoginView = ({navigation = useNavigation()}) => {
                     style={styles.TextfieldContainer}
                     placeholder="Enter Email"
                     onChangeText={Id => setEmail(Id)}
-                    defaultValue ={"dhirender@opayn.com"}
-                    // defaultValue={emailId}
+                     // defaultValue={emailId}
                 />
                 <TextInput
+                   secureTextEntry={true}
                     style={styles.TextfieldContainer}
                     placeholder="Enters Password"
                     onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue="123456"
-                    // defaultValue={password}
+                     // defaultValue={password}
                 />
                 <TouchableOpacity onPress={() => {onsubmit()}}>
                   <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
@@ -119,7 +122,7 @@ const styles = StyleSheet.create({
         borderRadius: 8, 
         padding: 8,
         marginBottom: 16,
-        fontSize: 16
+        fontSize: 14
     },
     sectionContainer: {
       marginTop: 32,

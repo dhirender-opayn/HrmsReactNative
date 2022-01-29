@@ -16,9 +16,9 @@ export const MyStack = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                <Stack.Screen name="Login"component={LoginView}/>
+                <Stack.Screen name="Login"component={LoginView} options={{headerShown:false}}/>
                 <Stack.Screen options={{headerShown:false}}  name="HomeScreen" component={HomeScreen}/>
-                <Stack.Screen name="Forget" component={Forget} options={{title:'Forget'}}/>
+                <Stack.Screen name="Forget" component={Forget} options={{title:'Forget', headerShown:false} }/>
                 <Stack.Screen name="OtpVerify" component={OtpVerify} />
                 <Stack.Screen name="ContactAdmin" component={ContactAdminView}/>               
                 <Stack.Screen name="User" component={UserDetail}/>

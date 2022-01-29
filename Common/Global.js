@@ -39,6 +39,19 @@ module.exports = {
         apiSuffix:{
             login: "login",
             addTicket: "ticket",
+            ATTANDANCE:"attendance",
+ 
+        },
+        apiPrams:{
+            lat:"lat",
+            lng:"lng",
+            time:"timing",
+            type:"type",
+            AuthToken : ""
+           
+        },
+        dateFormates:{
+            YearMonthDateTime : "YYYY-MM-DD HH:mm:ss",
         }
       
     }

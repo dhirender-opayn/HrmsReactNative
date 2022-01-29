@@ -1,5 +1,6 @@
 module.exports = {
     strings:{
+             
              title:'Opayn HRMS',
              home:'Home',
              forgetMsg:'Enter the email associated with your account and we\'ll send an email with 4-digit code to reset your password.',
