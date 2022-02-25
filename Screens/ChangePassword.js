@@ -5,7 +5,6 @@ import Global, { projct } from "../Common/Global";
 import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity } from "react-native";
 import  Colors  from "../Common/Colors";
 import Validations from "../Common/Validations";
-import UserData, { userData } from "../Common/UserData";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";

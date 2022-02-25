@@ -5,7 +5,6 @@ import Global, { projct } from "../Common/Global";
 import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity } from "react-native";
 import  Colors  from "../Common/Colors";
 import Validations from "../Common/Validations";
-import UserData, { userData } from "../Common/UserData";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
@@ -13,9 +12,8 @@ import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
 
 const AddTicketView = ({navigation = useNavigation()}) => {
-    const [currentPassword, setCurrentPswrd] = useState("");
-    const [newPassword, setNewPswrd] = useState("");
-    const [confirmPassword, setConfirmPswrd] = useState('');
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
     const [message, setMsg] = useState("");
     const [data, setData] = useState({});
     const toast = useToast();
@@ -26,10 +24,14 @@ const AddTicketView = ({navigation = useNavigation()}) => {
     var detail =  "";
     const [deail, setDetail] = useState("");
     
-    const ChangePasswordApi = async() => {
-      formData.append('old_password', currentPassword);
-      formData.append('new_password', newPassword);
-      const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.changePassword, {method: 'POST', headers: {
+    const ContactAdminAPI = async() => {
+      formData.append('user_id', userdata.user.id);
+      formData.append('name', userdata.user.name)
+      formData.append('email', userdata.user.email);
+      formData.append('mobile', userdata.user.mobile);
+      formData.append('subject', title);
+      formData.append('description', description);
+      const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.addTicket, {method: 'POST', headers: {
         Accept: 'application/json',
         Authorization: 'Bearer '+token,
         }, body: formData});
@@ -37,18 +39,11 @@ const AddTicketView = ({navigation = useNavigation()}) => {
             const response = await fetch(request)
             const json = await response.json();
             setMsg(json.message);
-            if (json.hasOwnProperty("data")){
-            setData(json.data);
-            const object = JSON.stringify(json.data);
-           // setEmail(json)
-            await AsyncStorage.setItem('userData',object);
-            toast.show(json.message, {duration:4000})
+             //setData(json.data);
+
+            toast.show(json.message, {duration: 4000});
+             
             navigation.goBack();
-            }
-            else{
-              toast.show(json.message, {duration:4000});
-            }
-            
         } catch (error) {
         console.error(error);
         toast.show(error, {duration: 3000})
@@ -57,17 +52,14 @@ const AddTicketView = ({navigation = useNavigation()}) => {
         }
     };
     const onsubmit = () => {
-      if (Validations.PasswordValidation(currentPassword)){
-        toast.show(Validations.PasswordValidation(currentPassword), {duration: 3000});
+      if (Validations.FieldValidation(title)){
+        toast.show(Validations.EmptyFieldStr("title"), {duration: 3000});
       }
-      else if (Validations.PasswordValidation(newPassword)){
-        toast.show(Validations.PasswordValidation(newPassword), {duration: 3000});
-      }
-      else if (confirmPassword != newPassword){
-          toast.show("Please enter confirm password same as new password", {duration: 3000});
+      else if (Validations.FieldValidation(description)){
+        toast.show(Validations.EmptyFieldStr("description"), {duration: 3000});
       }
       else{
-        ChangePasswordApi();
+        ContactAdminAPI();
       }
     }
     
@@ -99,9 +91,8 @@ const AddTicketView = ({navigation = useNavigation()}) => {
                 <TextInput
                     style={AuthStyle.inputText}
                     placeholder="Title"
-                    onChangeText={pswrd => setCurrentPswrd(pswrd)}
-                    defaultValue={currentPassword}
-                    secureTextEntry="true"
+                    onChangeText={title => setTitle(title)}
+                    defaultValue={title}
                 />
                 <TextInput
                     style={{borderWidth:1, 
@@ -113,14 +104,14 @@ const AddTicketView = ({navigation = useNavigation()}) => {
                       multiline={true}
                       numberOfLines={4}
                     placeholder="Enter the message"
-                    onChangeText={pswrd => setNewPswrd(pswrd)}
-                    defaultValue={newPassword}
+                    onChangeText={msg => setDescription(msg)}
+                    defaultValue={description}
                 />
                 
                 
                 <TouchableOpacity onPress={() => {onsubmit()}}>
                   <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
-                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Change Password</Text>
+                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Add Ticket</Text>
                   </View>
                 </TouchableOpacity>
                 

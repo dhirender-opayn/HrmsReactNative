@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { ActivityIndicator, SafeAreaView, Text, View, StyleSheet, BackgroundView } from "react-native";
  import { useNavigation } from "@react-navigation/native";
- import UserData from "../Common/UserData";
  import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState } from "react/cjs/react.development";
 import Colors from "../Common/Colors";

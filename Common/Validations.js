@@ -24,8 +24,19 @@ module.exports = {
         if(!subject) return "Please enter subject."
         return ''
     },
+    TitleValidation:subject =>{
+      if(!subject) return "Please enter title."
+      return ''
+  },
     DescriptonValidation:description => {
         if (!description) return "Please enter description."
         return ''
+    },
+    FieldValidation : inputText => {
+      if (!inputText) return "Please enter "
+      return ''
+    },
+    EmptyFieldStr : fieldName => {
+      return "Please enter "+fieldName
     }
 }

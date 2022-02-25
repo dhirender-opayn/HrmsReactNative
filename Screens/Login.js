@@ -5,7 +5,6 @@ import Global, { projct } from "../Common/Global";
 import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity } from "react-native";
 import  Colors  from "../Common/Colors";
 import Validations from "../Common/Validations";
-import UserData, { userData } from "../Common/UserData";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
@@ -71,15 +70,13 @@ const LoginView = ({navigation = useNavigation()}) => {
                     style={AuthStyle.inputText}
                     placeholder="Enter Email"
                     onChangeText={Id => setEmail(Id)}
-                    defaultValue ={"dhirender@opayn.com"}
-                    // defaultValue={emailId}
+                    defaultValue={emailId}
                 />
                 <TextInput
                     style={AuthStyle.inputText}
                     placeholder="Enters Password"
                     onChangeText={pswrd => setPswrd(pswrd)}
-                    defaultValue="123456"
-                    // defaultValue={password}
+                    defaultValue={password}
                 />
                 <TouchableOpacity onPress={() => {onsubmit()}}>
                   <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>

@@ -12,9 +12,13 @@ import { useState, useEffect } from "react";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import Colors, { color } from "../Common/Colors";
 import { get } from "react-native/Libraries/Utilities/PixelRatio";
+import GeoLocationScreen from "./GeoLocationScreen";
+
+
 const HomeScreen = ({ navigation = useNavigation() }) => {
    const [data, setData] = useState({});
    const [isLoad, setLoad] = useState(true)
+   const [latnow, longnow ] =  useState();
    var detail = "";
    let subPosition = "";
    let topdatalist = [
@@ -71,6 +75,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
                   isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{data.user.roles.map(roledata => { return roledata.name})}</Text>)
                }
             </View>
+            <GeoLocationScreen latnow = {latnow} />
             <FlatList
                // horizontal
                // showsHorizontalScrollIndicator={false}
@@ -181,3 +186,4 @@ const homeStyle = StyleSheet.create({
    },
 });
 export default HomeScreen;
+

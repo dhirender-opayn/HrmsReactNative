@@ -50,5 +50,23 @@ export const CustomStyling = StyleSheet.create({
         color: 'white',
         paddingHorizontal: 8
     },
-    
+    editImageView: {
+        width:80, 
+        height: 80, 
+        borderRadius: 40, 
+        marginTop: -80, 
+        borderWidth: 1, 
+        borderColor: color.red, 
+        alignSelf: "center"
+    },
+    editImageBtn: {
+        width:32, 
+        height: 32, 
+        borderRadius: 16, 
+        marginTop: -40, 
+        borderWidth: 1, 
+        borderColor: color.red, 
+        marginStart: 80,
+        alignSelf: "center"
+    }
 });

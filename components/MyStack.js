@@ -2,6 +2,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import React from "react";
 import { useState, useEffect } from "react";
 import { View } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Forget } from "../Screens/Forget";
@@ -17,6 +18,8 @@ import ChangePasswordView from "../Screens/ChangePassword";
 import AddTicketView from "../Screens/AddTicket";
 import { CalendarScreen } from "../Screens/CalendarScreen";
 import { RequestLeaveScreen } from "../Screens/RequestLeaveScreen";
+import EditProfileView from "../Screens/EditProfile";
+import ImagePickerView from "../Screens/ImagePickerView";
  
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,20 +65,30 @@ export const MyStack = () => {
                     <Stack.Screen name="Forget" component={Forget} options={{title:'Forget'}}/>
                     <Stack.Screen name="OtpVerify" component={OtpVerify} />
                     <Stack.Screen name="ContactAdmin" component={ContactAdminView} options={{headerStyle: {
-                        backgroundColor: "#28282B"//color.backgroundColor
+                        backgroundColor: "#28282B"
                     }, headerTitleStyle:{color:"white"}}}
                     />               
                     <Stack.Screen name="User" component={UserDetail} options={{headerStyle: {
-                        backgroundColor: "#28282B"//color.backgroundColor
+                        backgroundColor: "#28282B"
                     }, headerTitleStyle:{color:"white"}}}/>
                     <Stack.Screen name="ChangePassword" component={ChangePasswordView} options={{headerStyle: {
-                        backgroundColor: "#28282B"//color.backgroundColor
+                        backgroundColor: "#28282B"
                     }, headerTitleStyle:{color:"white"}}}/>
                     <Stack.Screen name="AddTicket" component={AddTicketView} options={{headerStyle: {
-                        backgroundColor: "#28282B"//color.backgroundColor
+                        backgroundColor: "#28282B"
                     }, headerTitleStyle:{color:"white"}}}/>
-                    <Stack.Screen name="CalendarScreen" component={CalendarScreen}/>
-                <Stack.Screen name="RequestLeaveScreen" component = {RequestLeaveScreen}/>
+                    <Stack.Screen name="CalendarScreen" component={CalendarScreen} options={{headerStyle: {
+                        backgroundColor: "#28282B"
+                    }, headerTitleStyle:{color:"white"}}}/>
+                    <Stack.Screen name="RequestLeaveScreen" component = {RequestLeaveScreen} options={{headerStyle: {
+                        backgroundColor: "#28282B"
+                    }, headerTitleStyle:{color:"white"}}}/>
+                    <Stack.Screen name="EditProfile" component = {EditProfileView} options={{headerStyle: {
+                        backgroundColor: "#28282B"
+                    }, headerTitleStyle:{color:"white"}}}/>
+                    <Stack.Screen name="picker" component = {ImagePickerView} options={{headerStyle: {
+                        backgroundColor: "#28282B"
+                    }, headerTitleStyle:{color:"white"}}}/>
                 </Stack.Navigator>
             </NavigationContainer>
         // }
@@ -88,10 +101,10 @@ const AppTabViews = () => {
     return (
         <Tab.Navigator>
             <Tab.Screen name="Home" component={HomeScreen} options={{tabBarActiveTintColor: color.red, headerStyle: {
-                        backgroundColor: "#28282B"//color.backgroundColor
+                        backgroundColor: "#28282B"
                     }, headerTitleStyle:{color:"white"} }}/>
             <Tab.Screen name="Profile" component={ProfileView} options={{tabBarActiveTintColor: color.red, headerStyle: {
-                        backgroundColor: "#28282B"//color.backgroundColor
+                        backgroundColor: "#28282B"
                     }, headerTitleStyle:{color:"white"}}}/>
         </Tab.Navigator>
        

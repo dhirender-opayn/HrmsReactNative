@@ -8,13 +8,37 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
+import Global from "../Common/Global";
+import { useToast } from "react-native-toast-notifications";
 
 const ProfileView = ({navigation=useNavigation()}) => {
     const [userdata, setData] = useState({});
-     const [isLoad, setLoad] = useState(true)
-     const [ListData, setListData] = useState([]);
+    const [isLoad, setLoad] = useState(true)
+    const [ListData, setListData] = useState([]);
+    const [message, setMsg] = useState("");
+    const [isLoading, setLoading] = useState(false);
     var detail =  "";
     const [deail, setDetail] = useState("");
+    const toast = useToast();
+    const LogoutAPI = async() => {
+        
+        const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.LogoutAPI, {method: 'POST', headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer '+userdata.token,
+          }});
+          try{
+              const response = await fetch(request)
+              const json = await response.json();
+              setMsg(json.message);  
+              //toast.show(json.message, {duration: 4000});
+              navigation.navigate("Login");
+          } catch (error) {
+          console.error(error);
+          toast.show(error, {duration: 3000})
+          } finally {
+          setLoading(false);
+          }
+      };
     const retrieveData = async() => {
         try{
             detail =  await AsyncStorage.getItem('userData');
@@ -64,7 +88,7 @@ const ProfileView = ({navigation=useNavigation()}) => {
                                 <Text style={CustomStyling.userDesignationText}>{userdata.user.roles[0].name}</Text>
                             </View>
                             <TouchableOpacity onPress={() => {
-
+                                navigation.navigate('EditProfile');
                             }}
                             style={{height: 32, flex: 1,  marginTop: 16, marginEnd: 8}}>
                                 <Image source={require("../images/editSquare.png")}
@@ -105,12 +129,14 @@ const ProfileView = ({navigation=useNavigation()}) => {
                         
                         <TouchableOpacity 
                             onPress={() => {
-
+                                setLoading(true);
+                                LogoutAPI();
                             }}
                             style={{marginTop: 16, marginHorizontal: 16}}
                         >
                         <View style={{backgroundColor:Colors.color.red, borderRadius: 12, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
                             <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Logout</Text>
+                            {isLoading ? <ActivityIndicator /> : null}
                         </View>
                         </TouchableOpacity>
                     </View>
