@@ -59,6 +59,24 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
       } else if(selectedData.key.match(strings.request_leave)){
          navigation.navigate('RequestLeaveScreen')
       }
+      if (selectedData.key.match(strings.checkin)) {
+         setFullIsLoad(true)
+         InOutClick = "IN";
+         
+      }
+      if(selectedData.key.match(strings.checkout)){
+         setFullIsLoad(true)
+         InOutClick = "OUT";
+         
+      }
+      if(calculateDistance()<=30){
+         
+         AttendenceApi();
+      } else {
+         alert("You Are Distance 6 : ",calculateDistance());
+      }
+   
+
    }
    return (
       <OverlayContainer>
