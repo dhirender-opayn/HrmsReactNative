@@ -109,7 +109,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
          
          AttendenceApi();
       } else {
-         alert("You Are Distance : ",calculateDistance());
+         alert("You Are Distance 6 : ",calculateDistance());
       }
    
 
