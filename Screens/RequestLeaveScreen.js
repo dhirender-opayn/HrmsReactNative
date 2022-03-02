@@ -11,9 +11,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
 import ContactAdminView from "./ContactAdmin";
+import DateTimePicker from '@react-native-community/datetimepicker';
+import moment from 'moment';
  
- 
-
 
 export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const [isLoading, setLoading] = useState(false);
@@ -26,8 +26,35 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const [data, setData] = useState({});
     const toast = useToast();
 
+    const [date, setDate] = useState(new Date());
+    const [mode, setMode] = useState('date');
+    const [show, setShow] = useState(false);
+
+
+   console.log( "date getting now day =====> ",date.getDate.toString)  
+  
+
+
     let formData = new FormData()
 
+
+    const onChange = (event, selectedDate) => {
+        const currentDate = selectedDate || date;
+        setShow(Platform.OS === 'ios');
+        setDate(currentDate);
+    };
+    const showMode = (currentMode) => {
+        setShow(true);
+        setMode(currentMode);
+    };
+
+    const showDatepicker = () => {
+        showMode('date');
+    };
+
+
+
+    console.log(moment(date).format('MM/DD/YYYY HH:mm:ss'))
 
     const ContactAdminAPI = async () => {
         formData.append('user_id', '');
@@ -87,7 +114,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             <AppBackgorund />
             <ScrollView>
                 <View style={{ padding: 16, marginTop: 20, justifyContent: "center" }}>
-                   
+
                     <View style={AuthStyle.CardmainContainer}>
                         <TextInput
                             style={styles.TextfieldContainer}
@@ -95,12 +122,39 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                             onChangeText={Id => setName(Id)}
                             defaultValue={name}
                         />
+
+
+
+
+
                         <TextInput
                             style={styles.TextfieldContainer}
                             placeholder="Leave Type"
                             onChangeText={pswrd => setEmail(pswrd)}
                             defaultValue={emailId}
                         />
+
+
+
+                        <TouchableOpacity onPress={showDatepicker}    >
+                            {/* <Button onPress={showDatepicker} title="Show date picker!" /> */}
+
+                                <Text style={[styles.TextfieldContainer, { paddingTop:13}]}>{moment(date).format('MM/DD/YYYY')}</Text>
+                                {show && (
+                                <DateTimePicker
+                                    testID="dateTimePicker"
+                                    value={date}
+                                    mode={mode}
+                                    is24Hour={true}
+                                    display="default"
+                                    onChange={onChange}
+                                />
+                            )}
+                            
+
+                        </TouchableOpacity>
+                        
+
                         <TextInput
                             style={styles.TextfieldContainer}
                             keyboardType='phone-pad'
@@ -124,7 +178,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                             onChangeText={decription => setDescription(decription)}
                             defaultValue={description}
                         />
-                      
+
+
 
                         <TouchableOpacity onPress={() => {
                             onsubmit()
@@ -135,7 +190,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                 {isLoading ? <ActivityIndicator /> : null}
                             </View>
                         </TouchableOpacity>
-                        
+
 
                     </View>
 
@@ -146,6 +201,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
 };
 
 const styles = StyleSheet.create({
+    
     TextfieldContainer: {
         height: 50,
         borderWidth: 1,

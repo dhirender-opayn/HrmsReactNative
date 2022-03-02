@@ -40,7 +40,20 @@ module.exports = {
             login: "login",
             addTicket: "ticket",
             changePassword: "change-password",
-            logout: "logout"
+            logout: "logout",
+            ATTANDANCE: "attendance",
+ 
+        },
+        apiPrams:{
+            lat:"lat",
+            lng:"lng",
+            time:"timing",
+            type:"type",
+            AuthToken : ""
+           
+        },
+        dateFormates:{
+            YearMonthDateTime : "YYYY-MM-DD HH:mm:ss",
         }
       
     }

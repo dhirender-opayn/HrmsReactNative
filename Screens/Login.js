@@ -51,9 +51,11 @@ const LoginView = ({navigation = useNavigation()}) => {
     const onsubmit = () => {
       if (Validations.EmailValidation(emailId)){
         toast.show(Validations.EmailValidation(emailId), {duration: 3000});
+        return
       }
-      else if (Validations.PasswordValidation(password)){
+        if (Validations.PasswordValidation(password)){
         toast.show(Validations.PasswordValidation(password), {duration: 3000});
+        return
       }
       else{
         LoginApi();
@@ -116,7 +118,7 @@ const styles = StyleSheet.create({
         borderRadius: 8, 
         padding: 8,
         marginBottom: 16,
-        fontSize: 16
+        fontSize: 14
     },
     sectionContainer: {
       marginTop: 32,

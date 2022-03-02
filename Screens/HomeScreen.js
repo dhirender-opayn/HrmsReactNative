@@ -186,4 +186,3 @@ const homeStyle = StyleSheet.create({
    },
 });
 export default HomeScreen;
-
