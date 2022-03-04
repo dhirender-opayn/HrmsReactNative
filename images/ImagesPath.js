@@ -1,17 +1,19 @@
  module.exports = {
-      
-       userwhiteUrl : require('../images/userwhite.png'),
-       checkInImage : require('../images/checkIn.png'),
-       checkOutImage : require('../images/checkout.png'),
-       barCodeScanner : require('../images/qr_code_scan.png'),
-       leaveImage : require('../images/leave.png'),
-       attendanceListImage : require('../images/attendance_list.png'),
-       calendarImage : require('../images/calendar_line.png'),
-       requestLeaveImage : require('../images/request_leave.png'),
-       announcementImage : require('../images/announcement.png'),
-       workHistoryImage : require('../images/work_history.png'),
-       holidayDefaultImg : require('../images/holiday_img.png')
-
-     
-    
+     userwhiteUrl : require('../images/userwhite.png'),
+     checkInImage : require('../images/checkIn.png'),
+     checkOutImage : require('../images/checkout.png'),
+     barCodeScanner : require('../images/qr_code_scan.png'),
+     leaveImage : require('../images/leave.png'),
+     attendanceListImage : require('../images/attendance_list.png'),
+     calendarImage : require('../images/calendar_line.png'),
+     requestLeaveImage : require('../images/request_leave.png'),
+     announcementImage : require('../images/announcement.png'),
+     workHistoryImage : require('../images/work_history.png'),
+     holidayDefaultImg : require('../images/holiday_img.png'),
+     downArrowImg: require('../images/downArrow.png'),
+     upArrowImg: require('../images/upArrow.png'),
+     holidayImg: require('../images/holiday.png'),
+     emergencyImg: require('../images/emergency.png'),
+     teamImg: require('../images/team.png'),
+     addUserImg: require('../images/addUser.png'),
  }

@@ -13,6 +13,8 @@ module.exports = {
              enter_code:"Enter Your Code",
              checkin : "Checkin",
              checkout : "Check out",
+             addUser: "Add User",
+             AddAnouncement: "Add Announcement",
              qr_code_scanner : "Scan QR Code",
              leave : "Leave",
              attendance_list : "Attendance List",
@@ -20,7 +22,9 @@ module.exports = {
              request_leave : "Request Leave",
              announcement : "Announcement",
              work_history : "Work History",
-             
+             employees: "Employees",
+             emergencyLeave: "Emaergency Leaves",
+             addHoliday: "Add Holiday",
 
                         
 

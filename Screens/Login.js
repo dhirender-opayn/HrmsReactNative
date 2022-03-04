@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
@@ -10,6 +10,7 @@ import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
+import { AuthContext, LoaderContext } from "../utils/context";
 
 const LoginView = ({navigation = useNavigation()}) => {
     const [emailId, setEmail] = useState("simran.sharma@opayn.com");
@@ -17,8 +18,8 @@ const LoginView = ({navigation = useNavigation()}) => {
     const [message, setMsg] = useState("");
     const [data, setData] = useState({});
     const toast = useToast();
+    const { signIn } = useContext(AuthContext);
     let formData = new FormData()
-    
     
     const LoginApi = async() => {
       formData.append('email', emailId);
@@ -32,10 +33,12 @@ const LoginView = ({navigation = useNavigation()}) => {
             setMsg(json.message);
             if (json.hasOwnProperty("data")){
             setData(json.data);
+            console.log(json.data)
+            signIn(json);
             const object = JSON.stringify(json.data);
            // setEmail(json)
             await AsyncStorage.setItem('userData',object);
-            navigation.navigate('TabView');
+            // navigation.navigate('TabView');
             }
             else{
               toast.show(json.message, {duration:4000});

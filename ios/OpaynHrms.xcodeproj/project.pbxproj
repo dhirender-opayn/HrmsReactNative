@@ -14,6 +14,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		DA2DF78E32630257D010EA98 /* libPods-OpaynHrms-OpaynHrmsTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4351ACF347CEF8FD21966AD4 /* libPods-OpaynHrms-OpaynHrmsTests.a */; };
 		F25E319761B90CBE8C9714FF /* libPods-OpaynHrms.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7779321DF1C84132BED88EED /* libPods-OpaynHrms.a */; };
+		F76FF2BF27D07EB900FD29ED /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F76FF2BE27D07EB900FD29ED /* CloudKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +45,8 @@
 		E60B19A9722B2D4E333F2F4C /* Pods-OpaynHrms.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpaynHrms.release.xcconfig"; path = "Target Support Files/Pods-OpaynHrms/Pods-OpaynHrms.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F1543D4C0C2F723F57734AE3 /* Pods-OpaynHrms-OpaynHrmsTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OpaynHrms-OpaynHrmsTests.release.xcconfig"; path = "Target Support Files/Pods-OpaynHrms-OpaynHrmsTests/Pods-OpaynHrms-OpaynHrmsTests.release.xcconfig"; sourceTree = "<group>"; };
+		F76FF2BD27D07E8E00FD29ED /* OpaynHrms.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = OpaynHrms.entitlements; path = OpaynHrms/OpaynHrms.entitlements; sourceTree = "<group>"; };
+		F76FF2BE27D07EB900FD29ED /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +63,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F25E319761B90CBE8C9714FF /* libPods-OpaynHrms.a in Frameworks */,
+				F76FF2BF27D07EB900FD29ED /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +90,7 @@
 		13B07FAE1A68108700A75B9A /* OpaynHrms */ = {
 			isa = PBXGroup;
 			children = (
+				F76FF2BD27D07E8E00FD29ED /* OpaynHrms.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -99,6 +104,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F76FF2BE27D07EB900FD29ED /* CloudKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				7779321DF1C84132BED88EED /* libPods-OpaynHrms.a */,
 				4351ACF347CEF8FD21966AD4 /* libPods-OpaynHrms-OpaynHrmsTests.a */,
@@ -483,7 +489,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = OpaynHrms/OpaynHrms.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3BNKP72G3V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = OpaynHrms/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -496,7 +504,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.OpaynHrms;
 				PRODUCT_NAME = OpaynHrms;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -510,7 +518,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = OpaynHrms/OpaynHrms.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3BNKP72G3V;
 				INFOPLIST_FILE = OpaynHrms/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -522,7 +532,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.OpaynHrms;
 				PRODUCT_NAME = OpaynHrms;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

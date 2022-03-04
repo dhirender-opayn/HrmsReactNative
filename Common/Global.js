@@ -1,6 +1,7 @@
 module.exports = {
   
     projct:{
+        BASE_URL: 'http://3.22.185.42/hrms-api/public/api/',
         ios:{
             BASE_URL: 'http://3.22.185.42/hrms-api/public/api/',
             COLOR_TEXT: 'white',
@@ -54,8 +55,13 @@ module.exports = {
         },
         dateFormates:{
             YearMonthDateTime : "YYYY-MM-DD HH:mm:ss",
+        },
+        leaveDateTypes:{
+            StartDate: "Start Date",
+            EndDate: "End Date",
+            StartTime: "Start Time",
+            EndTime: "End Time"
         }
-      
     }
    
     

@@ -3,8 +3,10 @@ import Colors,{color}from "../Common/Colors";
 
 export const CustomStyling = StyleSheet.create({
     imageThumb:{
+        marginTop: 20,
         height:80,
         width:80,
+        borderRadius: 40,
         alignSelf:'center',
     },
     title:{

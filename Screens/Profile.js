@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useState, useEffect } from "react";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import { View, Image, Text, ActivityIndicator, TouchableOpacity, FlatList, ScrollView } from "react-native";
@@ -10,16 +10,19 @@ import  Colors  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
 import Global from "../Common/Global";
 import { useToast } from "react-native-toast-notifications";
+import { AuthContext, UserContext } from "../utils/context";
 
 const ProfileView = ({navigation=useNavigation()}) => {
-    const [userdata, setData] = useState({});
-    const [isLoad, setLoad] = useState(true)
+    const [userdata, setData] = useContext(UserContext);
+    const [isLoad, setLoad] = useState(false)
     const [ListData, setListData] = useState([]);
     const [message, setMsg] = useState("");
     const [isLoading, setLoading] = useState(false);
     var detail =  "";
     const [deail, setDetail] = useState("");
     const toast = useToast();
+    const { signOut } = useContext(AuthContext);
+
     const LogoutAPI = async() => {
         
         const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.LogoutAPI, {method: 'POST', headers: {
@@ -30,8 +33,9 @@ const ProfileView = ({navigation=useNavigation()}) => {
               const response = await fetch(request)
               const json = await response.json();
               setMsg(json.message);  
+              signOut();
               //toast.show(json.message, {duration: 4000});
-              navigation.navigate("Login");
+             // navigation.navigate("Login");
           } catch (error) {
           console.error(error);
           toast.show(error, {duration: 3000})
@@ -39,26 +43,16 @@ const ProfileView = ({navigation=useNavigation()}) => {
           setLoading(false);
           }
       };
-    const retrieveData = async() => {
-        try{
-            detail =  await AsyncStorage.getItem('userData');
-            console.log(detail);
-            setDetail(detail)
-            setData(JSON.parse(detail));
+    const setViewData = async() => {
+        
             const listing = [{id:  0, title: "Change Password", view: "ChangePassword"}, 
                         {id:  0, title: "Notification", view: ""}, 
                         {id:  2, title: "Add Ticket", view: "AddTicket"}];
             setListData(listing);
-        }
-        catch (error){
-            console.error(error);
-        }
-        finally{
-            setLoad(false);
-        }
+       
     };
     useEffect(() =>{ 
-        retrieveData();
+        setViewData();
     }, []);
     return(
         <OverlayContainer>
@@ -97,16 +91,19 @@ const ProfileView = ({navigation=useNavigation()}) => {
                             </TouchableOpacity>
                         </View>
                         <TouchableOpacity onPress={() => {
-
+                            if (userdata.user.id == 1){
+                                setLoading(true);
+                                LogoutAPI();
+                            }
                         }}
-                        style={{height: 72, width: 80, alignSelf: "center",  marginTop: 20, marginEnd: 8}}>
+                        style={{height: 72, width: 80, alignSelf: "center",  marginTop: 20, marginBottom: 8}}>
                             <View style={{backgroundColor: Colors.color.red, borderRadius: 16, height: 72, width: 80, alignItems: "center", justifyContent: "center"}}>
                             <Image source={require("../images/EmergencyOff.png")}
                                 style={{height:32, width:32, tintColor: "white"}}
                             />
                             </View>
                         </TouchableOpacity>
-                        <Text style={[CustomStyling.title, {marginBottom: 16}]}>Emergency Leave</Text>
+                        <Text style={[CustomStyling.title, {marginBottom: 16}]}>{(userdata.user.id == 1) ? "Logout" : "Emergency Leave"}</Text>
                     </View>
                     <View style={{flex: 1, justifyContent: "flex-end", marginVertical: 16}}>
                         <FlatList 
@@ -127,7 +124,7 @@ const ProfileView = ({navigation=useNavigation()}) => {
                             style={{marginTop: 24}}
                         />
                         
-                        <TouchableOpacity 
+                        {(userdata.user.id != 1) ? <TouchableOpacity 
                             onPress={() => {
                                 setLoading(true);
                                 LogoutAPI();
@@ -138,7 +135,7 @@ const ProfileView = ({navigation=useNavigation()}) => {
                             <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Logout</Text>
                             {isLoading ? <ActivityIndicator /> : null}
                         </View>
-                        </TouchableOpacity>
+                        </TouchableOpacity> : null}
                     </View>
                 </View>
                 )}

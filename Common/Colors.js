@@ -11,6 +11,8 @@ module.exports = {
         green: "#00CB00",
         titleBlack: "#151526",
         subtitleBlack: "#222537",
-        backgroundBlack: "#28282B"
+        backgroundBlack: "#28282B",
+        purple: '#5857F3',
+        yellow: "#F0A003",
     }
 }
