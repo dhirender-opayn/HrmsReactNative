@@ -1,17 +1,21 @@
-import React from "react";
+import React, {useContext} from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import Colors, { color } from "../Common/Colors";
+import fonts from "../Common/fonts";
+import { LoaderContext } from "../utils/context";
 
 
 const ImagesPath = require("../images/ImagesPath");
 
 export const CalendarScreen = () => {
+    const { showLoader, hideLoader } = useContext(LoaderContext);
 
-    let DummyHolidayList = [{ holidayImg: ImagesPath.holidayDefaultImg, title: "Diwali", date: "20 May 2020 - 25 May 2020" },
-    { holidayImg: ImagesPath.holidayDefaultImg, title: "Diwali", date: "20 May 2020 - 25 May 2020" },
-    { holidayImg: ImagesPath.holidayDefaultImg, title: "Diwali", date: "20 May 2020 - 25 May 2020" },
-    { holidayImg: ImagesPath.holidayDefaultImg, title: "Diwali", date: "20 May 2020 - 25 May 2020" },
-    { holidayImg: ImagesPath.holidayDefaultImg, title: "Diwali", date: "20 May 2020 - 25 May 2020" }];
+
+    let DummyHolidayList = [{ holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." },
+    { holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." },
+    { holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." },
+    { holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." },
+    { holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." }];
     return (
         <FlatList
 
@@ -21,9 +25,10 @@ export const CalendarScreen = () => {
                 <View style={{ justifyContent: 'center', margin: 10 }}>
                     <View style={homeStyle.calendarContainer}>
                         <Image style={homeStyle.calendarCardImg} source={item.holidayImg} />
-                        <View style={{ flex: 1, flexDirection: 'column' }}>
-                            <Text style={homeStyle.calendarCardText}> {item.title}</Text>
-                            <Text style={homeStyle.calendarCardText}> {item.date}</Text>
+                        <View style={{ flex: 1, flexDirection: 'column', marginTop: 8 }}>
+                            <Text style={homeStyle.calendarCardText}>{item.title}</Text>
+                            <Text style={homeStyle.calendarCardSubText}>Date: {item.date}</Text>
+                            <Text style={[homeStyle.calendarCardSubText, {color: color.darkGray, fontFamily: fonts.medium}]}>{item.description}</Text>
                         </View>
 
                     </View>
@@ -48,21 +53,31 @@ const homeStyle = StyleSheet.create({
         elevation: 3,
     },
     calendarCardImg: {
-        height: 45,
-        width: 45,
+        height: 65,
+        width: 65,
         alignSelf: 'center',
-
+        resizeMode: "contain"
     },
     calendarCardText: {
         width: "100%",
         height: 25,
         fontSize: 16,
         textAlign: 'center',
-        color: 'black',
+        color:color.titleBlack,
         alignSelf: 'center',
-        fontWeight: '600',
+        fontFamily: fonts.semiBold,
+        marginTop: 4
 
-
+    },
+    calendarCardSubText: {
+        width: "100%",
+        height: 25,
+        fontSize: 14,
+        color:color.titleBlack,
+        alignSelf: 'center',
+        fontFamily: fonts.semiBold,
+        marginTop: 4,
+        marginLeft: 16,
     },
 });
 

@@ -8,7 +8,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Forget } from "../Screens/Forget";
 import { OtpVerify } from "../Screens/OtpVerify";
 import LoginView from '../Screens/Login';
-import UserDetail from '../Screens/UserDetail';
 import ContactAdminView from '../Screens/ContactAdmin';
 import HomeScreen from "../Screens/HomeScreen";
 import ProfileView from "../Screens/Profile";
@@ -28,6 +27,20 @@ import LeavesRequestListing from "../Screens/LeavesRequestListing";
 import LeaveDetail from "../Screens/LeaveDetail";
 import EmployeeList from "../Screens/EmployeeList";
 import EmployeeDetail from "../Screens/EmployeeDetail";
+import AttendanceList from "../Screens/AttendanceList";
+import PopUpModal from "../helper/PopUpModal";
+import AddEmployee from "../Screens/AddEmployee";
+import WorkHistory from "../Screens/WorkHistory";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
+import AddAnnouncementView from "../Screens/AddAnnouncement";
+import { AddHoliday } from "../Screens/AddHoliday";
+import EmergencyLeave from "../Screens/EmergencyLeave";
+import NotificationView from "../Screens/Notifications";
+import AnnouncementList from "../Screens/AnnouncementsList";
+import Validations from "../Common/Validations";
+import NavigationOptions from "../Common/NavigationOptions";
+import ImagesPath from "../images/ImagesPath";
+import fonts from "../Common/fonts";
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -158,12 +171,12 @@ export const MyStack = () => {
     //     locations={[0, 0.5, 1]}
     //     colors={['#2C1151', '#36103E', '#592635']}
     //     style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-    <View style={{backgroundColor:'#000', flex: 1, alignContent: "center"}}>
+    <View style={{backgroundColor:color.backgroundBlack, flex: 1, alignContent: "center"}}>
         <Text
           style={{
             color: '#fff',
-            fontSize: 25,
-            fontWeight: '700',
+            fontSize: 32,
+            fontFamily: fonts.bold,
             textAlign: "center"
           }}>{`Opayn HRMS`}</Text>
       </View>
@@ -187,19 +200,24 @@ export const MyStack = () => {
 
 
 const AppTabViews = () => {
+  const [tabRoute, setTabRoute] = useState('Home');
 
     return (
         <Tab.Navigator>
-            <Tab.Screen name="Home" component={HomeScreen} options={{tabBarActiveTintColor: color.red, headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, tabBarIcon: ({color}) => (
-                      <Image source={require("../images/homeBar.png")} style={{width: 32, height: 32, resizeMode: "contain"}}/>
-                  ), headerTitleStyle:{color:"white"} }}/>
-            <Tab.Screen name="Profile" component={ProfileView} options={{tabBarActiveTintColor: color.red, headerStyle: {
-                        backgroundColor: "#28282B", 
-                    }, tabBarIcon: ({color}) => (
-                      <Image source={require("../images/profileBar.png")} style={{width: 32, height: 32, resizeMode: "contain", tintColor: Colors.color.darkGray}}/>
-                  ), headerTitleStyle:{color:"white"}}}/>
+            <Tab.Screen name="Home" component={HomeScreen} options={{tabBarActiveTintColor: color.black, title: 'Home', headerStyle: CustomStyling.NavBarHeaderStyle,
+                tabBarIcon: ({focused}) => (
+                      <Image source={require("../images/homeBar.png")} style={{width: 28, height: 28, resizeMode: "contain",
+                            tintColor: ((focused) ? color.backgroundBlack : color.darkGray)}}/>
+                  ), headerTitleStyle:{color:"white", fontFamily: fonts.semiBold,
+                  fontSize: 20} }}
+            />
+            <Tab.Screen name="Profile" component={ProfileView} options={{tabBarActiveTintColor: color.black, title: 'Profile', headerStyle: CustomStyling.NavBarHeaderStyle,
+                tabBarIcon: ({focused}) => (
+                      <Image source={require("../images/profileBar.png")} style={{width: 28, height: 28, resizeMode: "contain", 
+                      tintColor: (focused) ? color.backgroundBlack : color.darkGray}}/>
+                  ), headerTitleStyle:{color:"white", fontFamily: fonts.semiBold,
+                  fontSize: 20,}}}
+            />
         </Tab.Navigator>
        
     );
@@ -209,12 +227,9 @@ const AuthStackNavigator = () => {
     return(
         <AuthStack.Navigator>
             <AuthStack.Screen name="Login" component={LoginView} options={{headerShown:false}}/>
-            <AuthStack.Screen name="Forget" component={Forget} options={{title:'Forget'}}/>
-            <AuthStack.Screen name="OtpVerify" component={OtpVerify} />
-            <AuthStack.Screen name="ContactAdmin" component={ContactAdminView} options={{headerStyle: {
-                backgroundColor: "#28282B"
-                }, headerTitleStyle:{color:"white"}}}
-            />  
+            <AuthStack.Screen name="Forget" component={Forget} options={NavigationOptions.NavHeaderStyle('')}/>
+            <AuthStack.Screen name="OtpVerify" component={OtpVerify} options={NavigationOptions.NavHeaderStyle('')}/>
+            <AuthStack.Screen name="ContactAdmin" component={ContactAdminView} options={NavigationOptions.NavHeaderStyle('')}/>  
         </AuthStack.Navigator>
     )
 };
@@ -224,39 +239,25 @@ const AppStackNavigator = () => {
         <AppStack.Navigator>
             <AppStack.Screen options={{headerShown:false}}  name="TabView" component={AppTabViews}/>
 
-            <AppStack.Screen name="User" component={UserDetail} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="ChangePassword" component={ChangePasswordView} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="AddTicket" component={AddTicketView} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="CalendarScreen" component={CalendarScreen} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="RequestLeaveScreen" component = {RequestLeaveScreen} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="EditProfile" component = {EditProfileView} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="picker" component = {ImagePickerView} options={{headerStyle: {
-                        backgroundColor: "#28282B"
-                    }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="leaveList" component={LeavesRequestListing} options={{headerStyle: {
-                        backgroundColor: "#282828"
-                      }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="leaveDetail" component={LeaveDetail} options={{headerStyle: {
-                        backgroundColor: "#282828"
-                      }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="employeeList" component={EmployeeList} options={{headerStyle: {
-                        backgroundColor: "#282828"
-                      }, headerTitleStyle:{color:"white"}}}/>
-                    <AppStack.Screen name="employeeDetail" component={EmployeeDetail} options={{headerStyle: {
-                        backgroundColor: "#282828"
-                      }, headerTitleStyle:{color:"white"}}}/>
+                    <AppStack.Screen name="ChangePassword" component={ChangePasswordView} options={NavigationOptions.NavHeaderStyle('')}/>
+                    <AppStack.Screen name="AddTicket" component={AddTicketView} options={NavigationOptions.NavHeaderStyle('')}/>
+                    <AppStack.Screen name="CalendarScreen" component={CalendarScreen} options={NavigationOptions.NavHeaderStyle('Holiday Listing')}/>
+                    <AppStack.Screen name="RequestLeaveScreen" component = {RequestLeaveScreen} options={NavigationOptions.NavHeaderStyle('Request Leave')}/>
+                    <AppStack.Screen name="EditProfile" component = {EditProfileView} options={NavigationOptions.NavHeaderStyle('Edit Profile')}/>
+                    <AppStack.Screen name="picker" component = {ImagePickerView} options={NavigationOptions.NavHeaderStyle('')}/>
+                    <AppStack.Screen name="leaveList" component={LeavesRequestListing} options={NavigationOptions.NavHeaderStyle('Leave Requests')}/>
+                    <AppStack.Screen name="leaveDetail" component={LeaveDetail} options={NavigationOptions.NavHeaderStyle('Leave Detail')}/>
+                    <AppStack.Screen name="employeeList" component={EmployeeList} options={NavigationOptions.NavHeaderStyle('Employees')}/>
+                    <AppStack.Screen name="employeeDetail" component={EmployeeDetail} options={NavigationOptions.NavHeaderStyle('Employee')}/>
+                      <AppStack.Screen name="Attendance List" component={AttendanceList} options={NavigationOptions.NavHeaderStyle('Attendance List')}/>
+                      <AppStack.Screen name="PopUpModal" component={PopUpModal} options={NavigationOptions.NavHeaderStyle('')}/>
+                       <AppStack.Screen name="addEmployee" component={AddEmployee} options={NavigationOptions.NavHeaderStyle('')}/>
+                      <AppStack.Screen name="workHistory" component={WorkHistory} options={NavigationOptions.NavHeaderStyle('Work History')}/>
+                       <AppStack.Screen name="addAnnouncementView" component={AddAnnouncementView} options={NavigationOptions.NavHeaderStyle('')}/>
+                       <AppStack.Screen name="addHoliday" component={AddHoliday} options={NavigationOptions.NavHeaderStyle('Add Holiday')}/>
+                       <AppStack.Screen name="emergencyLeave" component={EmergencyLeave} options={NavigationOptions.NavHeaderStyle('Emergency Leave')}/>
+                       <AppStack.Screen name="Notifications" component={NotificationView} options={NavigationOptions.NavHeaderStyle('Notification')}/>
+                       <AppStack.Screen name="Announcements" component={AnnouncementList} options={NavigationOptions.NavHeaderStyle('Announcements')}/>
         </AppStack.Navigator>
     )
 };

@@ -18,5 +18,10 @@
         if(!otp) return "Otp Can't Be Empty"
         if(otp.length != 4) return "Otp should be 4 digits"
         return ''
+    },
+    NavHeaderStyle: title =>{
+        return {headerStyle: {backgroundColor: color.backgroundBlack,
+            shadowOpacity: 0}, headerShadowVisible: false, headerBackTitleVisible: false, 
+          headerTitleStyle:{color:"white"}, title: title}
     }
 }

@@ -5,9 +5,9 @@ import { Dimensions } from "react-native";
  
  const AppBackgorund = () => {
     return(
-    <View style={{ flex: 1 }} >
+    <View  style={{ flex: 1}}>
         <View style={styles.parent}>
-            <View style={{position: 'absolute', top: 0, width: "67%", bottom: 0, justifyContent: "flex-end", backgroundColor:"#222", alignSelf: "center"}}></View>
+            <View style={{position: 'absolute', top: 0, width: "67%", bottom: 0, justifyContent: "flex-end", backgroundColor:color.backgroundBlack, alignSelf: "center"}}></View>
   </View>
 </View>
 

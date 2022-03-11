@@ -1,127 +1,97 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import FormData from "form-data";
-import Global, { projct } from "../Common/Global";
-import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity } from "react-native";
-import  Colors  from "../Common/Colors";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import  Colors, { color }  from "../Common/Colors";
 import Validations from "../Common/Validations";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
+import { LoaderContext, UserContext } from "../utils/context";
+import { apiCall } from "../utils/httpClient";
+import apiEndPoints from "../utils/apiEndPoints";
+import FloatTextField from "../helper/FloatTextField";
+import { MainButton } from "../components/mainButton";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
 
 const ChangePasswordView = ({navigation = useNavigation()}) => {
-    const [currentPassword, setCurrentPswrd] = useState("");
-    const [newPassword, setNewPswrd] = useState("");
-    const [confirmPassword, setConfirmPswrd] = useState('');
-    const [message, setMsg] = useState("");
-    const [data, setData] = useState({});
     const toast = useToast();
-    let formData = new FormData()
-    const [userdata, setUserData] = useState({});
-     const [isLoad, setLoad] = useState(true);
-     const [token, setToken] = useState('');
-    var detail =  "";
-    const [deail, setDetail] = useState("");
-    
+    const [formData, setFormData] = useState({});
+    const { showLoader, hideLoader } = useContext(LoaderContext);
+
+      
     const ChangePasswordApi = async() => {
-      formData.append('old_password', currentPassword);
-      formData.append('new_password', newPassword);
-      const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.changePassword, {method: 'POST', headers: {
-        Accept: 'application/json',
-        Authorization: 'Bearer '+token,
-        }, body: formData});
-        try{
-            const response = await fetch(request)
-            const json = await response.json();
-            setMsg(json.message);
-            if (json.hasOwnProperty("data")){
-            setData(json.data);
-            const object = JSON.stringify(json.data);
-           // setEmail(json)
-            await AsyncStorage.setItem('userData',object);
-            toast.show(json.message, {duration:4000})
-            navigation.goBack();
-            }
-            else{
-              toast.show(json.message, {duration:4000});
-            }
-            
-        } catch (error) {
-        console.error(error);
-        toast.show(error, {duration: 3000})
-        } finally {
-        setLoading(false);
-        }
-    };
+      let param = {
+        old_password: formData.CurrentPswrd,
+        new_password: formData.NewPswrd,
+      }
+      try {
+              const {data} = await apiCall("POST", apiEndPoints.ChangePassword, param);
+              console.log("Data: "+data);
+              toast.show(data.message, {duration: 4000});
+              navigation.goBack();
+          } catch (error) {
+              console.error("ERR: "+error);
+              toast.show(error, { duration: 3000 })
+          } finally {
+              hideLoader()
+          }
+  };
+
     const onsubmit = () => {
-      if (Validations.PasswordValidation(currentPassword)){
-        toast.show(Validations.PasswordValidation(currentPassword), {duration: 3000});
+      if (Validations.PasswordValidation((formData.CurrentPswrd == undefined) ? "" : formData.CurrentPswrd)){
+        toast.show("Please enter valid current password", {duration: 3000});
       }
-      else if (Validations.PasswordValidation(newPassword)){
-        toast.show(Validations.PasswordValidation(newPassword), {duration: 3000});
+      else if (Validations.PasswordValidation((formData.NewPswrd == undefined) ? "" : formData.NewPswrd)){
+        toast.show("Please enter valid new password", {duration: 3000});
       }
-      else if (confirmPassword != newPassword){
+      else if (formData.ConfirmPswrd == undefined || formData.ConfirmPswrd != formData.NewPswrd){
           toast.show("Please enter confirm password same as new password", {duration: 3000});
       }
       else{
+        showLoader();
         ChangePasswordApi();
       }
-    }
-    
-    const retrieveData = async() => {
-        try{
-            detail =  await AsyncStorage.getItem('userData');
-            console.log(detail);
-            setDetail(detail)
-            let data = JSON.parse(detail);
-            setUserData(data);
-            setToken(data.token)
-        }
-        catch (error){
-            console.error(error);
-        }
-        finally{
-            setLoad(false);
-        }
     };
-    useEffect(() =>{ 
-        retrieveData();
-    }, []);
+
+    const onTextChange = (key, value) => {
+      var data = {...formData};
+      data[key] = value;
+      setFormData(data);
+    };
+    
     return(
       <OverlayContainer>
             <AppBackgorund />
         <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
-            <Text style={AuthStyle.textTitile}>Change Password</Text>
-            <View style={AuthStyle.CardmainContainer}> 
-                <TextInput
-                    style={AuthStyle.inputText}
-                    placeholder="Current Password"
-                    onChangeText={pswrd => setCurrentPswrd(pswrd)}
-                    defaultValue={currentPassword}
-                    secureTextEntry="true"
+            <Text style={AuthStyle.viewTitile}>Change Password</Text>
+            <View style={[AuthStyle.CardmainContainer]}> 
+               
+                <FloatTextField 
+                    placeholder="Enter Current Password"
+                    // defaultValue={password}
+                    pickerLabel="Current Password"
+                    onTextChange={(val) => onTextChange('CurrentPswrd', val)}
+                    isPasswordField={true}
                 />
-                <TextInput
-                    style={AuthStyle.inputText}
-                    placeholder="New Password"
-                    onChangeText={pswrd => setNewPswrd(pswrd)}
-                    defaultValue={newPassword}
-                    secureTextEntry="true"
+                <FloatTextField 
+                    placeholder="Enter New Password"
+                    // defaultValue={password}
+                    pickerLabel="New Password"
+                    onTextChange={(val) => onTextChange('NewPswrd', val)}
+                    isPasswordField={true}
                 />
-                <TextInput
-                    style={AuthStyle.inputText}
-                    placeholder="Confirm New Password"
-                    onChangeText={pswrd => setConfirmPswrd(pswrd)}
-                    defaultValue={confirmPassword}
-                    secureTextEntry="true"
+                <FloatTextField 
+                    placeholder="Re-Enter New Password"
+                    // defaultValue={}
+                    pickerLabel="Confirm New Password"
+                    onTextChange={(val) => onTextChange('ConfirmPswrd', val)}
+                    isPasswordField={true}
                 />
-                
-                <TouchableOpacity onPress={() => {onsubmit()}}>
-                  <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
-                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Change Password</Text>
-                  </View>
-                </TouchableOpacity>
+                <MainButton
+                  text={'Change Password'}
+                  onPress={() => {onsubmit()}}
+                />
                 
             </View>
         </View>

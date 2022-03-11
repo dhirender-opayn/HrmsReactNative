@@ -17,54 +17,42 @@ import moment from 'moment';
 import DocumentPicker from 'react-native-document-picker';
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
-import { UserContext } from "../utils/context";
+import { LoaderContext, UserContext } from "../utils/context";
+import FloatTextField from "../helper/FloatTextField";
+import ClickabletextField from "../helper/ClickableTextField";
+import ImagesPath from "../images/ImagesPath";
+import { MainButton } from "../components/mainButton";
+import fonts from "../Common/fonts";
 
 export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const [userData, setUserData] = useContext(UserContext);
-    const [isLoading, setLoading] = useState(false);
     const [title, setTitle] = useState("");
     const [leaveType, setLeaveType] = useState("");
     const [leaveTypeId, setLeaveTypeId] = useState("1");
-    const [startDate, setStartDate] = useState('Start Date sel');
-    const [endDate, setEndDate] = useState('End Date');
-    const [startTime, setStartTime] = useState('Start Time');
-    const [endTime, setEndTime] = useState('End Time');
-    const [isFirstHalf, setiSFirstHalf] = useState('');
-    const [subject, setSubject] = useState("");
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
     const [description, setDescription] = useState("");
-    const [fileName, setFileName] = useState("Upload File");
+    const [fileName, setFileName] = useState("");
     const toast = useToast();
     const [forDateType, setForDateType] = useState(projct.leaveDateTypes.StartDate);
-    const [fileData, setFileData] = useState();
-    const fileParam = useState('file');
-    const [fileMimetype, setFileMimetype] = useState('');
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
+    const { showLoader, hideLoader } = useContext(LoaderContext);
+
     const leaveTypes = [
-        {value: "Short Leave", id: 4},
-        {value: "Half Day", id: 3}, 
-        {value: "Single Day", id: 1}, 
-        {value: "Multiple Day", id: 2}
+        {name: "Short Leave", id: 4},
+        {name: "Half Day", id: 3}, 
+        {name: "Single Day", id: 1}, 
+        {name: "Multiple Day", id: 2}
     ];
     const [DocsData, setDocData] = useState({});
     var fromDate = "";
     var toDate = ""
-    let formData = new FormData();
-   //console.log( "date getting now day =====> ",date.getDate.toString)  
-   function stringToDate(_date,_format,_delimiter)
-   {
-               var formatLowerCase=_format.toLowerCase();
-               var formatItems=formatLowerCase.split(_delimiter);
-               var dateItems=_date.split(_delimiter);
-               var monthIndex=formatItems.indexOf("mm");
-               var dayIndex=formatItems.indexOf("dd");
-               var yearIndex=formatItems.indexOf("yyyy");
-               var month=parseInt(dateItems[monthIndex]);
-               month-=1;
-               var formatedDate = new Date(dateItems[yearIndex],month,dateItems[dayIndex]);
-               return formatedDate;
-   }
+    var formData = new FormData();
+ 
 
     const onDateSelected = (selectedDate) => {
         setDate(selectedDate)
@@ -82,10 +70,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
         }
         setShow(false);
     };
-    const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-    };
+    
 
     const showDatepicker = (dateType) => {
         setForDateType(dateType);
@@ -99,11 +84,9 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     };
     const setHalfDayLeave = (firstHalf) => {
         if (firstHalf){
-            setiSFirstHalf(true);
             setLeaveTypeId("5");
         }
         else{
-            setiSFirstHalf(false);
             setLeaveTypeId("6");
         }
     }
@@ -112,91 +95,74 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
         //Opening Document Picker for selection of one file
         try {
             console.log("Hello")
-          const result = await DocumentPicker.pick({
-            type: [DocumentPicker.types.allFiles],
-          });
-          let res = result[0];
-          console.log('res : ' + JSON.stringify(res));
-          console.log('URI : ' + res.uri);
-          console.log('Type : ' + res.type);
-          console.log('File Name : ' + res.name);
-          console.log('File Size : ' + res.size);
+            const result = await DocumentPicker.pick({
+                type: [DocumentPicker.types.pdf, DocumentPicker.types.docx],
+            });
+            let res = result[0];
+            console.log('res : ' + JSON.stringify(res));
+            console.log('URI : ' + res.uri);
+            console.log('Type : ' + res.type);
+            console.log('File Name : ' + res.name);
+            console.log('File Size : ' + res.size);
           //Setting the state to show single file attributes\
-        //   let data = new Blob([res.uri], {type: res.type});
-        //   alert(data);
-           setFileData(res.uri);
-           setFileMimetype(res.type);
-           setFileName("HRMS-"+res.name);
-        let data = {uri: res.uri, name: "HRMS-"+res.name, type: res.type};
-        setDocData(data);
-          alert("Success "+ JSON.stringify(result));
-          addEventListener;
+            setFileName("HRMS-"+res.name);
+            let data = {uri: res.uri, name: "HRMS-"+res.name, type: res.type};
+            setDocData(data);
+            addEventListener;
         } catch (err) {
-          //Handling any exception (If any)
-          if (DocumentPicker.isCancel(err)) {
-            //If user canceled the document selection
-            alert('Canceled from single doc picker');
-          }
-          else if (DocumentPicker.isInProgress(err)){
-              alert('In Progreess')
-          }
-          else if (DocumentPicker.releaseSecureAccess(uris)){
-            alert("iOS secure access error.")
-          }
-           else {
-            console.log(JSON.stringify(err));
-            alert('Unknown Error: ' + JSON.stringify(err));
-            throw err;
-          }
+            if (DocumentPicker.isCancel(err)) {
+                console.log('Canceled from single doc picker');
+            }
+            else if (DocumentPicker.isInProgress(err)){
+                console.log('In Progreess')
+            }
+            else if (DocumentPicker.releaseSecureAccess(uris)){
+                console.log("iOS secure access error.")
+            }
+            else {
+                console.log(JSON.stringify(err));
+                console.log('Unknown Error: ' + JSON.stringify(err));
+                throw err;
+            }
         }
       };
       
-    const AddLeaveAPI = async () => {
-        console.log("Lets "+fromDate+" "+toDate+" "+description+" "+leaveTypeId+" "+String(userData.user.id)+" "+DocsData);
-        var params = JSON.stringify({file: fileData, start_date: fromDate, end_date: toDate, reason: description, type: leaveTypeId, user_id: String(userData.user.id)});
-        console.log('Start');
-        formData.append("user_id", String(userData.user.id));
-        formData.append("start_date", startDate);
-        formData.append("end_date", endDate);
-        formData.append("reason", description);
-        formData.append("type", leaveTypeId);
-        formData.append("file", {uri: fileData, name: fileName, type: fileMimetype});
-        console.log(formData);
-        
-        //console.log(params);
-        // try {
-        //     const {data} = await apiCall("POST", apiEndPoints.AddLeaveRequest, formData)
-        //     console.log(data);
-        //     if (data.code == 200){
-        //         toast.show(data.message, {duration: 4000});
-        //         navigation.goBack();
-        //     }
-        //     else{
-        //         toast.show(data.message, {duration: 4000});
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        //     toast.show(error, { duration: 3000 })
-        // } finally {
-        //     setLoading(false);
-        // }
-        const request = new Request(Global.projct.ios.BASE_URL+apiEndPoints.AddLeaveRequest, {method: 'POST', headers: {
-            Accept: 'application/json',
-            Authorization: 'Bearer '+userData.token,
-            }, body: formData});
-            try{
-                const response = await fetch(request)
-                const json = await response.json();
-             
-            console.log(json);
-            toast.show(json.message, {duration:4000});
-            } catch (error) {
-            console.error(error);
-            toast.show(error, {duration: 3000})
-            } finally {
-            setLoading(false);
-            }
-    };
+    const AddLeaveAPI = async() => {
+        // var param = {};
+        formData.append('user_id',  String(userData.user.id) );
+        formData.append('start_date', fromDate );
+        formData.append('end_date', toDate );
+        formData.append('reason', description );
+        formData.append('type',leaveTypeId);
+         if (fileName != ""){
+            // formData.append('file', {
+            //    uri: Platform.OS === 'android' ? `${fileData}` : fileData.replace('file://',''),
+            //    type: fileMimetype,
+            //    name: fileName,
+            //  } );
+            formData.append("file", DocsData);
+         }
+         console.log(formData);
+         const request = new Request(Global.projct.ios.BASE_URL+apiEndPoints.AddLeaveRequest, {method: 'POST', headers: {
+           Accept: 'application/json',
+           Authorization: `Bearer ${userData.token}`
+           }, body: formData});
+           try{
+               const response = await fetch(request)
+               console.log(response);
+               const json = await response.json();
+               console.log(json);
+               toast.show(json.message, {duration:4000});
+               if (json.message.toLowerCase().includes('success')){
+                   navigation.goBack();
+               }
+           } catch (error) {
+           console.error(error);
+           toast.show(error, {duration: 3000})
+           } finally {
+           hideLoader();
+           }
+       };
     const onsubmit = () => {
         if (Validations.FieldValidation(title)) {
             toast.show(Validations.EmptyFieldStr("title"), { duration: 3000 });
@@ -204,14 +170,14 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
         else if (Validations.FieldValidation(leaveType)) {
             toast.show(Validations.EmptyFieldStr("leave type"), { duration: 3000 });
         }
-        else if (startDate == "Start Date") {
+        else if (startDate == "") {
             toast.show("Please select start date", { duration: 3000 });
         }
         else if (Validations.FieldValidation(description)) {
             toast.show(Validations.EmptyFieldStr("description"), { duration: 3000 });
         }
         else if (leaveTypeId == '2'){
-            if (endDate == "End Date"){
+            if (endDate == ""){
                 toast.show("Please select end date", {duration: 3000});
             }
             else{
@@ -223,7 +189,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                 let eDate = moment(to).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
-                setLoading(true);
+                showLoader();
                 AddLeaveAPI();
             }
         }
@@ -231,10 +197,10 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             toast.show("Please select first or second half", {duration: 3000});
         }
         else if (leaveTypeId == '4'){
-            if (startTime == "Start Time"){
+            if (startTime == ""){
                 toast.show("Please select start time", {duration: 3000});
             }
-            else if (endTime == "End Time"){
+            else if (endTime == ""){
                 toast.show("Please select end time", {duration: 3000});
             }
             else{
@@ -244,7 +210,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                 let eDate = moment(new Date(to)).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
-                setLoading(true);
+                showLoader();
                 AddLeaveAPI();
             }
         }
@@ -254,7 +220,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             console.log("stat: "+sDate);
             fromDate = sDate;
             toDate = sDate;
-            setLoading(true);
+            showLoader();
             AddLeaveAPI();
         }
     }
@@ -265,18 +231,14 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                 <View style={{ padding: 16, marginTop: 20, justifyContent: "center" }}>
 
                     <View style={AuthStyle.CardmainContainer}>
-                        <TextInput
-                            style={styles.TextfieldContainer}
-                            placeholder="Title"
-                            onChangeText={Id => setTitle(Id)}
+                        
+                        <FloatTextField 
+                            placeholder="Enter Title"
                             defaultValue={title}
+                            pickerLabel="Title"
+                            onTextChange={(val) => setTitle(val)}
                         />
-                        {/* <TextInput
-                            style={styles.TextfieldContainer}
-                            placeholder="Leave Type"
-                           //onChangeText={pswrd => s(pswrd)}
-                            defaultValue={leaveType}
-                        /> */}
+                        
                         <View style={{zIndex: 1000}}>
                         <DropDownPicker
                             containerStyle={styles.TextfieldContainer}
@@ -295,28 +257,71 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
 
                         {(leaveTypeId == "2") ? 
                             <View style={{flex: 1, flexDirection: "row"}}>
-                                <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}  style={{flex: 1}}  >
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}  style={{flex: 1}}  >
                                 <Text style={[styles.TextfieldContainer, { paddingTop:13, marginEnd: 4}]}>{startDate}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndDate)}  style={{flex: 1}}  >
+                                </TouchableOpacity> */}
+                                <ClickabletextField 
+                                    containerStyle={{flex: 1, marginEnd: 4}}
+                                    imageStyle={{marginEnd: 8}}
+                                    defaultValue='Start Date'
+                                    value={startDate}
+                                    onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
+                                    pickerLabel='Start Date'
+                                    rightImagePath={ImagesPath.plainCalendarImg}
+                                />
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndDate)}  style={{flex: 1}}  >
                                     <Text style={[styles.TextfieldContainer, { paddingTop:13, marginLeft: 4}]}>{endDate}</Text>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
+                                <ClickabletextField 
+                                    containerStyle={{flex: 1, marginLeft: 4}}
+                                    imageStyle={{marginEnd: 8}}
+                                    defaultValue='End Date'
+                                    value={endDate}
+                                    onTouch={() => {showDatepicker(projct.leaveDateTypes.EndDate)}}
+                                    pickerLabel='End Date'
+                                    rightImagePath={ImagesPath.plainCalendarImg}
+                                />
                             </View> :
-                            <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}    >
-                                {/* <Button onPress={showDatepicker} title="Show date picker!" /> */}
+                            // <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}    >
+                            //     {/* <Button onPress={showDatepicker} title="Show date picker!" /> */}
 
-                                <Text style={[styles.TextfieldContainer, { paddingTop:13}]}>{startDate}</Text>
-                            </TouchableOpacity>
+                            //     <Text style={[styles.TextfieldContainer, { paddingTop:13}]}>{startDate}</Text>
+                            // </TouchableOpacity>
+                            <ClickabletextField 
+                                defaultValue='Start Date'
+                                value={startDate}
+                                onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
+                                pickerLabel='Start Date'
+                                rightImagePath={ImagesPath.plainCalendarImg}
+                            />
                         }
 
                         {(leaveTypeId == '4') ?  
                             <View style={{flex: 1, flexDirection: "row"}}>
-                                <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartTime)}  style={{flex: 1}}  >
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartTime)}  style={{flex: 1}}  >
                                     <Text style={[styles.TextfieldContainer, { paddingTop:13, marginEnd: 4}]}>{startTime}</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndTime)}  style={{flex: 1}}  >
+                                </TouchableOpacity> */}
+                                <ClickabletextField 
+                                    containerStyle={{flex: 1, marginEnd: 4}}
+                                    imageStyle={{marginEnd: 8}}
+                                    defaultValue='From'
+                                    value={startTime}
+                                    onTouch={() => {showDatepicker(projct.leaveDateTypes.StartTime)}}
+                                    pickerLabel='From'
+                                    rightImagePath={ImagesPath.clockImg}
+                                />
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndTime)}  style={{flex: 1}}  >
                                     <Text style={[styles.TextfieldContainer, { paddingTop:13, marginLeft: 4}]}>{endTime}</Text>
-                                </TouchableOpacity>
+                                </TouchableOpacity> */}
+                                <ClickabletextField 
+                                    containerStyle={{flex: 1, marginLeft: 4}}
+                                    imageStyle={{marginEnd: 8}}
+                                    defaultValue='To'
+                                    value={endTime}
+                                    onTouch={() => {showDatepicker(projct.leaveDateTypes.EndTime)}}
+                                    pickerLabel='To'
+                                    rightImagePath={ImagesPath.clockImg}
+                                />
                             </View> : null
                         }
 
@@ -351,40 +356,29 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                 />
                             )}
                             
-                        <TouchableOpacity onPress={() => selectOneFile()}    >
-                                {/* <Button onPress={showDatepicker} title="Show date picker!" /> */}
-
-                                <Text style={[styles.TextfieldContainer, { paddingTop:13}]}>{fileName}</Text>
-                            </TouchableOpacity>
-
-                        <TextInput
-                            style={{
-                                borderWidth: 1,
-                                borderColor: Colors.color.lightGray,
-                                borderRadius: 8,
-                                padding: 8,
-                                marginBottom: 16,
-                                fontSize: 16, minHeight: 80, maxHeight: 160
-                            }}
-                            multiline={true}
-                            numberOfLines={4}
-                            placeholder="Reason"
-                            onChangeText={decription => setDescription(decription)}
-                            defaultValue={description}
+                        <ClickabletextField 
+                            defaultValue='Upload File'
+                            value={fileName}
+                            onTouch={() => {selectOneFile()}}
+                            pickerLabel='Attachment'
+                            rightImagePath={ImagesPath.attachmentImg}
                         />
 
+                        <FloatTextField 
+                            placeholder="Enter Reason"
+                            defaultValue={description}
+                            pickerLabel="Reason"
+                            onTextChange={(val) => setDescription(val)}
+                            textInputMultiline={true}
+                            //textInputLines={4}
+                            containerStyle={{height: 160}}
+                            textInputStyle={{height: 150}}
+                        />
 
-
-                        <TouchableOpacity onPress={() => {
-                            onsubmit()
-                            //navigation.navigate('User');
-                        }}>
-                            <View style={{ backgroundColor: Colors.color.red, borderRadius: 16, height: 56, justifyContent: "center", alignItems: "center", marginVertical: 12 }}>
-                                <Text style={{ fontSize: 18, fontWeight: "600", color: '#fff' }}>Submit Request</Text>
-                                {isLoading ? <ActivityIndicator /> : null}
-                            </View>
-                        </TouchableOpacity>
-
+                        <MainButton
+                            text={'Submit Request'}
+                            onPress={() => {onsubmit()}}
+                        />
 
                     </View>
 
@@ -428,7 +422,7 @@ const styles = StyleSheet.create({
     },
     selectedText: {
         fontSize: 16,
-        fontWeight: '600',
+        fontFamily: fonts.semiBold,
         textAlign: "center",
         color: color.white,
     },
@@ -436,43 +430,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         textAlign: "center",
         color: color.black,
-        fontWeight: '600',
-    },
-    sectionContainer: {
-        marginTop: 32,
-        paddingHorizontal: 24
-    },
-    sectionTitle: {
-        fontSize: 24,
-        fontWeight: '600',
-    },
-    sectionDescription: {
-        marginTop: 8,
-        fontSize: 18,
-        fontWeight: '400',
-    },
-    highlight: {
-        fontWeight: '700',
-    },
-
-    shadowContainerStyle: {   //<--- Style with elevation
-
-        shadowColor: Colors.color.darkGray,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 1,
-        shadowRadius: 3,
-        elevation: 3,
-    },
-    shadowBottonContainerStyle: {    //<--- Style without elevation
-        borderWidth: 1,
-        borderRadius: 16,
-        borderColor: Colors.color.lightGray,
-        borderBottomWidth: 1,
-        //shadowColor: Colors.red,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-        paddingVertical: 24, paddingHorizontal: 16, margin: 16
+        fontFamily: fonts.semiBold,
     },
 
 });

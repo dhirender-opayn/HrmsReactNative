@@ -16,19 +16,20 @@ import Global from "../Common/Global";
 import { useToast } from "react-native-toast-notifications";
 import moment from 'moment';
 import {getDistance, getPreciseDistance} from 'geolib';
-import { UserContext } from "../utils/context";
+import { LoaderContext, UserContext } from "../utils/context";
+import apiEndPoints from "../utils/apiEndPoints";
+import { apiCall } from "../utils/httpClient";
  
 const HomeScreen = ({ navigation = useNavigation() }) => {
    const [userData, setUserData] = useContext(UserContext)
-   const OPAYN_LAT="30.8935428"
-   const OPAYN_LNG="75.8289174"
-   const [data, setData] = useState({});
-   const [isLoad, setLoad] = useState(true)
+   const OPAYN_LAT="30.8935"
+   const OPAYN_LNG="75.8290"
    const [fullIsLoad, setFullIsLoad] = useState(false)
    const [currentLatLocation, setCurrentLatLocation] = useState('');
    const [currentLongLocation, setCurrentLongLocation] = useState('');
-   const [message, setMsg] = useState("");
-   let InOutClick = "";
+   const { showLoader, hideLoader } = useContext(LoaderContext);
+
+   var InOutClick = "";
 
    const toast = useToast();
 
@@ -60,31 +61,6 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
       { key: strings.addHoliday, imagepath: ImagesPath.holidayImg },
    ]
 
-   const retrieveData = async () => {
-      try {
-         detail = await AsyncStorage.getItem('userData');
-         console.log(detail);
-         setData(JSON.parse(detail));
-      
-
-         // data.user.roles.forEach(element => {
-         //    console.log(element)
-         // });
-        
-
-      }
-      catch (error) {
-         console.error(error);
-      }
-      finally {
-         setLoad(false);
-      }
-   };
-   useEffect(() => {
-
-      retrieveData();
-   }, []);
-
 
    const singlePress = (selectedData) => {
       console.log("selectedData ", selectedData)
@@ -92,106 +68,79 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
          navigation.navigate('leaveList');
       }
       if (selectedData.key == (strings.calendar)) {
-         navigation.navigate('CalendarScreen')
+         navigation.navigate('CalendarScreen');
       }
       if (selectedData.key == (strings.request_leave)) {
-         navigation.navigate('RequestLeaveScreen')
+         navigation.navigate('RequestLeaveScreen');
       }
       if (selectedData.key == (strings.employees)){
-         navigation.navigate('employeeList')
+         navigation.navigate('employeeList');
+      }
+      if (selectedData.key == (strings.attendance_list)){
+         navigation.navigate('Attendance List');
+      }
+      if (selectedData.key == (strings.addUser)){
+         navigation.navigate('addEmployee');
+      }
+      if (selectedData.key == strings.work_history){
+         navigation.navigate('workHistory');
+      }
+      if (selectedData.key == strings.AddAnouncement){
+         navigation.navigate('addAnnouncementView');
+      }
+      if (selectedData.key == strings.addHoliday){
+         navigation.navigate('addHoliday');
+      }
+      if (selectedData.key == strings.emergencyLeave){
+         navigation.navigate('emergencyLeave');
+      }
+      if (selectedData.key == strings.announcement){
+         navigation.navigate('Announcements');
       }
       if (selectedData.key == (strings.checkin)) {
-         setFullIsLoad(true)
          InOutClick = "IN";
-         if(calculateDistance()<=30){
-            setFullIsLoad(false);
+         if(calculateDistance()<=20){
+            showLoader();
             AttendenceApi();
          } else {
-            setFullIsLoad(false);
-            alert("You Are Distance 6 : ",calculateDistance());
+            toast.show("Attendance can me marked between 20 meters of distance. You are at distance "+calculateDistance()+"m.", {duration: 4000})
          }
       }
       if(selectedData.key == (strings.checkout)){
-         setFullIsLoad(true)
          InOutClick = "OUT";
-         if(calculateDistance()<=30){
-            setFullIsLoad(false);
+         if(calculateDistance()<=20){
+            showLoader();
             AttendenceApi();
          } else {
-            setFullIsLoad(false);
-            alert("You Are Distance 6 : ",calculateDistance());
+           
+            toast.show("Attendance can me marked between 20 meters of distance. You are at distance "+calculateDistance()+"m.", {duration: 4000})
          }
       }
-      // if(calculateDistance()<=30){
-      //    setFullIsLoad(false);
-      //    AttendenceApi();
-      // } else {
-      //    setFullIsLoad(false);
-      //    alert("You Are Distance 6 : ",calculateDistance());
-      // }
-   
-
    }
  
 
    //API
    const AttendenceApi = async () => {
  
-      console.log("FFFFFFFF====>>>>>> ", InOutClick)
       let date = moment(new Date()).format(Global.projct.dateFormates.YearMonthDateTime)
-   
-      formData.append(Global.projct.apiPrams.lat, currentLatLocation);
-      formData.append(Global.projct.apiPrams.lng, currentLongLocation);
-      formData.append(Global.projct.apiPrams.time, date);
-      formData.append(Global.projct.apiPrams.type, InOutClick);
-      console.log("DetialOfCheckInOut " , formData);
 
-      console.log("checkdataeverthing",formData)
-
-      const request = new Request(Global.projct.ios.BASE_URL + Global.projct.apiSuffix.ATTANDANCE, {
-         method: 'POST', headers: {
-            Accept: 'application/json',
-            Authorization: Global.projct.apiPrams.AuthToken
-         }, body: formData
-      });
       try {
-         const response = await fetch(request)
-         const json = await response.json();
-         setMsg(json.message);
-         if (json.hasOwnProperty("data")) {
-            setData(json.data);
-            const object = JSON.stringify(json.data);
-            // setEmail(json)
-            console.log("hoursessssss=====>>>>> ", object)
-            await AsyncStorage.setItem('userData', object);
-            toast.show(json.message);
-            //navigation.navigate('HomeScreen');
-         }
-         else {
-            toast.show(json.message, { duration: 4000 });
-         }
-
-      } catch (error) {
-         console.error(error);
-         toast.show(error, { duration: 3000 })
-      } finally {
-         setFullIsLoad(false);
-      }
-   };
-
-
-
-   // const calculateDistance = () => {
-   //    var dis = getDistance(
-   //      {latitude: OPAYN_LAT, longitude: OPAYN_LNG},
-   //      {latitude: currentLatLocation, longitude: currentLongLocation},
-   //    );
-   //    alert(
-   //      `Distance\n\n${dis} Meter\nOR\n${dis / 1000} KM`
-   //    );
-   //  };
-   //  console.log(calculateDistance)
-    
+         const {data} = await apiCall("POST", apiEndPoints.MarkAttendance, {lat: currentLatLocation, lng: currentLongLocation, timing: date, type: InOutClick});
+         console.log("Data: "+JSON.stringify(data));
+         // alert(JSON.stringify(data));
+         // if (code == 200){
+         toast.show(data.message, {duration: 3000});
+         // }
+         // else{
+         //    toast.show(data, {duration: 3000});
+         // }
+     } catch (error) {
+         console.error("In Err"+error);
+         toast.show(error, { duration: 3000 });
+     } finally {
+         hideLoader();
+     }
+   };    
   
     const calculateDistance = () => {
       var dis = getDistance(
@@ -203,13 +152,6 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
       console.log("meternow ==> ", dis)
       return dis/1000;
     };
-    console.log( "-------->>>>>>>>>>>>>>>>>-------->>>>>>>>>>>>>>>>>",calculateDistance())
-
-    console.log("token =====>>>>>>>> " ,userData.token)
-    Global.projct.apiPrams.AuthToken = "Bearer "+userData.token;   //data.token;
-    console.log("AuthToken -------->>>>", Global.projct.apiPrams.AuthToken)
-
-    console.log("=====>  ", data);
 
    return (
       <OverlayContainer>
@@ -232,13 +174,12 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
                }
             <View style={{ marginTop: 20 }}>
                {
-
-                   isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.title} >{userData.user.name}</Text>)
+                   <Text style={CustomStyling.title} >{userData.user.name}</Text>
                }
             </View>
             <View style={{ marginTop: 10 }}>
                {
-                   isLoad ? <ActivityIndicator /> : (<Text style={CustomStyling.subTitle} >{userData.user.roles.map(roledata => { return roledata.name })}</Text>)
+                  <Text style={CustomStyling.subTitle} >{userData.user.roles.map(roledata => { return roledata.name })}</Text>
                }
             </View>
 
@@ -252,7 +193,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
 
                         <View>
                            <View style={homeStyle.homeCardContainer}>
-                              <Image style={homeStyle.homeCardImg} source={item.imagepath} />
+                              <Image style={[homeStyle.homeCardImg, {tintColor: (item.key == strings.checkout) ? null : color.imageBlack}]} source={item.imagepath} />
                               <Text style={homeStyle.homeCardText}> {item.key}</Text>
                            </View>
                         </View>
@@ -271,7 +212,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
                         {/* <View style={{margin:5}} > */}
                         <View>
                            <View style={homeStyle.homeCardContainerbottom}>
-                              <Image style={homeStyle.homeCardImg} source={item.imagepath} />
+                              <Image style={[homeStyle.homeCardImgBottom, {tintColor: (item.key == strings.leave || item.key == strings.emergencyLeave) ? null : color.imageBlack}]} source={item.imagepath} />
                               <Text style={homeStyle.homeCardTextbottom}> {item.key}</Text>
                            </View>
                         </View>
@@ -294,39 +235,34 @@ const homeStyle = StyleSheet.create({
       marginLeft: 10,
       backgroundColor: color.white,
       borderRadius: 12,
-      width: 140,
+      width: 152,
       alignContent: 'center',
       paddingVertical: 15,
-      paddingHorizontal: 10,
-      shadowColor: Colors.color.darkGray,
+      paddingTop: 30,
+      paddingHorizontal: 8,
+      shadowColor: Colors.color.lightGray,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 1,
-      shadowRadius: 3,
-      elevation: 3,
+      shadowRadius: 2,
+      elevation: 2,
    },
    homeCardImg: {
       height: 45,
       width: 45,
       alignSelf: 'center',
-      resizeMode: "contain"
+      resizeMode: "contain",
+      tintColor: color.backgroundBlack,
    },
    homeCardText: {
       width: "100%",
       height: 25,
-      fontSize: 12,
+      fontSize: 14,
       textAlign: 'center',
       color: 'black',
       alignSelf: 'center',
-      fontWeight: '600',
-      color: Colors.color.gray,
-      marginTop: 10,
-   },
-   homeTitle: {
-      marginBottom: 30,
-      fontSize: 25,
-      color: "#fff",
-      textAlign: 'center',
-      fontWeight: '700'
+      fontFamily: 'Asap-SemiBold',
+      color: Colors.color.titleBlack,
+      marginTop: 12,
    },
 
    homeCardContainerbottom: {
@@ -336,27 +272,28 @@ const homeStyle = StyleSheet.create({
       paddingTop: 15,
       width: '100%',
       paddingBottom: 5,
-      paddingHorizontal: 8,
-      shadowColor: Colors.color.darkGray,
+      shadowColor: Colors.color.lightGray,
       shadowOffset: { width: 0, height: 0 },
       shadowOpacity: 1,
-      shadowRadius: 3,
-      elevation: 3,
+      shadowRadius: 2,
+      elevation: 2,
+      justifyContent: "center"
    },
    homeCardImgBottom: {
-      height: 35,
-      width: 40,
+      height: 32,
+      width: 32,
       alignSelf: 'center',
+      resizeMode: "contain",
+      tintColor: color.imageBlack,
 
    },
    homeCardTextbottom: {
       //width: 60,
       height: 30,
       fontSize: 12,
-      color: 'black',
       alignSelf: 'center',
-      fontWeight: 'bold',
-      color: Colors.color.gray,
+      fontFamily: 'Asap-Medium',
+      color: Colors.color.titleBlack,
       marginTop: 10,
       textAlign: "center",
    },

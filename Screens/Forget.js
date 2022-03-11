@@ -1,5 +1,5 @@
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { MainButton } from "../components/mainButton";
 import { EmailValidation } from "../helper/Validation";
@@ -9,19 +9,24 @@ import Global, { projct } from "../Common/Global";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import Colors from "../Common/Colors";
+import FloatTextField from "../helper/FloatTextField";
+import { LoaderContext } from "../utils/context";
  
 
 export const Forget = ({ navigation = useNavigation() }) => {
-    const [email, setEmail] = useState();
+    const [email, setEmail] = useState("");
     const [message, setMsg] = useState("");
     const [data, setData] = useState({});
+    const { showLoader, hideLoader } = useContext(LoaderContext);
+
     let formData = new FormData()
 
     const onButtonPress = () => {
         console.log("check value")
 
         if (!EmailValidation(email)) {
-            console.log("Email   valid ")
+            console.log("Email   valid ");
+            showLoader();
             forgetApi();
 
         }
@@ -47,31 +52,34 @@ export const Forget = ({ navigation = useNavigation() }) => {
         } catch (error) {
             console.error(error);
         } finally {
-            setLoading(false);
+            hideLoader();
         }
     };
 
     return (
         <OverlayContainer>
             <AppBackgorund />
-        <SafeAreaView style={AuthStyle.mainContainer}>
-            <View>
-                <View style={{ marginTop: 60 }}>
-                    <Text style={AuthStyle.text} >{String.strings.title}</Text>
-                    <Text style={AuthStyle.subText} >{String.strings.forgetMsg}</Text>
-                </View>
-                <View style={{ height: 100,marginTop:10 }} />
-                <Text style={AuthStyle.textTitile} >{String.strings.forgotPassword}</Text>
+            <SafeAreaView style={{padding: 16, marginTop: 40, justifyContent: "center", flex: 1}}>
+                <View style={{flex: 1}}>
+                    <View style={{ marginTop: 0 }}>
+                        <Text style={AuthStyle.viewSubTitile} >{String.strings.title}</Text>
+                        <Text style={AuthStyle.medium16Text} >{String.strings.forgetMsg}</Text>
+                    </View>
+                    <Text style={[AuthStyle.viewTitile, {marginTop: 32}]} >{String.strings.forgotPassword}</Text>
+                    </View>
+                    <View style={{flex: 1}}> 
 
-                <View style={{ marginTop: 60 ,marginHorizontal:25}}>
-                    <TextInput onChangeText={(text) => setEmail(text)} value={email} style={AuthStyle.inputText} placeholder="Enter Your E-mail" placeholderTextColor={Colors.color.gray} />
-                    <TouchableOpacity>
-                        <MainButton text={'submit'} onPress={onButtonPress} />
-                        {/* <Text style={AuthStyle.mainButtonText}>Submit </Text> */}
-                    </TouchableOpacity>
+                    <View style={{ marginTop: 16 ,marginHorizontal:25}}>
+                        <FloatTextField 
+                            placeholder="Enter Your Email"
+                            defaultValue={email}
+                            pickerLabel="Email"
+                            onTextChange={(val) => setEmail(val)}
+                        />
+                        <MainButton text={'Submit'} onPress={onButtonPress} />
+                    </View>
                 </View>
-            </View>
-        </SafeAreaView>
+            </SafeAreaView>
         </OverlayContainer>
 
     );

@@ -1,5 +1,5 @@
 import { Text, TextInput, TextInputBase, TouchableOpacity, View } from "react-native";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import String, { strings } from "../Common/String";
@@ -9,6 +9,11 @@ import { OtpValidation, PasswordValidation } from "../helper/Validation";
 import Global from "../Common/Global";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
+import FloatTextField from "../helper/FloatTextField";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
+import { LoaderContext } from "../utils/context";
+import { useToast } from "react-native-toast-notifications";
+import Validations from "../Common/Validations";
 
 
 export const OtpVerify = ({ navigation, route }) => {
@@ -16,23 +21,33 @@ export const OtpVerify = ({ navigation, route }) => {
     const [otp, setOtp] = useState();
     const [password, setPassword] = useState();
     const [comfirmPassword, setComfirmPassword] = useState();
-    const [message, setMessage] = useState('');
-    const [data, setData] = useState({});
+    const [message, setMessage] = useState('');3 
     let formdata = new FormData();
+    const { showLoader, hideLoader } = useContext(LoaderContext);
+    let toast = useToast();
 
     const buttonPress = () => {
         console.log("press")
-        if (!OtpValidation(otp) && !PasswordValidation(password) && !PasswordValidation(comfirmPassword) && password.match(comfirmPassword)) {
-            console.log("Success OTp Phase");
-            OtpApiCall();
-        } else {
-            console.log("UnSuccess OTp Phase");
+        if (Validations.OtpValidation(otp)){
+            toast.show(Validations.OtpValidation(otp), {duration: 3000});
         }
-    }
+        else if (Validations.PasswordValidation(password)){
+            toast.show(Validations.PasswordValidation(password), {duration: 3000});
+        }
+        else if (comfirmPassword != password){
+            toast.show("Please enter confirm password same as new password", {duration: 3000});
+        }
+        else{
+            console.log("Success OTp Phase");
+            showLoader();
+            OtpApiCall();
+        }
+    };
+
     const OtpApiCall = async () => {
-        formdata.append(Global.projct.android.code, otp);
-        formdata.append(Global.projct.password, password);
-        formdata.append(Global.projct.android.confirm_password, comfirmPassword);
+        formdata.append("code", otp);
+        formdata.append("password", password);
+        formdata.append("confirm_password", comfirmPassword);
 
         const request = new Request(Global.projct.android.BASE_URL + Global.projct.android.RESETPASSWORD, {
             method: 'POST', headers: {
@@ -42,14 +57,15 @@ export const OtpVerify = ({ navigation, route }) => {
         try {
             const response = await fetch(request)
             const json = await response.json();
-            setMessage(json.message);
-            setData(json.data);
-            const object = JSON.stringify(json.data);
-            navigation.navigate('Login');
+            console.log(json);
+            toast.show(json.message, {duration: 3000});
+            if (json.message.toLowerCase().includes("success")){
+                navigation.navigate('Login');
+            }
         } catch (error) {
             console.error(error);
         } finally {
-            setLoading(false);
+            hideLoader();
         }
 
     };
@@ -59,24 +75,39 @@ export const OtpVerify = ({ navigation, route }) => {
             <AppBackgorund />
 
             <SafeAreaView style={AuthStyle.mainContainer}>
-                <View style={{ marginTop: 60 }}>
-                    <Text style={AuthStyle.text}>{strings.title}</Text>
-                    <View style={{ height: 20 }} />
-                    <Text style={AuthStyle.subText}>{strings.optmsg}</Text>
-                    <View style={{ height: 30 }} />
+                <View >
+                    <Text style={[AuthStyle.viewSubTitile, {marginBottom: 20}]}>{strings.title}</Text>
+                    <Text style={[AuthStyle.medium16Text, {marginBottom: 24}]}>{strings.optmsg}</Text>
 
                     {/* Card Container */}
                     <View style={AuthStyle.CardmainContainer}>
-                        <Text style={AuthStyle.Cardtext}>{strings.enter_code}</Text>
-                        <View style={{ marginTop: 10 }}>
-                            <TextInput onChangeText={(otp) => setOtp(otp)} value={otp} style={AuthStyle.CardinputText} keyboardType="number-pad" placeholder={strings.enterOtp} placeholderTextColor={color.gray} />
-                            <TextInput onChangeText={(new_pass) => setPassword(new_pass)} value={password} style={AuthStyle.CardinputText} placeholder={strings.newPassword} placeholderTextColor={color.gray} />
-                            <TextInput onChangeText={(comfirm_pass) => setComfirmPassword(comfirm_pass)} value={comfirmPassword} style={AuthStyle.CardinputText} placeholder={strings.comfirmPassword} placeholderTextColor={color.gray} />
-                            <TouchableOpacity>
-                                <MainButton text={strings.submit} onPress={() => buttonPress()} />
-                            </TouchableOpacity>
+                        <Text style={CustomStyling.containerTitle}>{strings.enter_code}</Text>
+                        <View style={{ marginTop: 8 }}>
+                            
+                            <FloatTextField 
+                                placeholder="Enter OTP"
+                                defaultValue={otp}
+                                pickerLabel="OTP"
+                                onTextChange={(val) => setOtp(val)}
+                            />
+                           
+                              <FloatTextField 
+                                placeholder="Enter New Password"
+                                defaultValue={password}
+                                pickerLabel="New Password"
+                                onTextChange={(val) => setPassword(val)}
+                                isPasswordField={true}
+                            />
+                          
+                             <FloatTextField 
+                                placeholder="Re-Enter Password"
+                                defaultValue={comfirmPassword}
+                                pickerLabel="Confirm Password"
+                                onTextChange={(val) => setComfirmPassword(val)}
+                                isPasswordField={true}
+                            />
+                            <MainButton text={strings.submit} onPress={() => buttonPress()} />
                         </View>
-                        <View style={{ height: 30 }} />
                     </View>
                 </View>
             </SafeAreaView>

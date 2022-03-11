@@ -10,15 +10,22 @@ import  Colors, { color }  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
 import Global from "../Common/Global";
 import { useToast } from "react-native-toast-notifications";
-import { AuthContext, UserContext } from "../utils/context";
+import { AuthContext, LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
 import { StyleSheet } from "react-native";
+import moment from 'moment';
+import fonts from "../Common/fonts";
 
 const EmployeeDetail = ({navigation=useNavigation(), route}) => {
     const [userData, setUserData] = useState({});
-    const [isLoading, setLoading] = useState(true)
-   
+    const [isLoading, setLoading] = useState(true);
+    const [showAttendance, setShowAttend] = useState(true);
+    const LeaveSummary = [{id: 1, count: 18, type: "Casual Leave"}, {id: 2, count: 18, type: "Casual Leave"}, {id: 3, count: 18, type: "Casual Leave"}]
+    const leaveTypes = [{value: "Single Day", id: 1}, {value: "Multiple Day", id: 2}, {value: "Short Leave", id: 4},
+         {value: "First Half", id: 5}, {value: "Second Half", id: 6}, {value: "", id: 0}, {value: "", id: 3}];
+    const leaveStatus = [{value: "Pending", id: 0}, {value: "Approved", id: 1}, {value: "Rejected", id: 2}];
+    const { showLoader, hideLoader } = useContext(LoaderContext);
    
     const toast = useToast();
        
@@ -32,19 +39,41 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
                     toast.show(error, { duration: 3000 })
                 } finally {
                     setLoading(false);
+                    hideLoader();
                 }
         };
 
+        const leaveDate = (data) => {
+            var dateStr = ""
+            if(data.leave_type == 2){
+                dateStr = moment(new Date(data.start_date)).format("DD MMM, YYYY");
+                dateStr += " - ";
+                dateStr += moment(new Date(data.end_date)).format("DD MMM, YYYY");
+            }
+            else if (data.leave_type == 4){
+                dateStr = moment(new Date(data.start_date)).format("DD MMM, YYYY");
+                dateStr += " (";
+                dateStr += moment.utc(data.start_date).local().format("HH:mm");
+                dateStr += " - ";
+                dateStr += moment.utc(data.end_date).local().format("HH:mm") + ")";
+            }
+            else{
+                dateStr = moment(new Date(data.start_date)).format("DD MMM, YYYY");
+            }
+            return dateStr;
+        };
+
         useEffect(() => {
+            showLoader();
             getTeamData();
         }, []);
     
     return(
         <OverlayContainer>
             <AppBackgorund />
-            <View style={{padding: 16, flex: 1}}>
+            <View style={{padding: 16}}>
                 { isLoading ? <ActivityIndicator /> :
-               ( <View style={{}}>
+               ( <ScrollView style={{}}>
                    <View style={{}}>
                         <View style={{flexDirection: "row", marginTop: 24, left: 0, right: 0}}>
                             {(userData.profile.image != null) ? 
@@ -62,47 +91,91 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
                                 />)
                             }
                             <View style={{paddingHorizontal: 4, paddingVertical: 0, justifyContent: "center", marginLeft: 8}}>
-                                <Text style={{numberOfLines: 2, fontSize: 18, color: 'white', paddingVertical: 8}}>{userData.name}</Text>
-                                <Text style={{numberOfLines: 2, fontSize: 16, color: 'white', paddingVertical:4}}>{userData.roles[0].name}</Text>
+                                <Text style={[CustomStyling.title, {paddingVertical: 8}]} numberOfLines={2}>{userData.name}</Text>
+                                <Text style={[CustomStyling.subTitle, {paddingVertical:4, alignSelf: "flex-start"}]} numberOfLines={2}>{userData.roles[0].name}</Text>
                             </View>
                         </View>
                         <View style = {{marginTop: 24}}>
-                            <Text style = {{color: color.white, fontSize: 16}}>Basic Information</Text>
-                            <View style = {empStyle.cardStyle}>
+                            <Text style = {[CustomStyling.subTitle, {alignSelf: "flex-start"}]}>Basic Information</Text>
+                            <View style = {[CustomStyling.cardStyle, {marginTop: 12, marginHorizontal: 0}]}>
                                 <View style={{ flexDirection: "row", margin: 8}}>
-                                    <Text style={{fontSize: 18, width: '50%'}}>Designation</Text>
-                                    <Text style={{fontSize: 18, width: '50%', textAlign: "right"}}>{userData.roles[0].name}</Text>
+                                    <Text style={CustomStyling.detailLabel}>Designation</Text>
+                                    <Text style={[CustomStyling.detailLabel, {textAlign: "right"}]}>{userData.roles[0].name}</Text>
                                 </View>
-                                <View style={empStyle.seperatorStyle}>
+                                <View style={CustomStyling.seperatorStyle}>
                                 </View>
                                 <View style={{flexDirection: "row", margin: 8}}>
-                                    <Text style={{fontSize: 18, width: '50%'}}>Company</Text>
-                                    <Text style={{fontSize: 18, width: '50%', textAlign: "right"}}>Opayn llc.</Text>
+                                    <Text style={CustomStyling.detailLabel}>Company</Text>
+                                    <Text style={[CustomStyling.detailLabel, {textAlign: "right"}]}>Opayn llc.</Text>
                                 </View>
                             </View>
                         </View>
                     </View>
-                    <View style={{ justifyContent: "flex-end", marginVertical: 16}}>
-                        {/* <FlatList 
-                            data={ListData}
-                            keyExtractor={({id}, index) => id}
-                            renderItem={({item}) => (
-                                <TouchableOpacity onPress={() => 
-                                    navigation.navigate(item.view)
-                                }>
-                                <View style={{ flexDirection: "row", borderBottomWidth: (item.id == ListData.length-1) ? 0 : 1, borderBottomColor: Colors.color.lightGray, paddingTop: 16, paddingBottom: 8, justifyContent: "center"}}>
-                                    <Text style={[CustomStyling.listTitle, {flex: 7, height: 20}]}>{item.title}</Text>
-                                    <Image source={require("../images/rightArrow.png")}
-                                    style={{height: 20, width: 16, flex: 1, tintColor: Colors.color.lightGray, resizeMode: "contain"}} 
-                                    />
-                                </View>
+                    <View style={empStyle.HalfLeaveView}>
+                                <TouchableOpacity onPress={() => {setShowAttend(true)}}  style={[
+                                    (showAttendance) ? empStyle.SelectedHalfView : empStyle.UnselectedHalfView, 
+                                    {borderTopLeftRadius: 0, borderBottomLeftRadius: 0}
+                                ]}>
+                                    <Text style={(showAttendance) ? empStyle.selectedText : empStyle.UnselectedText}>Attendance</Text>
                                 </TouchableOpacity>
-                            )}
-                            style={{marginTop: 24}}
-                        />
-                         */}
-                    </View>
-                </View>
+                                <TouchableOpacity onPress={() => setShowAttend(false)}  style={[
+                                    (!showAttendance) ? empStyle.SelectedHalfView : empStyle.UnselectedHalfView,
+                                    {borderTopRightRadius: 0, borderBottomRightRadius: 0}
+                                ]}>
+                                    <Text style={(!showAttendance) ? empStyle.selectedText : empStyle.UnselectedText}>Leaves</Text>
+                                </TouchableOpacity>
+                            </View>
+                    {/* <View style={{  marginVertical: 4}}>
+                        <FlatList 
+                            data={showAttendance ? userData.attandances : userData.leaves}
+                            keyExtractor={({id}, index) => id}
+                            renderItem={({item}) => ( showAttendance ? */}
+                                {(showAttendance) ? userData.attandances.map((item, index) => {
+                                return (<View style = {[CustomStyling.cardStyle, {marginHorizontal: 0}]}>
+                                    <View style={{ flexDirection: "row", margin: 8}}>
+                                        <Text style={CustomStyling.attendanceLabel}>Date</Text>
+                                        <Text style={[CustomStyling.attendanceLabel, {textAlign: "right"}]}>{moment.utc(item.timing).local().format("DD MMM, YYYY")}</Text>
+                                    </View>
+                                    <View style={CustomStyling.seperatorStyle}>
+                                    </View>
+                                    <View style={{flexDirection: "row", margin: 8}}>
+                                        <Text style={CustomStyling.attendanceLabel}>{item.type}</Text>
+                                        <Text style={[CustomStyling.attendanceLabel, {textAlign: "right", color: (item.type == "IN") ? color.green : color.darkRed}]}>{moment.utc(item.timing).format("hh: mm a")}</Text>
+                                    </View>
+                                </View>);
+                            }) : userData.leaves.map((item, index) => {
+                                    return (<View style={[CustomStyling.cardStyle, {marginHorizontal: 0}]}>
+                                    <View style={{flex: 1, flexDirection: 'row'}}>
+                                        <View style={{flex: 2, flexDirection: 'column'}}>
+                                            <Text style={{fontSize: 16, fontFamily: fonts.semiBold}}>{userData.name}</Text>
+                                            <Text style={{fontSize: 14, fontFamily: fonts.semiBold, marginTop: 4}}>{leaveTypes.find(type => type.id == item.leave_type).value}</Text>
+                                        </View>
+                                        <View style={{flex: 1}}>
+                                        <View style={[CustomStyling.statusStyle, {backgroundColor: (item.status == 0) ? color.yellow : (item.status == 1) ?  color.green : color.darkRed}]}>
+                                            <Image source={require("../images/clock.png")}
+                                                style={{height: 16, width: 16, tintColor: Colors.color.white, resizeMode: "contain"}} 
+                                            />
+                                            <Text style={{fontSize: 14, fontFamily: fonts.semiBold, color: color.white, marginLeft: 4}}>{leaveStatus.find(status => status.id == item.status).value}</Text>
+                                        </View>
+                                        </View>
+                                    </View>
+                                    <View style={{marginLeft: 8}}>
+                                        <View style={{flex: 1, flexDirection: 'row', marginVertical: 8}}>
+                                            <Image source={require("../images/calendar.png")}
+                                                style={{height: 16, width: 16, tintColor: Colors.color.black, resizeMode: "contain"}} 
+                                            />
+                                            <Text style={{fontSize: 14, fontFamily: fonts.medium, color:color.backgroundBlack, marginLeft: 6}}>Date: </Text>
+                                            <Text style={{fontSize: 14, fontFamily: fonts.medium}}>{leaveDate(item)}</Text>
+                                        </View>
+                                        <Text style={{fontSize: 16, fontFamily: fonts.medium, color:color.backgroundBlack}}>{item.reason}</Text>
+                                    </View>
+                                </View>)
+                                })}
+                        {/* //     )}
+                        // /> */}
+                        
+                    {/* </View> */}
+                </ScrollView>
                 )}
             </View>
         </OverlayContainer>
@@ -112,35 +185,48 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
 export default EmployeeDetail;
 
 const empStyle = StyleSheet.create({
-    cardStyle: {
-        marginHorizontal: 0,
-        marginVertical: 12,
-        padding: 8,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: color.lightGray,
-        backgroundColor: color.white,
-    },
-    statusStyle: {
-        //height: 32,
-        borderRadius: 16,
-        backgroundColor: color.red,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        alignSelf: "flex-end",
-        flexDirection: 'row'
-    },
+    
     imageStyle: {
-        height: 70,
-        width: 70,
+        height: 100,
+        width: 100,
         borderRadius: 8,
         //resizeMode: "contain"
 
     },
-    seperatorStyle: {
-        height: 1,
-        backgroundColor: color.lightGray,
-        marginHorizontal: 8,
-        marginVertical: 4
-    }
+    HalfLeaveView: {
+        marginTop: 12,
+        // flex: 1,
+        width: '100%',
+        flexDirection: "row",
+    },
+    SelectedHalfView: {
+        backgroundColor: color.titleBlack,
+        borderWidth: 1,
+        borderColor: Colors.color.lightGray,
+        // flex: 1,
+        width: '50%',
+        height: 60,
+        justifyContent: "center",
+    },
+    UnselectedHalfView: {
+        backgroundColor: color.white,
+        borderWidth: 1,
+        borderColor: Colors.color.lightGray,
+        // flex: 1,
+        width: '50%',
+        height: 60,
+        justifyContent: "center"
+    },
+    selectedText: {
+        fontSize: 16,
+        fontFamily: fonts.bold,
+        textAlign: "center",
+        color: color.white,
+    },
+    UnselectedText: {
+        fontSize: 16,
+        textAlign: "center",
+        color: color.black,
+        fontFamily: fonts.bold,
+    },
 });

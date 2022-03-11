@@ -9,6 +9,7 @@ import {
   Image,
 } from "react-native";
 import { color } from "../Common/Colors";
+import fonts from "../Common/fonts";
 import ImagesPath from "../images/ImagesPath";
 
 const DropDownPicker = ({
@@ -58,7 +59,7 @@ const DropDownPicker = ({
             style={{ position: "absolute", right: 8 }}
           /> */}
           <Image source={!showPicker ? ImagesPath.downArrowImg : ImagesPath.upArrowImg}
-           style={{position: "absolute", alignSelf: "center", right: 8, height: 16, width: 16, color: color.black}}/>
+           style={{position: "absolute", alignSelf: "center", resizeMode: "contain", right: 8, height: 16, width: 16, tintColor: color.imageBlack}}/>
         </TouchableOpacity>
         {showPicker && (
           <View style={[styles.pickerContainer, pickerdrop]}>
@@ -70,13 +71,13 @@ const DropDownPicker = ({
                 <TouchableOpacity
                   key={index}
                   onPress={() => {
-                    onSelectValue(item?.value);
+                    onSelectValue(item?.name);
                     setShowPicker(false);
                     passID(item?.id);
                   }}
                   style={styles.pickerItemStyle}
                 >
-                  <Text style={styles.containerItemStyle}>{item?.value}</Text>
+                  <Text style={styles.containerItemStyle}>{item?.name}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
@@ -119,6 +120,7 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     fontSize: 16,
+    fontFamily: fonts.regular,
     color: "black",
   },
   containerItemStyle: {

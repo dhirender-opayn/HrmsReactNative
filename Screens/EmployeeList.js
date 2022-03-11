@@ -1,36 +1,51 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, View, Text, Image, FlatList, TouchableOpacity } from "react-native";
+import { ActivityIndicator, View, Text, Image, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import { useToast } from "react-native-toast-notifications";
 import Colors, { color } from "../Common/Colors";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import apiEndPoints from "../utils/apiEndPoints";
-import { UserContext } from "../utils/context";
+import { LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import AppBackgorund from "./BackgroundView";
 import moment from 'moment';
 import { StyleSheet } from "react-native";
 import { types } from "@babel/core";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
+import fonts from "../Common/fonts";
 
 
 const EmployeeList = ({navigation=useNavigation()}) => {
     const [userData] = useContext(UserContext);
     const [isLoading, setLoading] = useState(true);
+    const [refershing, setRefreshing] = useState(false);
     const [teamData, setTeamData] = useState([]);
     const toast = useToast();
+    const { showLoader, hideLoader } = useContext(LoaderContext);
    
     const getTeamData = async() => {
+        console.log("refresh");
         try {
                 const {data} = await apiCall("GET", apiEndPoints.Team);
-                console.log(data);
+                console.log("Data: "+data);
                 setTeamData(data.data);
             } catch (error) {
-                console.error(error);
+                console.error("ERR: "+error);
                 toast.show(error, { duration: 3000 })
             } finally {
                 setLoading(false);
+                setRefreshing(false);
+                console.log("Refreshed");
+                hideLoader();
             }
-    }
+    };
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        getTeamData();
+      }, []);
+
     useEffect(() => {
+        showLoader();
         getTeamData();
     }, []);
 
@@ -39,7 +54,6 @@ const EmployeeList = ({navigation=useNavigation()}) => {
             <AppBackgorund />
             {isLoading ? <ActivityIndicator /> :
                 <View>
-                    
                     <FlatList 
                         data={teamData}
                         keyExtractor={({id}, index) => id}
@@ -49,7 +63,7 @@ const EmployeeList = ({navigation=useNavigation()}) => {
                                 navigation.navigate("employeeDetail", {id: item.id});
                             }
                             }>
-                            <View style={empStyle.cardStyle}>
+                            <View style={CustomStyling.cardStyle}>
                                 <View style={{flex: 1, flexDirection: 'row'}}>
                                     {(item.profile.image != null) ? 
                                         (<Image 
@@ -66,8 +80,8 @@ const EmployeeList = ({navigation=useNavigation()}) => {
                                         />)
                                     }
                                     <View style={{flex: 2, flexDirection: 'column', justifyContent: "center", marginLeft: 8}}>
-                                        <Text style={{fontSize: 18, fontWeight: '600'}}>{item.name}</Text>
-                                        <Text style={{fontSize: 16, fontWeight: '500', marginTop: 4}}>
+                                        <Text style={{fontSize: 16, fontFamily: fonts.bold, color: color.titleBlack}}>{item.name}</Text>
+                                        <Text style={{fontSize: 14, fontFamily: fonts.medium, marginTop: 4, color: color.subtitleBlack}}>
                                             {item.roles[0].name}
                                         </Text>
                                     </View>
@@ -77,6 +91,9 @@ const EmployeeList = ({navigation=useNavigation()}) => {
                             </TouchableOpacity>
                             )}
                             style={{marginTop: 24}}
+                            refreshControl={
+                                <RefreshControl refreshing= {refershing} onRefresh={onRefresh} />
+                              }
                         />
                 </View>
             }
@@ -87,29 +104,10 @@ const EmployeeList = ({navigation=useNavigation()}) => {
 export default EmployeeList;
 
 const empStyle = StyleSheet.create({
-    cardStyle: {
-        marginHorizontal: 16,
-        marginVertical: 8,
-        padding: 8,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: color.lightGray,
-        backgroundColor: color.white,
-    },
-    statusStyle: {
-        //height: 32,
-        borderRadius: 16,
-        backgroundColor: color.red,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        alignSelf: "flex-end",
-        flexDirection: 'row'
-    },
+    
     imageStyle: {
         height: 70,
         width: 70,
         borderRadius: 8,
-        //resizeMode: "contain"
-
     }
 });

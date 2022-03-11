@@ -4,12 +4,14 @@ import { useToast } from "react-native-toast-notifications";
 import Colors, { color } from "../Common/Colors";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import apiEndPoints from "../utils/apiEndPoints";
-import { UserContext } from "../utils/context";
+import { LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import AppBackgorund from "./BackgroundView";
 import moment from 'moment';
 import { StyleSheet } from "react-native";
 import { types } from "@babel/core";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
+import fonts from "../Common/fonts";
 
 
 const LeavesRequestListing = ({navigation=useNavigation()}) => {
@@ -21,39 +23,42 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
     const leaveTypes = [{value: "Single Day", id: 1}, {value: "Multiple Day", id: 2}, {value: "Short Leave", id: 4},
          {value: "First Half", id: 5}, {value: "Second Half", id: 6}, {value: "", id: 0}, {value: "", id: 3}];
     const leaveStatus = [{value: "Pending", id: 0}, {value: "Approved", id: 1}, {value: "Rejected", id: 2}];
+    const { showLoader, hideLoader } = useContext(LoaderContext);
 
     const getLeavesData = async() => {
         try {
                 const {data} = await apiCall("GET", apiEndPoints.LeaveListing);
-                console.log(data);
+                console.log("Data" + data);
                 setLeavesData(data.data);
             } catch (error) {
-                console.error(error);
+                console.error("EER: "+error);
                 toast.show(error, { duration: 3000 })
             } finally {
                 setLoading(false);
+                hideLoader();
             }
     }
     useEffect(() => {
+        showLoader();
         getLeavesData();
     }, []);
 
     const leaveDate = (data) => {
         var dateStr = ""
         if(data.leave_type == 2){
-            dateStr = moment(new Date(data.start_date)).format("DD MMM, YYYY");
+            dateStr = moment.utc(data.start_date).format("DD MMM, YYYY");
             dateStr += " - ";
-            dateStr += moment(new Date(data.end_date)).format("DD MMM, YYYY");
+            dateStr += moment.utc(data.end_date).format("DD MMM, YYYY");
         }
         else if (data.leave_type == 4){
-            dateStr = moment(new Date(data.start_date)).format("DD MMM, YYYY");
+            dateStr = moment.utc(data.start_date).format("DD MMM, YYYY");
             dateStr += " (";
             dateStr += moment.utc(data.start_date).local().format("HH:mm");
             dateStr += " - ";
             dateStr += moment.utc(data.end_date).local().format("HH:mm") + ")";
         }
         else{
-            dateStr = moment(new Date(data.start_date)).format("DD MMM, YYYY");
+            dateStr = moment.utc(data.start_date).format("DD MMM, YYYY");
         }
         return dateStr;
     };
@@ -76,15 +81,26 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
             console.error(error);
             toast.show(error, { duration: 3000 })
         } finally {
-            setLoading(false);
+            hideLoader();
         }
+    }
+
+    const updateData = (item) => {
+        console.log("Upadte data")
+        var leaves = [...LeavesData];
+        var index = leaves.findIndex(leave => leave.id == item.id);
+        console.log(index);
+        let leaveData = {...leaves[index]};
+        leaveData["status"] = item.status;
+        leaves[index] = {...leaveData};
+        setLeavesData(leaves);
     }
 
     return(
         <OverlayContainer>
             <AppBackgorund />
             {isLoading ? <ActivityIndicator /> :
-                <View>
+                <View style={{flex: 1}}>
                     {(userData.user.id != 1) ? <View style={{backgroundColor: color.white, marginTop: 12, paddingVertical: 8}}>
                         <FlatList
                             horizontal
@@ -97,8 +113,8 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
                                             style={{height: 60, width: 60  , resizeMode: "contain"}} 
                                         />
                                     <View style = {{flex: 2, flexDirection: "column", alignContent: "center", justifyContent: "center", marginLeft: 4, marginEnd: 8}}>
-                                        <Text style={{textAlign: "center", fontSize: 14, fontWeight: '800'}}>{item.count} Days</Text>
-                                        <Text style={{textAlign: "center", marginTop: 6, fontSize: 12, fontWeight: "400", color: color.lightGray}}>{item.type}</Text>
+                                        <Text style={{textAlign: "center", fontSize: 15, fontFamily: fonts.bold, color: color.titleBlack}}>{item.count} Days</Text>
+                                        <Text style={{textAlign: "center", marginTop: 6, fontSize: 12, fontFamily: fonts.medium, color: color.darkGray}}>{item.type}</Text>
                                     </View>
                                 </View>
                             )}
@@ -112,44 +128,50 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
 
                         renderItem={({item}) => (
                             <TouchableOpacity onPress={() => {
-                                navigation.navigate("leaveDetail", {data: item});
+                                navigation.navigate("leaveDetail", {data: item, updatedData: ((val) => {updateData(val)}) });
                             }
                             }>
-                            <View style={leavStyle.cardStyle}>
-                                <View style={{flex: 1, flexDirection: 'row'}}>
+                            <View style={CustomStyling.cardStyle}>
+                                <View style={{flex: 1, flexDirection: 'row', marginTop: 8}}>
                                     <View style={{flex: 2, flexDirection: 'column'}}>
-                                        <Text style={{fontSize: 18, fontWeight: '600'}}>{item.user.name}</Text>
-                                        <Text style={{fontSize: 16, fontWeight: '500', marginTop: 4}}>{leaveTypes.find(type => type.id == item.leave_type).value}</Text>
+                                        <Text style={{fontSize: 16, fontFamily: fonts.semiBold, color: color.titleBlack}}>{item.user.name}</Text>
+                                        <Text style={{fontSize: 14, fontFamily: fonts.semiBold, marginTop: 4, color: color.titleBlack}}>{leaveTypes.find(type => type.id == item.leave_type).value}</Text>
                                     </View>
                                     <View style={{flex: 1}}>
-                                    <View style={[leavStyle.statusStyle, {backgroundColor: (item.status == 0) ? color.yellow : (item.status == 1) ?  color.green : color.red}]}>
+                                    <View style={[CustomStyling.statusStyle, {backgroundColor: (item.status == 0) ? color.yellow : (item.status == 1) ?  color.green : color.darkRed}]}>
                                         <Image source={require("../images/clock.png")}
                                             style={{height: 16, width: 16, tintColor: Colors.color.white, resizeMode: "contain"}} 
                                         />
-                                        <Text style={{fontSize: 15, fontWeight: '600', color: color.white, marginLeft: 4}}>{leaveStatus.find(status => status.id == item.status).value}</Text>
+                                        <Text style={{fontSize: 14, fontFamily: fonts.semiBold, color: color.white, marginLeft: 4}}>{leaveStatus.find(status => status.id == item.status).value}</Text>
                                     </View>
                                     </View>
                                 </View>
                                 <View style={{marginLeft: 8}}>
                                     <View style={{flex: 1, flexDirection: 'row', marginVertical: 8}}>
                                         <Image source={require("../images/calendar.png")}
-                                            style={{height: 16, width: 16, tintColor: Colors.color.black, resizeMode: "contain"}} 
+                                            style={{height: 16, width: 16, tintColor: Colors.color.imageBlack, resizeMode: "contain"}} 
                                         />
-                                        <Text style={{fontSize: 16, fontWeight: '400', color:color.purple, marginLeft: 6}}>Date: </Text>
-                                        <Text style={{fontSize: 16, fontWeight: '400'}}>{leaveDate(item)}</Text>
+                                        <Text style={{fontSize: 14, fontFamily: fonts.medium, color:color.backgroundBlack, marginLeft: 6}}>Date: </Text>
+                                        <Text style={{fontSize: 14, fontFamily: fonts.medium, color: color.titleBlack}}>{leaveDate(item)}</Text>
                                     </View>
-                                    <Text style={{fontSize: 16, fontWeight: '400', color:color.purple}}>{item.reason}</Text>
+                                    <Text style={{fontSize: 16, fontFamily: fonts.medium, color:color.backgroundBlack}}>{item.reason}</Text>
                                 </View>
                                 {(userData.user.id == 1 && item.status == 0) ? 
                                     <View style = {{flex: 1, flexDirection: "row", marginTop: 8}}>
-                                        <TouchableOpacity style={{flex: 1, padding: 8}} onPress={() => updateStatus(item.id, item.user_id, 2)}>
+                                        <TouchableOpacity style={{flex: 1, padding: 8}} onPress={() => {
+                                            showLoader();
+                                            updateStatus(item.id, item.user_id, 2)
+                                        }}>
                                             <View style={{borderWidth: 1, borderColor: color.darkGray, borderRadius: 4, justifyContent: "center", height: 32}}>
-                                                <Text style={{textAlign: "center", fontSize: 16, fontWeight: '600', color: color.darkGray}}>Cancel</Text>
+                                                <Text style={{textAlign: "center", fontSize: 16, fontFamily: fonts.bold, color: color.darkGray}}>Cancel</Text>
                                             </View>
                                         </TouchableOpacity>
-                                        <TouchableOpacity style={{flex: 1, padding: 8}} onPress={() => updateStatus(item.id, item.user_id, 1)}>
+                                        <TouchableOpacity style={{flex: 1, padding: 8}} onPress={() => {
+                                            showLoader();
+                                            updateStatus(item.id, item.user_id, 1)
+                                        }}>
                                             <View style={{borderRadius: 4, backgroundColor: color.green, justifyContent: "center", height: 32}}>
-                                                <Text style={{textAlign: "center", fontSize: 16, fontWeight: '600', color: color.white}}>Approve</Text>
+                                                <Text style={{textAlign: "center", fontSize: 16, fontFamily: fonts.bold, color: color.white}}>Approve</Text>
                                             </View>
                                         </TouchableOpacity>
                                     </View> : null
@@ -157,7 +179,7 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
                             </View>
                                 </TouchableOpacity>
                             )}
-                            style={{marginTop: 24}}
+                             style={{marginTop: 24, marginBottom: 4}}
                         />
                 </View>
             }
@@ -166,24 +188,3 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
 };
 
 export default LeavesRequestListing;
-
-const leavStyle = StyleSheet.create({
-    cardStyle: {
-        marginHorizontal: 16,
-        marginVertical: 8,
-        padding: 16,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: color.lightGray,
-        backgroundColor: color.white,
-    },
-    statusStyle: {
-        //height: 32,
-        borderRadius: 16,
-        backgroundColor: color.red,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        alignSelf: "flex-end",
-        flexDirection: 'row'
-    }
-})

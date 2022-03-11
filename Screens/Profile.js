@@ -10,18 +10,14 @@ import  Colors  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
 import Global from "../Common/Global";
 import { useToast } from "react-native-toast-notifications";
-import { AuthContext, UserContext } from "../utils/context";
+import { AuthContext, LoaderContext, UserContext } from "../utils/context";
 
 const ProfileView = ({navigation=useNavigation()}) => {
     const [userdata, setData] = useContext(UserContext);
-    const [isLoad, setLoad] = useState(false)
     const [ListData, setListData] = useState([]);
-    const [message, setMsg] = useState("");
-    const [isLoading, setLoading] = useState(false);
-    var detail =  "";
-    const [deail, setDetail] = useState("");
     const toast = useToast();
     const { signOut } = useContext(AuthContext);
+    const { showLoader, hideLoader } = useContext(LoaderContext);
 
     const LogoutAPI = async() => {
         
@@ -32,21 +28,19 @@ const ProfileView = ({navigation=useNavigation()}) => {
           try{
               const response = await fetch(request)
               const json = await response.json();
-              setMsg(json.message);  
               signOut();
-              //toast.show(json.message, {duration: 4000});
-             // navigation.navigate("Login");
+            
           } catch (error) {
           console.error(error);
           toast.show(error, {duration: 3000})
           } finally {
-          setLoading(false);
+          hideLoader();
           }
       };
     const setViewData = async() => {
         
             const listing = [{id:  0, title: "Change Password", view: "ChangePassword"}, 
-                        {id:  0, title: "Notification", view: ""}, 
+                        {id:  1, title: "Notification", view: "Notifications"}, 
                         {id:  2, title: "Add Ticket", view: "AddTicket"}];
             setListData(listing);
        
@@ -59,10 +53,9 @@ const ProfileView = ({navigation=useNavigation()}) => {
             <AppBackgorund />
             <View style={{padding: 16, flex: 1}}>
                 {/* <Text>{deail}</Text> */}
-                { isLoad ? <ActivityIndicator /> :
-               ( <View style={{flex: 1}}>
+                <View style={{flex: 1}}>
                    <View style={{flex: 1}}>
-                        <View style={{flexDirection: "row", marginTop: 24, left: 0, right: 0, flex: 1}}>
+                        <View style={{flexDirection: "row", marginTop: 4, left: 0, right: 0, flex: 1}}>
                             {(userdata.user.profile.image != null) ? 
                                 (<Image 
                                 source={{
@@ -78,8 +71,8 @@ const ProfileView = ({navigation=useNavigation()}) => {
                                 />)
                             }
                             <View style={{paddingHorizontal: 4, paddingVertical: 8, flex: 3}}>
-                                <Text style={CustomStyling.UserNameText}>{userdata.user.name}</Text>
-                                <Text style={CustomStyling.userDesignationText}>{userdata.user.roles[0].name}</Text>
+                                <Text style={[CustomStyling.title, {padding: 8, alignSelf: 'flex-start'}]}>{userdata.user.name}</Text>
+                                <Text style={[CustomStyling.subTitle, {alignSelf: 'flex-start', paddingHorizontal: 8}]}>{userdata.user.roles[0].name}</Text>
                             </View>
                             <TouchableOpacity onPress={() => {
                                 navigation.navigate('EditProfile');
@@ -92,18 +85,18 @@ const ProfileView = ({navigation=useNavigation()}) => {
                         </View>
                         <TouchableOpacity onPress={() => {
                             if (userdata.user.id == 1){
-                                setLoading(true);
+                                showLoader();
                                 LogoutAPI();
                             }
                         }}
                         style={{height: 72, width: 80, alignSelf: "center",  marginTop: 20, marginBottom: 8}}>
-                            <View style={{backgroundColor: Colors.color.red, borderRadius: 16, height: 72, width: 80, alignItems: "center", justifyContent: "center"}}>
+                            <View style={{backgroundColor: Colors.color.white, borderRadius: 16, height: 72, width: 80, alignItems: "center", justifyContent: "center"}}>
                             <Image source={require("../images/EmergencyOff.png")}
-                                style={{height:32, width:32, tintColor: "white"}}
+                                style={{height:32, width:32, tintColor: Colors.color.backgroundBlack}}
                             />
                             </View>
                         </TouchableOpacity>
-                        <Text style={[CustomStyling.title, {marginBottom: 16}]}>{(userdata.user.id == 1) ? "Logout" : "Emergency Leave"}</Text>
+                        <Text style={[AuthStyle.mainButtonText, {marginBottom: 16}]}>{(userdata.user.id == 1) ? "Logout" : "Emergency Leave"}</Text>
                     </View>
                     <View style={{flex: 1, justifyContent: "flex-end", marginVertical: 16}}>
                         <FlatList 
@@ -114,9 +107,9 @@ const ProfileView = ({navigation=useNavigation()}) => {
                                     navigation.navigate(item.view)
                                 }>
                                 <View style={{ flexDirection: "row", borderBottomWidth: (item.id == ListData.length-1) ? 0 : 1, borderBottomColor: Colors.color.lightGray, paddingTop: 16, paddingBottom: 8, justifyContent: "center"}}>
-                                    <Text style={[CustomStyling.listTitle, {flex: 7, height: 20}]}>{item.title}</Text>
+                                    <Text style={[CustomStyling.listTitle, {flex: 7, height: 18}]}>{item.title}</Text>
                                     <Image source={require("../images/rightArrow.png")}
-                                    style={{height: 20, width: 16, flex: 1, tintColor: Colors.color.lightGray, resizeMode: "contain"}} 
+                                    style={CustomStyling.rightArrowImg} 
                                     />
                                 </View>
                                 </TouchableOpacity>
@@ -126,19 +119,18 @@ const ProfileView = ({navigation=useNavigation()}) => {
                         
                         {(userdata.user.id != 1) ? <TouchableOpacity 
                             onPress={() => {
-                                setLoading(true);
+                                showLoader();
                                 LogoutAPI();
                             }}
                             style={{marginTop: 16, marginHorizontal: 16}}
                         >
                         <View style={{backgroundColor:Colors.color.red, borderRadius: 12, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
                             <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Logout</Text>
-                            {isLoading ? <ActivityIndicator /> : null}
                         </View>
                         </TouchableOpacity> : null}
                     </View>
                 </View>
-                )}
+            
             </View>
         </OverlayContainer>
     );

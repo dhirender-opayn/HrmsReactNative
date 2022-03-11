@@ -1,113 +1,129 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
 import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image } from "react-native";
 import  Colors, { color }  from "../Common/Colors";
 import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
-import ImagePickerView from "./ImagePickerView";
+import { LoaderContext, UserContext } from "../utils/context";
+import ImagePicker from "react-native-image-crop-picker";
+import PopUpModal from "../helper/PopUpModal";
+import { apiCall } from "../utils/httpClient";
+import apiEndPoints from "../utils/apiEndPoints";
 
 const EditProfileView = ({navigation = useNavigation()}) => {
     const [isLoading, setLoading] = useState(false);
-    const [isLoad, setLoad] = useState(true);
-    const [name, setName] = useState("");
-    const [emailId, setEmail] = useState("");
-    const [mobile, setMobile] = useState("");
-    const [clockifyKey, setKey] = useState("");
-    const [description, setDescription] = useState("");
-    const [message, setMsg] = useState("");
-    const [data, setData] = useState({});
+    const [isLoad, setLoad] = useState(false);
     const toast = useToast();
-    const [userdata, setUserData] = useState({});
-    const [token, setToken] = useState('');
-    const [selectImage, setselectImage] = useState(false);
-    const [profileUrl, setPUrl] = useState('');
-    const selectedImage = useState({});
-   var detail =  "";
-   const [deail, setDetail] = useState("");
-    let formData = new FormData()
-    
-    
-    const ContactAdminAPI = async() => {
-      formData.append('user_id', '');
-      formData.append('name', name)
-      formData.append('email', emailId);
-      formData.append('mobile', mobile);
-      formData.append('subject', subject);
-      formData.append('description', description);
-      const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.addTicket, {method: 'POST', headers: {
-        Accept: 'application/json',
-        }, body: formData});
-        try{
-            const response = await fetch(request)
-            const json = await response.json();
-            setMsg(json.message);
-             //setData(json.data);
+    const [userdata, setUserData] = useContext(UserContext);
+    const [formData, setFormData] = useState({});
+    const [showPickerModal, setShowPicker] = useState(false);
+    const [selectdImageData, setSelectedImgData] = useState({});
+    const { showLoader, hideLoader } = useContext(LoaderContext);
 
-             toast.show(json.message, {duration: 4000});
-            
-            //  navigation.goBack();
-        } catch (error) {
-        console.error(error);
-        toast.show(error, {duration: 3000})
-        } finally {
-        setLoading(false);
+  
+    let form = new FormData()
+    const UpdateProfile = async() => {
+       // var param = {};
+       form.append('id', userdata.user.id );
+       form.append('name', (formData.name === undefined) ? userdata.user.name : formData.name );
+       form.append('email', userdata.user.email );
+       form.append('mobile', (formData.mobile === undefined) ? userdata.user.mobile : formData.mobile );
+       form.append('clockify_key', (formData.clockifyKey === undefined) ? userdata.user.profile.clockify_key : formData.clockifyKey );
+        if (selectdImageData.path != null || selectdImageData.path != undefined){
+            form.append('image', {
+              uri: Platform.OS === 'android' ? `file:///${selectdImageData/path}` : selectdImageData.path,
+              type: 'image/jpeg',
+              name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",
+            } );
         }
-    };
+        console.log(form);
+        const request = new Request(Global.projct.ios.BASE_URL+apiEndPoints.UpdatePropfile, {method: 'POST', headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${userdata.token}`
+          }, body: form});
+          try{
+              const response = await fetch(request)
+              const json = await response.json();
+              //setMsg(json.message);
+              console.log(json);
+              var updatedData = {...userdata};
+              updatedData["user"] = {...json.data.user};
+              setUserData(updatedData);
+                toast.show(json.message, {duration:4000});
+            
+              
+          } catch (error) {
+          console.error(error);
+          toast.show(error, {duration: 3000})
+          } finally {
+            hideLoader();
+          setLoading(false);
+          }
+      };
+
     const onsubmit = () => {
-      if (Validations.NameValidation(name)){
-        toast.show(Validations.NameValidation(name), {duration: 3000});
+      if (Validations.NameValidation((formData.name === undefined) ? userdata.user.name : formData.name)){
+        toast.show(Validations.NameValidation((formData.name === undefined) ? userdata.user.name : formData.name), {duration: 3000});
       }
-      else if (Validations.EmailValidation(emailId)){
-        toast.show(Validations.EmailValidation(emailId), {duration: 3000});
+      else if (Validations.MobileValidation((formData.mobile === undefined) ? userdata.user.mobile : formData.mobile)){
+        toast.show(Validations.MobileValidation((formData.mobile === undefined) ? userdata.user.mobile : formData.mobile), {duration: 3000});
       }
-      else if (Validations.MobileValidation(mobile)){
-        toast.show(Validations.MobileValidation(mobile), {duration: 3000});
-      }
-      else if (Validations.SubjectValidation(subject)){
-        toast.show(Validations.SubjectValidation(subject), {duration: 3000});
-      }
-      else if (Validations.DescriptonValidation(description)){
-        toast.show(Validations.DescriptonValidation(description), {duration: 3000});
+      else if (Validations.FieldValidation((formData.clockifyKey === undefined) ? userdata.user.profile.clockify_key : formData.clockifyKey)){
+        toast.show(Validations.EmptyFieldStr("clockify key"), {duration: 3000});
       }
       else{
         setLoading(true);
-        ContactAdminAPI();
+        showLoader();
+        UpdateProfile();
       }
     };
-    const retrieveData = async() => {
-        try{
-            detail =  await AsyncStorage.getItem('userData');
-            console.log(detail);
-            setDetail(detail)
-            let data = JSON.parse(detail);
-            setUserData(data);
-            setToken(data.token)
-            if (data.user.profile.image != null && data.user.profile.image != ""){
-            setPUrl(data.user.profile.image);
-            }
-        }
-        catch (error){
-            console.error(error);
-        }
-        finally{
-            setLoad(false);
-        }
+    
+    
+    const onTextChange = (key, value) => {
+      var data = {...formData};
+      data[key] = value;
+      setFormData(data);
     };
-    useEffect(() =>{ 
-        retrieveData();
-    }, []);
-    useEffect(() =>{ 
-        if (selectedImage.hasOwnProperty('assets')){
-        setPUrl(selectedImage.assets[0].uri);
-        }
-    }, [selectedImage]);
+
+    const openImagePicker = () => {
+       ImagePicker.openPicker({
+        
+         cropping: true,
+         includeBase64: true,
+       })
+       
+         .then((I) => {
+          setShowPicker(false);
+          console.log(I);
+          setSelectedImgData(I);
+         })
+         .catch((error) => {     
+          setShowPicker(false);
+         });
+      
+     };
+   
+     const openCamera = () => {
+       ImagePicker.openCamera({
+
+         cropping: true,
+         includeBase64: true,
+       })
+         .then((I) => {
+          setShowPicker(false);
+          setSelectedImgData(I);
+          
+         })
+         .catch((error) => {
+          setShowPicker(false);
+         });
+     };
+
     return(
       <OverlayContainer>
             <AppBackgorund />
@@ -117,93 +133,89 @@ const EditProfileView = ({navigation = useNavigation()}) => {
           
         <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
             <View style={AuthStyle.CardmainContainer}> 
-                {(profileUrl != "" && profileUrl != null) ? 
-                    (<Image 
+                
+                { (selectdImageData.path != null || selectdImageData.path != undefined) ?
+                 (<Image 
+                  source={{
+                      uri: selectdImageData.path,
+                      //method: 'GET'
+                  }}
+                  style={CustomStyling.editImageView}
+                  />) :
+                  ((userdata.user.profile.image != null) ? 
+                                (<Image 
                                 source={{
-                                    uri: {profileUrl}//selectedImage.assets[0].uri,//userdata.user.profile.image,
-                                   //method: 'GET'
+                                    uri: userdata.user.profile.image,
+                                    method: 'GET'
                                 }}
                                 style={CustomStyling.editImageView}
-                    />)
-                    :
-                    (<Image 
+                                />)
+                                :
+                                (<Image 
                                 source={require('../images/userwhite.png')}
                                 style={CustomStyling.editImageView}
-                    />)
-                }
+                                />))
+                            }
                 <TouchableOpacity onPress={() => {
                     //navigation.navigate('picker');
-                    setselectImage(true);
+                    setShowPicker(true);
                     }}
                     style={CustomStyling.editImageBtn}>
                     <Image source={require("../images/camera.png")}
-                        style={{height:32, width:32}}
+                        style={CustomStyling.camerImageStyle}
                     />
                 </TouchableOpacity>
                 <TextInput
-                    style={[AuthStyle.inputText, {marginTop: 20}]}
+                    style={[AuthStyle.inputText, {marginTop: 32}]}
                     placeholder="Name"
-                    onChangeText={Id => setName(Id)}
-                    defaultValue={name}
+                    defaultValue={userdata.user.name}
+                    onChangeText={(val) => onTextChange("name", val)}
                 />
                 <TextInput
                     style={AuthStyle.inputText}
                     placeholder="Email"
-                    onChangeText={pswrd => setEmail(pswrd)}
-                    defaultValue={emailId}
+                    defaultValue={userdata.user.email}
+                    editable={false}
+                    onChangeText={(val) => onTextChange("email", val)}
                 />
                 <TextInput
                     style={AuthStyle.inputText}
                     keyboardType='phone-pad'
                     placeholder="Mobile"
-                    onChangeText={mobile => setMobile(mobile)}
-                    defaultValue={mobile}
+                    defaultValue={userdata.user.mobile}
+                    onChangeText={(val) => onTextChange("mobile", val)}
+
                 />
                 <TextInput
                     style={AuthStyle.inputText}
                     placeholder="Clockify Key"
-                    onChangeText={key => setKey(key)}
-                    defaultValue={clockifyKey}
+                    editable={(userdata.user.profile.clockify_key != null) ? false : true}
+                    defaultValue={userdata.user.profile.clockify_key}
+                    onChangeText={(val) => onTextChange("clockifyKey", val)}
                 />
                 
-                <TouchableOpacity onPress={() => {
-                    if (selectedImage.hasOwnProperty('assets')){
-                        setPUrl(selectedImage.assets[0].uri);
-                        }
-                        console.log(selectedImage);
-                 // onsubmit()
+            </View>
+            <TouchableOpacity onPress={() => {
+                onsubmit();
                 //navigation.navigate('User');
-                }}>
-                  <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
-                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Make Request</Text>
+            }}>
+                  <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", margin: 24}}>
+                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Save</Text>
                     {isLoading ? <ActivityIndicator /> : null}
                   </View>
                 </TouchableOpacity>
-                
-            </View>
-            
         </View>
-
-       //</ScrollView> <Text>Gekn</Text>
-        // /* {(userdata.user.profile.image != null) ? 
-        //                         (<Image 
-        //                         source={{
-        //                             uri: userdata.user.profile.image,
-        //                             method: 'GET'
-        //                         }}
-        //                         style={{width:80, height: 80, borderRadius: 40, marginTop: 40}}
-        //                         />)
-        //                         :
-        //                         (<Image 
-        //                         source={require('../images/userwhite.png')}
-        //                         style={{width:80, height: 80, borderRadius: 40, marginTop: 40}}
-        //                         />)
-        //                     } */
-       // </OverlayContainer>
+      
         )}
-        {(selectImage) ? <ImagePickerView selectImage={selectedImage}/> : null}
+        {showPickerModal && (
+        <PopUpModal
+          onPressCamera={openCamera}
+          onPressGallery={openImagePicker}
+          onPressCancel={() => setShowPicker(false)}
+        />
+      )}
+        {/* {(selectImage) ? <ImagePickerView selectImage={selectedImage}/> : null} */}
         </ScrollView>
-        {/* {(selectImage) ? <ImagePickerView /> : null} */}
         </OverlayContainer>
     );
 };

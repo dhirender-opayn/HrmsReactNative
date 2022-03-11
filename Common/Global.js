@@ -2,6 +2,7 @@ module.exports = {
   
     projct:{
         BASE_URL: 'http://3.22.185.42/hrms-api/public/api/',
+        filesURL: 'http://3.22.185.42/hrms-api/public/uploads/',
         ios:{
             BASE_URL: 'http://3.22.185.42/hrms-api/public/api/',
             COLOR_TEXT: 'white',

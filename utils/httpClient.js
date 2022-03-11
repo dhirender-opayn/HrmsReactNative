@@ -21,6 +21,11 @@ export async function apiCall(
     'Content-Type': 'application/json',
   },
   ) {
+    const noNetdata = {
+      data :
+     { message: 'Please check your internet connection',
+      code: 400}
+    };
     try {
       const netInfo = await NetInfo.fetch();
       if (netInfo.isConnected) {
@@ -33,16 +38,11 @@ export async function apiCall(
           headers: header,
           withCredentials: false,
         });
-        // console.log('res: ', res);
+          console.log('res: ', res);
         return res;
       } else {
-        const data = {
-          message: 'Please check your internet connection',
-          code: 400,
-        };
-
-      
-        return data;
+        console.log(noNetdata);
+        return noNetdata;
       }
     } catch (error) {
       if (error.response.data) {

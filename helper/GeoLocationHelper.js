@@ -18,8 +18,7 @@ const GeoLocationHelper = ({setCurrentLatLocation, setCurrentLongLocation}) => {
   ] = useState('');
 
   let watchID = ""
-  setCurrentLatLocation(currentLatitude)
-  setCurrentLongLocation(currentLongitude)
+  
 
   useEffect(() => {
     const requestLocationPermission = async () => {
@@ -74,6 +73,8 @@ const GeoLocationHelper = ({setCurrentLatLocation, setCurrentLongLocation}) => {
 
         //Setting Longitude state
         setCurrentLatitude(currentLatitude);
+        setCurrentLatLocation(currentLatitude)
+        setCurrentLongLocation(currentLongitude)
       },
       (error) => {
         setLocationStatus(error.message);
@@ -108,6 +109,8 @@ const GeoLocationHelper = ({setCurrentLatLocation, setCurrentLongLocation}) => {
 
         //Setting Latitude state
         setCurrentLatitude(currentLatitude);
+        setCurrentLatLocation(currentLatitude)
+        setCurrentLongLocation(currentLongitude)
       },
       (error) => {
         setLocationStatus(error.message);

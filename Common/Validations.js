@@ -1,3 +1,5 @@
+const { color } = require("./Colors");
+
 module.exports = {
      EmailValidation : email => {
       const re = /\S+@\S+\.\S+/;
@@ -20,6 +22,11 @@ module.exports = {
       if(!name) return "Please enter name."
       return ''
     },
+    OtpValidation: otp =>{
+      if(!otp) return "Please enter otp"
+      if(otp.length != 4) return "Please enter all 4 digits of otp."
+      return ''
+  },
     SubjectValidation:subject =>{
         if(!subject) return "Please enter subject."
         return ''

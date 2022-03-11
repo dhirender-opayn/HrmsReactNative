@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
-import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text } from "react-native";
 import  Colors  from "../Common/Colors";
 import Validations from "../Common/Validations";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,12 +11,16 @@ import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
 import { AuthContext, LoaderContext } from "../utils/context";
+import FloatTextField from "../helper/FloatTextField";
+import { MainButton } from "../components/mainButton";
+import { TextButton } from "../components/TextButton";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
 
 const LoginView = ({navigation = useNavigation()}) => {
     const [emailId, setEmail] = useState("simran.sharma@opayn.com");
     const [password, setPswrd] = useState("123456");
-    const [message, setMsg] = useState("");
-    const [data, setData] = useState({});
+    const { showLoader, hideLoader } = useContext(LoaderContext);
+
     const toast = useToast();
     const { signIn } = useContext(AuthContext);
     let formData = new FormData()
@@ -30,9 +34,7 @@ const LoginView = ({navigation = useNavigation()}) => {
         try{
             const response = await fetch(request)
             const json = await response.json();
-            setMsg(json.message);
             if (json.hasOwnProperty("data")){
-            setData(json.data);
             console.log(json.data)
             signIn(json);
             const object = JSON.stringify(json.data);
@@ -45,10 +47,10 @@ const LoginView = ({navigation = useNavigation()}) => {
             }
             
         } catch (error) {
-        console.error(error);
-        toast.show(error, {duration: 3000})
+          console.error(error);
+          toast.show(error, {duration: 3000});
         } finally {
-        setLoading(false);
+          hideLoader();
         }
     };
     const onsubmit = () => {
@@ -61,6 +63,7 @@ const LoginView = ({navigation = useNavigation()}) => {
         return
       }
       else{
+        showLoader();
         LoginApi();
       }
     }
@@ -68,99 +71,51 @@ const LoginView = ({navigation = useNavigation()}) => {
       <OverlayContainer>
             <AppBackgorund />
         <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
-            <Text style={AuthStyle.textTitile}>Login</Text>
+            <Text style={AuthStyle.viewTitile}>Login</Text>
             <View style={AuthStyle.CardmainContainer}> 
-                <Text style={{paddingTop: 0, paddingBottom: 32, alignSelf: "center", fontSize: 32, fontWeight: "bold"}}>Opayn HRMS</Text>
-                <TextInput
-                    style={AuthStyle.inputText}
+                <Text style={CustomStyling.containerTitle}>Opayn HRMS</Text>
+                
+                <FloatTextField 
                     placeholder="Enter Email"
-                    onChangeText={Id => setEmail(Id)}
                     defaultValue={emailId}
+                    pickerLabel="Email"
+                    onTextChange={(val) => setEmail(val)}
                 />
-                <TextInput
-                    style={AuthStyle.inputText}
-                    placeholder="Enters Password"
-                    onChangeText={pswrd => setPswrd(pswrd)}
+                <FloatTextField 
+                    placeholder="Enter Password"
                     defaultValue={password}
+                    pickerLabel="Password"
+                    onTextChange={(val) => setPswrd(val)}
+                    isPasswordField={true}
                 />
-                <TouchableOpacity onPress={() => {onsubmit()}}>
-                  <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", marginVertical: 12}}>
-                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Login</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity onPress = {() => {
-                  navigation.navigate('Forget')
-            
-                }}>
-                <Text style={{fontSize: 16, fontWeight: "bold", color: Colors.color.red, alignSelf: "flex-end", marginVertical: 16}}>Forgot Password?</Text>
-
-                </TouchableOpacity >
-              
+                
+                <MainButton 
+                    text='Login'
+                    onPress={() => {onsubmit()}}
+                />
+               
+                <TextButton 
+                  text='Forgot Password?'
+                  onPress={() => {
+                    navigation.navigate('Forget');
+                  }}
+                  textStyle={{alignSelf: "flex-end", marginVertical: 16}}
+                />
                 
             </View>
             <View style={{padding:0, flexDirection:"row", alignItems:"center", alignSelf:"center"}}>
-              <Text style={{color:Colors.color.darkGray, fontSize: 16}}>Request for Approval </Text>
-              <TouchableOpacity onPress = {() => {
-                  navigation.navigate('ContactAdmin')
-            
-                }}>
-                <Text style={{fontSize: 16, fontWeight: "bold", color: Colors.color.red}}>Request</Text>
-
-                </TouchableOpacity >
+              <Text style={CustomStyling.regular16Text}>Request for Approval </Text>
+                <TextButton 
+                  text='Request'
+                  onPress={() => {
+                    navigation.navigate('ContactAdmin');
+                  }}
+                  
+                />
             </View>
         </View>
         </OverlayContainer>
     );
 };
-
-const styles = StyleSheet.create({
-    TextfieldContainer: {
-        height: 50, 
-        borderWidth:1, 
-        borderColor: Colors.color.lightGray, 
-        borderRadius: 8, 
-        padding: 8,
-        marginBottom: 16,
-        fontSize: 14
-    },
-    sectionContainer: {
-      marginTop: 32,
-      paddingHorizontal: 24
-    },
-    sectionTitle: {
-      fontSize: 24,
-      fontWeight: '600',
-    },
-    sectionDescription: {
-      marginTop: 8,
-      fontSize: 18,
-      fontWeight: '400',
-    },
-    highlight: {
-      fontWeight: '700',
-    },
-  
-    shadowContainerStyle: {   //<--- Style with elevation
-     
-      shadowColor: Colors.color.darkGray,
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 1,
-      shadowRadius: 3,
-      elevation: 3,
-    },
-    shadowBottonContainerStyle: {    //<--- Style without elevation
-      borderWidth: 1,
-      borderRadius: 16,
-      borderColor: Colors.color.lightGray,
-      borderBottomWidth: 1,
-      //shadowColor: Colors.red,
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 1,
-      shadowRadius: 0,
-      paddingVertical: 24, paddingHorizontal: 16, margin: 16,
-      backgroundColor: 'white'
-    },
-    
-  });
 
 export default LoginView;

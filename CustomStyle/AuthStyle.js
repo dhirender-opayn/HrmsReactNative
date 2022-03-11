@@ -14,17 +14,25 @@ export const AuthStyle = StyleSheet.create({
         alignSelf: 'center',
 
     },
-    textTitile: {
-        fontWeight: 'bold',
-        fontSize: 24,
+    viewTitile: {
+        fontFamily: 'Asap-Bold',
+        fontSize: 26,
         alignSelf: 'center',
         color: 'white'
     },
-    subText: {
-        fontSize: 16,
-        color: 'white',
+    viewSubTitile: {
+        fontFamily: 'Asap-SemiBold',
+        fontSize: 26,
         alignSelf: 'center',
-        marginTop: 20
+        color: 'white'
+    },
+    medium16Text: {
+        fontSize: 16,
+        fontFamily: 'Asap-Medium',
+        color: 'white',
+        textAlign: 'center',
+        marginTop: 20,
+        marginHorizontal: 24
     },
     inputText: {
         height: 50, 
@@ -32,35 +40,44 @@ export const AuthStyle = StyleSheet.create({
         borderColor: Colors.color.lightGray, 
         borderRadius: 8, 
         padding: 8,
-        marginBottom: 16,
+        marginBottom: 20,
         fontSize: 16
     },
     mainButtonContainer: {
-        borderColor:'red',
-        backgroundColor: 'red',
+        borderColor:color.red,
+        backgroundColor: color.red,
         marginTop: 20,
-        borderRadius: 5,
+        borderRadius: 16,
         borderWidth: 1,
-        padding: 13,
+        height: 50,
+        justifyContent: "center"
     },
     mainButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight:'bold',
-        textAlign: 'center'
+        fontSize: 18, 
+        fontFamily: "Asap-Bold", 
+        color: '#fff',
+        textAlign: "center"
+    },
+    textButtonText: {
+        fontSize: 16, 
+        fontFamily: "Asap-SemiBold", 
+        color: Colors.color.red
     },
 
-
     CardmainContainer:{
-        padding:15,
         marginHorizontal:25,
         backgroundColor:'white',
-        borderWidth:1,
+        borderWidth:0,
         borderRadius: 12,
         borderColor: Colors.color.lightGray,
         paddingVertical: 24, 
         paddingHorizontal: 16,
-        margin: 16
+        margin: 16,
+        shadowColor: Colors.color.lightGray,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 1,
+      shadowRadius: 2,
+      elevation: 2,
     },
     Cardtext: {
         fontSize: 24,
@@ -78,6 +95,23 @@ export const AuthStyle = StyleSheet.create({
         color:'black',
         fontSize:16
     },
-    
+    IconInputView: {
+        height: 50, 
+        borderWidth:1, 
+        borderColor: Colors.color.lightGray, 
+        borderRadius: 8, 
+       // padding: 8,
+        marginBottom: 20,
+        flexDirection: "row",
+
+    },
+    downloadView: {
+        borderWidth:1, 
+        borderColor: Colors.color.lightGray, 
+        borderRadius: 8, 
+        marginBottom: 20,
+        flexDirection: "row",
+
+    },
    
 });

@@ -59,5 +59,12 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Asap-Bold.ttf</string>
+		<string>Asap-Medium.ttf</string>
+		<string>Asap-Regular.ttf</string>
+		<string>Asap-SemiBold.ttf</string>
+	</array>
 </dict>
 </plist>
