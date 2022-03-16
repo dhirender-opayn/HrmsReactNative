@@ -88,12 +88,15 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
             );
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
               // Start downloading
+              console.log("Download");
               downloadFile();
             } else {
               // If permission denied then show alert
+              console.log("Alert");
               Alert.alert('Error','Storage Permission Not Granted');
             }
           } catch (err) {
+            console.log("Err: "+err);
             // To handle permission related exception
           }
         }
@@ -108,7 +111,7 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
         const {config} = RNFetchBlob; 
         const isIOS = Platform.OS == "ios"; 
         const aPath = Platform.select({ios: DocumentDir, android: DownloadDir});
-        const fPath = aPath + '/' + Math.floor(date.getTime() + date.getSeconds() / 2)+file_ext;
+        const fPath = aPath + '/' + new Date().getUTCMilliseconds() + file_ext;
         const configOptions = Platform.select({
           ios: {
             fileCache: true,
@@ -151,15 +154,18 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
           this.refs.toast.show(errorMessage,2000);
         });
     } else {
+      console.log("Start Download");
       config(configOptions)
         .fetch('GET', fileUrl)
         .then(res => {
+          console.log("Succes: "+res);
           RNFetchBlob.android.actionViewIntent(res.path());
           this.setState({overLoader: false});
           this.refs.toast.show('File download successfully',2000);
          
         })
         .catch((errorMessage, statusCode) => {
+          console.log(errorMessage);
           this.setState({overLoader: false});
           this.refs.toast.show(errorMessage,2000);
         });
@@ -185,7 +191,7 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
                     <View style={{width: '60%', flexDirection: "row", marginTop: 12}}>
                         <Image source={require("../images/ticket.png")}
                                 style={CustomStyling.Image18Size} 
-                            />
+                        />
                         <Text style={[CustomStyling.LeaveTextStyle, {marginRight: 6, width: '85%'}]} numberOfLines={1}>{item.reason}</Text>
                     </View>
                     <View style={{width: '40%', alignContent: "flex-end", borderWidth: 0}}>

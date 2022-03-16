@@ -84,8 +84,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
     return(
       <OverlayContainer>
         <AppBackgorund />
-        <ScrollView>
-          <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
+        <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
+          <ScrollView>
             <View style={{padding: 16, marginTop: 8, justifyContent: "center"}}>
                 <Text style={AuthStyle.viewTitile}>Contact Admin</Text>
                 <View style={AuthStyle.CardmainContainer}> 
@@ -152,8 +152,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                 </View>
                 
             </View>
-          </KeyboardAwareView>
-        </ScrollView>
+          </ScrollView>
+        </KeyboardAwareView>
       </OverlayContainer>
     );
 };

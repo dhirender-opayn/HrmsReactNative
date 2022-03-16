@@ -20,6 +20,7 @@ const EditProfileView = ({navigation = useNavigation()}) => {
     const toast = useToast();
     const [userdata, setUserData] = useContext(UserContext);
     const [formData, setFormData] = useState({});
+    const [imageData, setImageData] = useState({});
     const [showPickerModal, setShowPicker] = useState(false);
     const [selectdImageData, setSelectedImgData] = useState({});
     const { showLoader, hideLoader } = useContext(LoaderContext);
@@ -33,12 +34,8 @@ const EditProfileView = ({navigation = useNavigation()}) => {
        form.append('email', userdata.user.email );
        form.append('mobile', (formData.mobile === undefined) ? userdata.user.mobile : formData.mobile );
        form.append('clockify_key', (formData.clockifyKey === undefined) ? userdata.user.profile.clockify_key : formData.clockifyKey );
-        if (selectdImageData.path != null || selectdImageData.path != undefined){
-            form.append('image', {
-              uri: Platform.OS === 'android' ? `file:///${selectdImageData/path}` : selectdImageData.path,
-              type: 'image/jpeg',
-              name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",
-            } );
+        if (selectdImageData?.uri != null || selectdImageData.uri != undefined){
+            form.append('image', selectdImageData );
         }
         const request = new Request(Global.projct.ios.BASE_URL+apiEndPoints.UpdatePropfile, {method: 'POST', headers: {
           Accept: 'application/json',
@@ -93,9 +90,11 @@ const EditProfileView = ({navigation = useNavigation()}) => {
          includeBase64: true,
        })
        
-         .then((I) => {
+         .then((ImgData) => {
           setShowPicker(false);
-          setSelectedImgData(I);
+          setSelectedImgData({ uri: ImgData.path,
+          type: 'image/jpeg',
+          name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",});
          })
          .catch((error) => {     
           setShowPicker(false);
@@ -109,9 +108,11 @@ const EditProfileView = ({navigation = useNavigation()}) => {
          cropping: true,
          includeBase64: true,
        })
-         .then((I) => {
+         .then((ImgData) => {
           setShowPicker(false);
-          setSelectedImgData(I);
+          setSelectedImgData({ uri: ImgData.path,
+          type: 'image/jpeg',
+          name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",});
           
          })
          .catch((error) => {
@@ -123,13 +124,13 @@ const EditProfileView = ({navigation = useNavigation()}) => {
       <OverlayContainer>
             <AppBackgorund />
       <ScrollView>
-        <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
+        <View style={{padding: 16, marginTop: 40, justifyContent: "center"}}>
             <View style={AuthStyle.CardmainContainer}> 
                 
-                { (selectdImageData.path != null || selectdImageData.path != undefined) ?
+                { (selectdImageData.uri != null || selectdImageData.uri != undefined) ?
                  (<Image 
                   source={{
-                      uri: selectdImageData.path,
+                      uri: selectdImageData.uri,
                       //method: 'GET'
                   }}
                   style={CustomStyling.editImageView}

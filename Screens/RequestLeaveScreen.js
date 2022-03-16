@@ -100,7 +100,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             });
             let res = result[0];
           //Setting the state to show single file attributes\
-            setFileName((res.name.includes("pdf")) ? "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".pdf" : "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".docx");
+            setFileName((res.name.includes("pdf")) ? "HRMS_"+new Date().getUTCMilliseconds()+".pdf" : "HRMS_"+new Date().getUTCMilliseconds()+".docx");
             let data = {uri: res.uri, name: (res.name.includes("pdf")) ? "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".pdf" : "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".docx", type: res.type};
             setDocData(data);
             addEventListener;

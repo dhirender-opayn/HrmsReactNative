@@ -138,7 +138,7 @@ export const CustomStyling = StyleSheet.create({
         width:100, 
         height: 100, 
         borderRadius: 50, 
-        marginTop: -80, 
+        marginTop: -110, 
         borderWidth: 1, 
         borderColor: color.red, 
         alignSelf: "center"

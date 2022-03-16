@@ -67,7 +67,7 @@ const AddTicketView = ({navigation = useNavigation()}) => {
       <OverlayContainer>
             <AppBackgorund />
             <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
-              <View style={{padding: 16, marginTop: 40, justifyContent: "center"}}>
+              <View style={{padding: 0, marginTop: 0, justifyContent: "center"}}>
                   <View style={AuthStyle.CardmainContainer}> 
                       <Text style={CustomStyling.containerTitle}>Add Ticket</Text>
                       

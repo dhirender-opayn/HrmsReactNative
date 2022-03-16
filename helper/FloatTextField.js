@@ -45,23 +45,24 @@ const FloatTextField = ({
                 </View>: null
             }
             <TextInput
-                    style={[CustomStyling.fieldText, {width: (leftImagePath != null) ? ((isPasswordField || (rightImagePath != null)) ? '80%' : '90%') : ((isPasswordField || (rightImagePath != null)) ? '90%' : '100%')}, textInputStyle]}
-                    multiline={textInputMultiline}
-                    numberOfLines={textInputLines}
-                    placeholder={placeholder}
-                    onChangeText={val => {onTextChange(val);
-                        setTextValue(val);
-                    }}
-                    defaultValue={defaultValue}
-                    value={value}
-                    secureTextEntry={(isPasswordField) ? hidePswrdText : false}
-                    color={color.subtitleBlack}
-                    placeholderTextColor={color.lightGray}
-                />
+                style={[CustomStyling.fieldText, {width: (leftImagePath != null) ? ((isPasswordField || (rightImagePath != null)) ? '80%' : '90%') : ((isPasswordField || (rightImagePath != null)) ? '90%' : '100%')}, textInputStyle]}
+                multiline={textInputMultiline}
+                numberOfLines={textInputLines}
+                placeholder={placeholder}
+                onChangeText = {val => {onTextChange(val);
+                    setTextValue(val);
+                }}
+                defaultValue={defaultValue}
+                value={value}
+                secureTextEntry={(isPasswordField) ? hidePswrdText : false}
+                color={color.subtitleBlack}
+                placeholderTextColor={color.lightGray}
+                textAlignVertical="top"
+            />
                 
           {(isPasswordField) ? <TouchableOpacity onPress={() => setHidePswrdText(!hidePswrdText)} style={CustomStyling.fieldSubView}>
               <Image source={hidePswrdText ? require('../images/eye.png') :require('../images/slashEye.png')}
-           style={CustomStyling.passwordImage}/>
+                style={CustomStyling.passwordImage}/>
            </TouchableOpacity> : null}
 
            {(rightImagePath != null) ? <View style={CustomStyling.fieldSubView}>

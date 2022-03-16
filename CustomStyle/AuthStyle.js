@@ -66,11 +66,11 @@ export const AuthStyle = StyleSheet.create({
 
     CardmainContainer:{
         marginHorizontal:25,
-        backgroundColor:'white',
+        backgroundColor:color.white,
         borderWidth:0,
         borderRadius: 12,
         borderColor: Colors.color.lightGray,
-        paddingVertical: 24, 
+        paddingVertical: 60, 
         paddingHorizontal: 16,
         margin: 16,
         shadowColor: Colors.color.lightGray,

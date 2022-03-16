@@ -17,12 +17,13 @@ export const CalendarScreen = () => {
     { holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." },
     { holidayImg: ImagesPath.meetingImg, title: "Diwali", date: "20 May 2020 - 25 May 2020", description: "Lorem lpsum is simply dummy text." }];
     return (
+        <View style={{paddingHorizontal: 8, paddingVertical: 8}}>
         <FlatList
-
+            style={{backgroundColor: 'transparent'}}
             showsHorizontalScrollIndicator={false}
             data={DummyHolidayList}
             renderItem={({ item }) =>
-                <View style={{ justifyContent: 'center', margin: 10 }}>
+                <View style={{ justifyContent: 'center', marginBottom: 16, paddingHorizontal: 8 }}>
                     <View style={homeStyle.calendarContainer}>
                         <Image style={homeStyle.calendarCardImg} source={item.holidayImg} />
                         <View style={{ flex: 1, flexDirection: 'column', marginTop: 8 }}>
@@ -35,6 +36,7 @@ export const CalendarScreen = () => {
                 </View>
             }
         />
+        </View>
     );
 }
 
@@ -45,11 +47,11 @@ const homeStyle = StyleSheet.create({
         alignContent: 'center',
         paddingVertical: 15,
         flexDirection: 'row',
-        paddingHorizontal: 23,
+        paddingHorizontal: 24,
         shadowColor: Colors.color.darkGray,
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: 1,
-        shadowRadius: 3,
+        shadowRadius: 2,
         elevation: 3,
     },
     calendarCardImg: {

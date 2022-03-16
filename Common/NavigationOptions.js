@@ -18,7 +18,7 @@ module.exports = {
           fontFamily: fonts.semiBold,
           fontSize: 20,
         },
-        
+        animationEnabled: false,
       }
   }
 }

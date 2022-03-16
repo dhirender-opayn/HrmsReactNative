@@ -69,8 +69,8 @@ const AddEmployee = ({navigation = useNavigation()}) => {
               const response = await fetch(request)
               const json = await response.json();
               if (json.message.toLowerCase().includes("success")){
-                navigation.goBack();
-              }
+                navigation.goBack();410
+6              }
               toast.show(json.message, {duration:4000});
           } catch (error) {
           console.error(error);
@@ -156,7 +156,7 @@ const AddEmployee = ({navigation = useNavigation()}) => {
               (//<OverlayContainer>
               
             <View style={{padding: 16, zIndex: 50, justifyContent: "center"}}>
-                <View style={[AuthStyle.CardmainContainer, {zIndex: 100}]}> 
+                <View style={[AuthStyle.CardmainContainer, {zIndex: 100, paddingVertical: 24}]}> 
                     <Text style={CustomStyling.containerTitle}>Add User</Text>
                     { (selectdImageData.path != null || selectdImageData.path != undefined) ?
                     (<Image 
@@ -164,12 +164,12 @@ const AddEmployee = ({navigation = useNavigation()}) => {
                           uri: selectdImageData.path,
                           //method: 'GET'
                       }}
-                      style={[CustomStyling.editImageView, {marginTop: 16}]}
+                      style={[CustomStyling.editImageView, {marginTop: -8}]}
                       />) :
                       
                         (<Image 
                             source={require('../images/userwhite.png')}
-                            style={[CustomStyling.editImageView, {marginTop: 16}]}
+                            style={[CustomStyling.editImageView, {marginTop: -8}]}
                         />)
                     }
                     <TouchableOpacity onPress={() => {
