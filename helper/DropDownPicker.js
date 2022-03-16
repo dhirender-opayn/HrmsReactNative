@@ -28,7 +28,6 @@ const DropDownPicker = ({
   pickerLabelStyle,
   dropDownType,
 }) => {
-  // console.log('PICKER DATA', pickerData);
   const [showPicker, setShowPicker] = useState(false);
   return (
     <View style={[styles.container, containerStyle]}>

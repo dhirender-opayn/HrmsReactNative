@@ -8,8 +8,6 @@ import { LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import AppBackgorund from "./BackgroundView";
 import moment from 'moment';
-import { StyleSheet, BackHandler } from "react-native";
-import { types } from "@babel/core";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import RNFetchBlob from 'rn-fetch-blob';
 import Global from "../Common/Global";
@@ -51,19 +49,15 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
     const updateLeaveStatus = async(id, userid, status) => {
         try {
             const {data} = await apiCall("POST", apiEndPoints.UpdateLeaveStatus, {user_id: userid, id: id, status: status});
-            console.log(data);
            if (data.hasOwnProperty("data")){
-                console.log("Heloo");
                 var leave = {...item};
                 leave["status"] = status;
-                console.log(leave);
                 setLeaveData(leave);
                 route.params.updatedData(leave);
                 //navigation.goBack();
            }
            toast.show(data.message, {duration: 3000});
         } catch (error) {
-            console.error(error);
             toast.show(error, { duration: 3000 });
         } finally {
             hideLoader();
@@ -71,9 +65,7 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
     };
 
     useEffect(() => {
-        console.log("hello");
         setLeaveData(route.params.data);
-        console.log(route.params.data)
         setLoading(false);
     }, []);
     
@@ -83,7 +75,6 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
         //setFileUrl(Global.projct.filesURL);
         fileUrl = Global.projct.filesURL+item.file;
         if (Platform.OS === 'ios') {
-            console.log('Start');
           downloadFile();
         } else {
           try {
@@ -98,14 +89,12 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
             if (granted === PermissionsAndroid.RESULTS.GRANTED) {
               // Start downloading
               downloadFile();
-              console.log('Storage Permission Granted.');
             } else {
               // If permission denied then show alert
               Alert.alert('Error','Storage Permission Not Granted');
             }
           } catch (err) {
             // To handle permission related exception
-            console.log("++++"+err);
           }
         }
       };
@@ -115,13 +104,11 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
         var date = new Date();
         let extData = getFileExtention(fileUrl);
         let file_ext = '.' + extData[0];
-        console.log(file_ext);
         const { dirs: {DownloadDir, DocumentDir} } = RNFetchBlob.fs; 
         const {config} = RNFetchBlob; 
         const isIOS = Platform.OS == "ios"; 
         const aPath = Platform.select({ios: DocumentDir, android: DownloadDir});
         const fPath = aPath + '/' + Math.floor(date.getTime() + date.getSeconds() / 2)+file_ext;
-        console.log(fPath);
         const configOptions = Platform.select({
           ios: {
             fileCache: true,
@@ -151,13 +138,9 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
       config(configOptions)
         .fetch('GET', fileUrl)
         .then(res => {                 
-          console.log(res);
-        //   this.setState({overLoader: false});
-        //   this.onResumeCall();
-          //this.refs.toast.show('File download successfully');
+        
           setTimeout(() => {
-          //  RNFetchBlob.ios.previewDocument('file://' + res.path());
-           console.log('show');
+         
             RNFetchBlob.ios.openDocument(res.path());
            // Alert.alert(CONSTANTS.APP_NAME,'File download successfully');
           }, 300);
@@ -238,7 +221,7 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
                     <Text style={[CustomStyling.LeaveTextStyle, {marginTop: 16}]}>{item.reason}</Text>
                 </View>
                 {(item.file != null) ?
-                    <TouchableOpacity onPress={() => checkPermission()} style={{marginTop: 16}}>
+                    <TouchableOpacity onPress={() => checkPermission()}>
                     <View style={[AuthStyle.downloadView, { padding: 8, justifyContent: "center"}]}>
                         <View style={{width: '10%', justifyContent: "center"}}>
                           <Image source= {require("../images/attachment.png")}
@@ -246,7 +229,7 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
                           />
                         </View>
                         <View style={{width: '80%', justifyContent: "center"}}>
-                        <Text style={{fontSize: 16, color: color.subtitleBlack}}>Attachment</Text>
+                        <Text style={{fontSize: 16, fontFamily: fonts.medium, color: color.subtitleBlack}}>Attachment</Text>
                         </View>
                         <View style={{width: '10%', justifyContent: "center"}}>
                           <Image source= {require("../images/download.png")}

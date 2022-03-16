@@ -17,7 +17,6 @@ import apiEndPoints from "../utils/apiEndPoints";
 
 const EditProfileView = ({navigation = useNavigation()}) => {
     const [isLoading, setLoading] = useState(false);
-    const [isLoad, setLoad] = useState(false);
     const toast = useToast();
     const [userdata, setUserData] = useContext(UserContext);
     const [formData, setFormData] = useState({});
@@ -41,7 +40,6 @@ const EditProfileView = ({navigation = useNavigation()}) => {
               name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",
             } );
         }
-        console.log(form);
         const request = new Request(Global.projct.ios.BASE_URL+apiEndPoints.UpdatePropfile, {method: 'POST', headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${userdata.token}`
@@ -49,8 +47,6 @@ const EditProfileView = ({navigation = useNavigation()}) => {
           try{
               const response = await fetch(request)
               const json = await response.json();
-              //setMsg(json.message);
-              console.log(json);
               var updatedData = {...userdata};
               updatedData["user"] = {...json.data.user};
               setUserData(updatedData);
@@ -99,7 +95,6 @@ const EditProfileView = ({navigation = useNavigation()}) => {
        
          .then((I) => {
           setShowPicker(false);
-          console.log(I);
           setSelectedImgData(I);
          })
          .catch((error) => {     
@@ -128,9 +123,6 @@ const EditProfileView = ({navigation = useNavigation()}) => {
       <OverlayContainer>
             <AppBackgorund />
       <ScrollView>
-          {(isLoad) ? <ActivityIndicator /> :
-          (//<OverlayContainer>
-          
         <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
             <View style={AuthStyle.CardmainContainer}> 
                 
@@ -206,7 +198,7 @@ const EditProfileView = ({navigation = useNavigation()}) => {
                 </TouchableOpacity>
         </View>
       
-        )}
+        
         {showPickerModal && (
         <PopUpModal
           onPressCamera={openCamera}

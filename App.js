@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { SafeAreaView, View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator } from 'react-native';
 import { MyStack } from './components/MyStack';
-import { OtpVerify } from './Screens/OtpVerify';
 import { ToastProvider } from 'react-native-toast-notifications';
 import {LoaderContext, UserProvider} from './utils/context';
 import Colors from "./Common/Colors";

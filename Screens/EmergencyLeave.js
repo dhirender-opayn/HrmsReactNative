@@ -13,7 +13,7 @@ import { types } from "@babel/core";
 import ImagesPath from "../images/ImagesPath";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import fonts from "../Common/fonts";
-
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const EmergencyLeave = ({navigation=useNavigation()}) => {
     const [userData] = useContext(UserContext);
@@ -29,10 +29,8 @@ const EmergencyLeave = ({navigation=useNavigation()}) => {
     const getLeavesData = async() => {
         try {
                 const {data} = await apiCall("GET", apiEndPoints.LeaveListing);
-                console.log("Data" + data);
                 setLeavesData(data.data);
             } catch (error) {
-                console.error("EER: "+error);
                 toast.show(error, { duration: 3000 })
             } finally {
                 setLoading(false);
@@ -40,7 +38,7 @@ const EmergencyLeave = ({navigation=useNavigation()}) => {
             }
     }
     useEffect(() => {
-        showLoader();
+        setLoading(true);
         getLeavesData();
     }, []);
 
@@ -67,29 +65,48 @@ const EmergencyLeave = ({navigation=useNavigation()}) => {
     const updateStatus = async(id, userid, status) => {
         try {
             const {data} = await apiCall("POST", apiEndPoints.UpdateLeaveStatus, {user_id: userid, id: id, status: status});
-            console.log(data);
-            console.log(data.hasOwnProperty("data"));
            if (data.hasOwnProperty("data")){
-               console.log("Hello")
                 var leaves = [...LeavesData];
                 var index = leaves.findIndex(item => item.id == id);
-                console.log(index);
                 leaves[index].status = status;
                 setLeavesData(leaves);
            }
            toast.show(data.message, {duration: 4000});
         } catch (error) {
-            console.error(error);
             toast.show(error, { duration: 3000 })
         } finally {
-            setLoading(false);
+            setLoading(true);
         }
     }
 
     return(
         <OverlayContainer>
             <AppBackgorund />
-            {isLoading ? <ActivityIndicator /> :
+            {isLoading ? <SkeletonPlaceholder speed={700} backgroundColor= {color.skeletonGray}>
+            
+            <View style={{height: '100%'}}>
+            {[...Array(10)].map((elementInArray, index) => ( 
+      <View style={[{ flexDirection: "column",marginHorizontal: 16, marginVertical: 8,
+              padding: 8,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: color.lightGray, }]}>
+      
+              
+              <View style={{ width: 120, height: 16, borderRadius: 4}} />
+                <View style={{ width: 120, height: 16, borderRadius: 4, marginTop: 8 }} />
+                <View style={{ marginLeft: 8, width: "100%", flexDirection: "row", marginTop: 8 }}>
+                    <View  style={{ width: 20, height: 16, borderRadius: 4 }}/>
+                    <View  style={{ width: 80, height: 16, borderRadius: 4, marginLeft: 4 }}/>
+                    <View  style={{ width: 110, height: 16, borderRadius: 4, marginLeft: 4 }}/>
+                </View>
+                <View
+                  style={{ marginTop: 8, marginLeft: 8, width: '90%', height: 16, borderRadius: 4 }}
+                />
+            </View>
+            ))}
+            </View>
+            </SkeletonPlaceholder>  :
                 <View style={{flex: 1}}>
                     
                     {/* <Text style={{color: '#fff'}}>{LeavesData}</Text> */}

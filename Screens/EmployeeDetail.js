@@ -1,21 +1,17 @@
-import React, { useContext } from "react";
-import { useState, useEffect } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { OverlayContainer } from "../Common/OverlayContainer";
-import { View, Image, Text, ActivityIndicator, TouchableOpacity, FlatList, ScrollView } from "react-native";
-import { AuthStyle } from "../CustomStyle/AuthStyle";
+import { View, Image, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 import AppBackgorund from "./BackgroundView";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors, { color }  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
-import Global from "../Common/Global";
 import { useToast } from "react-native-toast-notifications";
-import { AuthContext, LoaderContext, UserContext } from "../utils/context";
+import { LoaderContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
-import { StyleSheet } from "react-native";
 import moment from 'moment';
 import fonts from "../Common/fonts";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const EmployeeDetail = ({navigation=useNavigation(), route}) => {
     const [userData, setUserData] = useState({});
@@ -32,10 +28,8 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
         const getTeamData = async() => {
             try {
                     const {data} = await apiCall("GET", apiEndPoints.Team+"?user_id="+route.params.id);
-                    console.log(data);
                     setUserData(data.data);
                 } catch (error) {
-                    console.error(error);
                     toast.show(error, { duration: 3000 })
                 } finally {
                     setLoading(false);
@@ -64,7 +58,7 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
         };
 
         useEffect(() => {
-            showLoader();
+            setLoading(true);
             getTeamData();
         }, []);
     
@@ -72,10 +66,47 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
         <OverlayContainer>
             <AppBackgorund />
             <View style={{padding: 16}}>
-                { isLoading ? <ActivityIndicator /> :
-               ( <ScrollView style={{}}>
+                { isLoading ? <SkeletonPlaceholder speed={700} backgroundColor={color.skeletonGray}>
+            
+                    <View style={{height: '100%'}}>
+                        <View style={[{ flexDirection: "row", alignItems: "center", marginVertical: 8, padding: 8}]}>
+                            <View >
+                                <View style={empStyle.imageStyle} />
+                            </View>
+                            <View style={{ marginLeft: 8, }}>
+                                <View style={{ width: 120, height: 16, borderRadius: 4, alignSelf: "flex-end" }} />
+                                <View
+                                style={{ marginTop: 6, width: 80, height: 16, borderRadius: 4 }}
+                                />
+                            </View>
+                        </View>
+                        <View style={{ width: 120, height: 16, borderRadius: 4}} />
+                        {[...Array(10)].map((elementInArray, index) => ( 
+                            <View style={[{ flexDirection: "row", alignItems: "center", marginVertical: 8,
+                                padding: 8,
+                                borderRadius: 8,
+                                borderWidth: 1,
+                                borderColor: color.lightGray, }]}>
+                
+                                <View style={{ marginLeft: 4, width: "50%" }}>
+                                    <View style={{ width: 120, height: 16, borderRadius: 4 }} />
+                                    <View
+                                    style={{ marginTop: 6, width: 80, height: 16, borderRadius: 4 }}
+                                    />
+                                </View>
+                                <View style={{ marginRight: 8, width: "50%", alignItems: "flex-end" }}>
+                                    <View style={{ width: 120, height: 16, borderRadius: 4, alignSelf: "flex-end" }} />
+                                    <View
+                                    style={{ marginTop: 6, width: 80, height: 16, borderRadius: 4 }}
+                                    />
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                </SkeletonPlaceholder> :
+                (<ScrollView style={{}}>
                    <View style={{}}>
-                        <View style={{flexDirection: "row", marginTop: 24, left: 0, right: 0}}>
+                        <View style={{flexDirection: "row", marginTop: 8, left: 0, right: 0}}>
                             {(userData.profile.image != null) ? 
                                 (<Image 
                                 source={{

@@ -11,7 +11,6 @@ export function setDefaultHeader(token,value) {
   httpClient.defaults.headers.common['Authorization'] = `Bearer ${value}`;
   //httpClient.defaults.headers.common[token] = `Bearer ${value}`;
   
-  console.log('token: ', value);
 }
 export async function apiCall(
   method,
@@ -29,8 +28,6 @@ export async function apiCall(
     try {
       const netInfo = await NetInfo.fetch();
       if (netInfo.isConnected) {
-        // console.log('header: ', header);
-        console.log(url);
         const res = await httpClient({
           method,
           url,
@@ -38,10 +35,8 @@ export async function apiCall(
           headers: header,
           withCredentials: false,
         });
-          console.log('res: ', res);
         return res;
       } else {
-        console.log(noNetdata);
         return noNetdata;
       }
     } catch (error) {

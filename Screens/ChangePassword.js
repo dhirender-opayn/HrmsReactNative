@@ -1,18 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from "react-native";
-import  Colors, { color }  from "../Common/Colors";
+import { View, Text } from "react-native";
 import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { useToast } from "react-native-toast-notifications";
-import { LoaderContext, UserContext } from "../utils/context";
+import { LoaderContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
 import FloatTextField from "../helper/FloatTextField";
 import { MainButton } from "../components/mainButton";
-import { CustomStyling } from "../CustomStyle/CustomStyling";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const ChangePasswordView = ({navigation = useNavigation()}) => {
     const toast = useToast();
@@ -27,7 +26,6 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
       }
       try {
               const {data} = await apiCall("POST", apiEndPoints.ChangePassword, param);
-              console.log("Data: "+data);
               toast.show(data.message, {duration: 4000});
               navigation.goBack();
           } catch (error) {
@@ -63,6 +61,7 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
     return(
       <OverlayContainer>
             <AppBackgorund />
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
         <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
             <Text style={AuthStyle.viewTitile}>Change Password</Text>
             <View style={[AuthStyle.CardmainContainer]}> 
@@ -95,7 +94,8 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
                 
             </View>
         </View>
-        </OverlayContainer>
+        </KeyboardAwareView>
+      </OverlayContainer>
     );
 };
 

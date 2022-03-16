@@ -36,7 +36,6 @@ const ImagePickerView = ({selectedFile}) => {
         // If CAMERA Permission is granted
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       } catch (err) {
-        console.warn(err);
         return false;
       }
     } else return true;
@@ -55,7 +54,6 @@ const ImagePickerView = ({selectedFile}) => {
         // If WRITE_EXTERNAL_STORAGE Permission is granted
         return granted === PermissionsAndroid.RESULTS.GRANTED;
       } catch (err) {
-        console.warn(err);
         alert('Write permission err', err);
       }
       return false;
@@ -76,7 +74,6 @@ const ImagePickerView = ({selectedFile}) => {
     let isStoragePermitted = await requestExternalWritePermission();
     if (isCameraPermitted && isStoragePermitted) {
       launchCamera(options, (response) => {
-        console.log('Response = ', response);
 
         if (response.didCancel) {
           alert('User cancelled camera picker');
@@ -91,13 +88,7 @@ const ImagePickerView = ({selectedFile}) => {
           alert(response.errorMessage);
           return;
         }
-        console.log('base64 -> ', response.base64);
-        console.log('uri -> ', response.uri);
-        console.log('width -> ', response.width);
-        console.log('height -> ', response.height);
-        console.log('fileSize -> ', response.fileSize);
-        console.log('type -> ', response.type);
-        console.log('fileName -> ', response.fileName);
+       
         setFilePath(response);
         selectedFile = response;
         setSelected('true');
@@ -113,7 +104,6 @@ const ImagePickerView = ({selectedFile}) => {
       quality: 1,
     };
     launchImageLibrary(options, (response) => {
-      console.log('Response = ', response);
 
       if (response.didCancel) {
         alert('User cancelled camera picker');
@@ -133,13 +123,7 @@ const ImagePickerView = ({selectedFile}) => {
         return;
       }
       setFileN('Response fetched')
-      console.log('base64 -> ', response.assets[0].base64);
-      console.log('uri -> ', response.assets[0].uri);
-      console.log('width -> ', response.assets[0].width);
-      console.log('height -> ', response.assets[0].height);
-      console.log('fileSize -> ', response.assets[0].fileSize);
-      console.log('type -> ', response.assets[0].type);
-      console.log('fileName -> ', response.assets[0].fileName);
+     
       setFilePath(response);
       selectedFile = response;
       setSelected('true');

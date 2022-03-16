@@ -28,18 +28,9 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
    const [currentLatLocation, setCurrentLatLocation] = useState('');
    const [currentLongLocation, setCurrentLongLocation] = useState('');
    const { showLoader, hideLoader } = useContext(LoaderContext);
-
    var InOutClick = "";
-
    const toast = useToast();
 
-   let formData = new FormData()
-
-   console.log("currentLatLocation", currentLatLocation)
-   console.log("currentLongLocation", currentLongLocation)
-
-   var detail = "";
-   let subPosition = "";
    let topdatalist = [
       { key: strings.checkin, imagepath: ImagesPath.checkInImage }, { key: strings.checkout, imagepath: ImagesPath.checkOutImage }, { key: strings.qr_code_scanner, imagepath: ImagesPath.barCodeScanner }
    ];
@@ -52,18 +43,17 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
       { key: strings.request_leave, imagepath: ImagesPath.requestLeaveImage },
       { key: strings.announcement, imagepath: ImagesPath.announcementImage },
       { key: strings.work_history, imagepath: ImagesPath.workHistoryImage },
-   ]
+   ];
    let adminBottomList = [
       { key: strings.leave, imagepath: ImagesPath.leaveImage },
       { key: strings.calendar, imagepath: ImagesPath.calendarImage },
       { key: strings.employees, imagepath: ImagesPath.teamImg },
       { key: strings.emergencyLeave, imagepath: ImagesPath.emergencyImg },
       { key: strings.addHoliday, imagepath: ImagesPath.holidayImg },
-   ]
+   ];
 
 
    const singlePress = (selectedData) => {
-      console.log("selectedData ", selectedData)
       if (selectedData.key == (strings.leave)){
          navigation.navigate('leaveList');
       }
@@ -97,6 +87,9 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
       if (selectedData.key == strings.announcement){
          navigation.navigate('Announcements');
       }
+      if (selectedData.key == strings.qr_code_scanner){
+         navigation.navigate('barcode');
+      }
       if (selectedData.key == (strings.checkin)) {
          InOutClick = "IN";
          if(calculateDistance()<=20){
@@ -112,34 +105,23 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
             showLoader();
             AttendenceApi();
          } else {
-           
             toast.show("Attendance can me marked between 20 meters of distance. You are at distance "+calculateDistance()+"m.", {duration: 4000})
          }
       }
    }
  
-
-   //API
    const AttendenceApi = async () => {
  
       let date = moment(new Date()).format(Global.projct.dateFormates.YearMonthDateTime)
 
       try {
          const {data} = await apiCall("POST", apiEndPoints.MarkAttendance, {lat: currentLatLocation, lng: currentLongLocation, timing: date, type: InOutClick});
-         console.log("Data: "+JSON.stringify(data));
-         // alert(JSON.stringify(data));
-         // if (code == 200){
          toast.show(data.message, {duration: 3000});
-         // }
-         // else{
-         //    toast.show(data, {duration: 3000});
-         // }
-     } catch (error) {
-         console.error("In Err"+error);
+      } catch (error) {
          toast.show(error, { duration: 3000 });
-     } finally {
+      } finally {
          hideLoader();
-     }
+      }
    };    
   
     const calculateDistance = () => {
@@ -147,9 +129,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
         {latitude: currentLatLocation, longitude: currentLongLocation},
         {latitude: OPAYN_LAT, longitude: OPAYN_LNG},
       );
-      console.log("Clat: "+ currentLatLocation + " CLog: " + currentLongLocation);
-      console.log("OLat: "+ OPAYN_LAT + " OLong: " + OPAYN_LNG);
-      console.log("meternow ==> ", dis)
+     
       return dis/1000;
     };
 
@@ -192,9 +172,9 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
                      <TouchableOpacity onPress={() => singlePress(item)} style={{ flex: 1, padding: 5, }}>
 
                         <View>
-                           <View style={homeStyle.homeCardContainer}>
-                              <Image style={[homeStyle.homeCardImg, {tintColor: (item.key == strings.checkout) ? null : color.imageBlack}]} source={item.imagepath} />
-                              <Text style={homeStyle.homeCardText}> {item.key}</Text>
+                           <View style={CustomStyling.homeCardContainer}>
+                              <Image style={[CustomStyling.homeCardImg, {tintColor: (item.key == strings.checkout) ? null : color.imageBlack}]} source={item.imagepath} />
+                              <Text style={CustomStyling.homeCardText}> {item.key}</Text>
                            </View>
                         </View>
                      </TouchableOpacity>
@@ -211,9 +191,9 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
                      <TouchableOpacity onPress={() => singlePress(item)} style={{ width: "33.33%", padding: 5, }}>
                         {/* <View style={{margin:5}} > */}
                         <View>
-                           <View style={homeStyle.homeCardContainerbottom}>
-                              <Image style={[homeStyle.homeCardImgBottom, {tintColor: (item.key == strings.leave || item.key == strings.emergencyLeave) ? null : color.imageBlack}]} source={item.imagepath} />
-                              <Text style={homeStyle.homeCardTextbottom}> {item.key}</Text>
+                           <View style={CustomStyling.homeCardContainerbottom}>
+                              <Image style={[CustomStyling.homeCardImgBottom, {tintColor: (item.key == strings.leave || item.key == strings.emergencyLeave) ? null : color.imageBlack}]} source={item.imagepath} />
+                              <Text style={CustomStyling.homeCardTextbottom}> {item.key}</Text>
                            </View>
                         </View>
                      </TouchableOpacity>
@@ -227,76 +207,5 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
    );
 
 };
-
-const homeStyle = StyleSheet.create({
-   homeCardContainer: {
-      marginTop: 35,
-      marginStart: 10,
-      marginLeft: 10,
-      backgroundColor: color.white,
-      borderRadius: 12,
-      width: 152,
-      alignContent: 'center',
-      paddingVertical: 15,
-      paddingTop: 30,
-      paddingHorizontal: 8,
-      shadowColor: Colors.color.lightGray,
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 1,
-      shadowRadius: 2,
-      elevation: 2,
-   },
-   homeCardImg: {
-      height: 45,
-      width: 45,
-      alignSelf: 'center',
-      resizeMode: "contain",
-      tintColor: color.backgroundBlack,
-   },
-   homeCardText: {
-      width: "100%",
-      height: 25,
-      fontSize: 14,
-      textAlign: 'center',
-      color: 'black',
-      alignSelf: 'center',
-      fontFamily: 'Asap-SemiBold',
-      color: Colors.color.titleBlack,
-      marginTop: 12,
-   },
-
-   homeCardContainerbottom: {
-      marginTop: 10,
-      backgroundColor: color.white,
-      borderRadius: 12,
-      paddingTop: 15,
-      width: '100%',
-      paddingBottom: 5,
-      shadowColor: Colors.color.lightGray,
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 1,
-      shadowRadius: 2,
-      elevation: 2,
-      justifyContent: "center"
-   },
-   homeCardImgBottom: {
-      height: 32,
-      width: 32,
-      alignSelf: 'center',
-      resizeMode: "contain",
-      tintColor: color.imageBlack,
-
-   },
-   homeCardTextbottom: {
-      //width: 60,
-      height: 30,
-      fontSize: 12,
-      alignSelf: 'center',
-      fontFamily: 'Asap-Medium',
-      color: Colors.color.titleBlack,
-      marginTop: 10,
-      textAlign: "center",
-   },
-});
 
 export default HomeScreen;

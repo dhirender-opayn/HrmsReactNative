@@ -111,7 +111,7 @@ export const AuthStyle = StyleSheet.create({
         borderRadius: 8, 
         marginBottom: 20,
         flexDirection: "row",
-
+        marginTop: 16
     },
    
 });

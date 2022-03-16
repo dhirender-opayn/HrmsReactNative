@@ -53,7 +53,6 @@ const GeoLocationHelper = ({setCurrentLatLocation, setCurrentLongLocation}) => {
   }, []);
 
   const getOneTimeLocation = () => {
-    console.log("=====>>>>>>>>>>>>>>>>", currentLatitude )
     setLocationStatus('Getting Location ...');
     Geolocation.getCurrentPosition(
       //Will give you the current location
@@ -94,7 +93,6 @@ const GeoLocationHelper = ({setCurrentLatLocation, setCurrentLongLocation}) => {
         //Will give you the location on location change
 
         setLocationStatus('You are Here');
-        console.log(position);
 
         //getting the Longitude from the location json        
         const currentLongitude =

@@ -11,6 +11,7 @@ import AppBackgorund from "./BackgroundView";
 import Colors from "../Common/Colors";
 import FloatTextField from "../helper/FloatTextField";
 import { LoaderContext } from "../utils/context";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
  
 
 export const Forget = ({ navigation = useNavigation() }) => {
@@ -22,17 +23,14 @@ export const Forget = ({ navigation = useNavigation() }) => {
     let formData = new FormData()
 
     const onButtonPress = () => {
-        console.log("check value")
 
         if (!EmailValidation(email)) {
-            console.log("Email   valid ");
             showLoader();
             forgetApi();
 
         }
     }
-    console.log("message now : ", message)
-    console.log("data ===> ", data);
+   
 
     const forgetApi = async () => {
         formData.append('email', email);
@@ -50,7 +48,6 @@ export const Forget = ({ navigation = useNavigation() }) => {
             const object = JSON.stringify(json.data);
             navigation.navigate('OtpVerify');
         } catch (error) {
-            console.error(error);
         } finally {
             hideLoader();
         }
@@ -59,6 +56,7 @@ export const Forget = ({ navigation = useNavigation() }) => {
     return (
         <OverlayContainer>
             <AppBackgorund />
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
             <SafeAreaView style={{padding: 16, marginTop: 40, justifyContent: "center", flex: 1}}>
                 <View style={{flex: 1}}>
                     <View style={{ marginTop: 0 }}>
@@ -80,6 +78,7 @@ export const Forget = ({ navigation = useNavigation() }) => {
                     </View>
                 </View>
             </SafeAreaView>
+            </KeyboardAwareView>
         </OverlayContainer>
 
     );

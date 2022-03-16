@@ -16,6 +16,7 @@ import { apiCall } from "../utils/httpClient";
 import FloatTextField from "../helper/FloatTextField";
 import { MainButton } from "../components/mainButton";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const AddAnnouncementView = ({navigation = useNavigation()}) => {
     const [formData, setFormData] = useState({});
@@ -68,6 +69,7 @@ const AddAnnouncementView = ({navigation = useNavigation()}) => {
     return(
       <OverlayContainer>
             <AppBackgorund />
+        <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
         <ScrollView>
         <View style={{padding: 16, marginTop: 40, justifyContent: "center"}}>
             <View style={AuthStyle.CardmainContainer}> 
@@ -98,6 +100,7 @@ const AddAnnouncementView = ({navigation = useNavigation()}) => {
             </View>
         </View>
         </ScrollView>
+        </KeyboardAwareView>
         </OverlayContainer>
     );
 };

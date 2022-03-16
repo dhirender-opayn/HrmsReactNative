@@ -14,6 +14,7 @@ import { CustomStyling } from "../CustomStyle/CustomStyling";
 import { LoaderContext } from "../utils/context";
 import { useToast } from "react-native-toast-notifications";
 import Validations from "../Common/Validations";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 
 export const OtpVerify = ({ navigation, route }) => {
@@ -27,7 +28,6 @@ export const OtpVerify = ({ navigation, route }) => {
     let toast = useToast();
 
     const buttonPress = () => {
-        console.log("press")
         if (Validations.OtpValidation(otp)){
             toast.show(Validations.OtpValidation(otp), {duration: 3000});
         }
@@ -38,7 +38,6 @@ export const OtpVerify = ({ navigation, route }) => {
             toast.show("Please enter confirm password same as new password", {duration: 3000});
         }
         else{
-            console.log("Success OTp Phase");
             showLoader();
             OtpApiCall();
         }
@@ -57,7 +56,6 @@ export const OtpVerify = ({ navigation, route }) => {
         try {
             const response = await fetch(request)
             const json = await response.json();
-            console.log(json);
             toast.show(json.message, {duration: 3000});
             if (json.message.toLowerCase().includes("success")){
                 navigation.navigate('Login');
@@ -73,7 +71,7 @@ export const OtpVerify = ({ navigation, route }) => {
     return (
         <OverlayContainer>
             <AppBackgorund />
-
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
             <SafeAreaView style={AuthStyle.mainContainer}>
                 <View >
                     <Text style={[AuthStyle.viewSubTitile, {marginBottom: 20}]}>{strings.title}</Text>
@@ -111,6 +109,7 @@ export const OtpVerify = ({ navigation, route }) => {
                     </View>
                 </View>
             </SafeAreaView>
+            </KeyboardAwareView>
         </OverlayContainer>
     );
 }

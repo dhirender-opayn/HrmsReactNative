@@ -3,9 +3,7 @@ import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
 import { View, Text } from "react-native";
-import  Colors  from "../Common/Colors";
 import Validations from "../Common/Validations";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
@@ -15,10 +13,11 @@ import FloatTextField from "../helper/FloatTextField";
 import { MainButton } from "../components/mainButton";
 import { TextButton } from "../components/TextButton";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
+import { KeyboardAwareView } from 'react-native-keyboard-aware-view';
 
 const LoginView = ({navigation = useNavigation()}) => {
-    const [emailId, setEmail] = useState("simran.sharma@opayn.com");
-    const [password, setPswrd] = useState("123456");
+    const [emailId, setEmail] = useState("");
+    const [password, setPswrd] = useState("");
     const { showLoader, hideLoader } = useContext(LoaderContext);
 
     const toast = useToast();
@@ -35,11 +34,9 @@ const LoginView = ({navigation = useNavigation()}) => {
             const response = await fetch(request)
             const json = await response.json();
             if (json.hasOwnProperty("data")){
-            console.log(json.data)
             signIn(json);
             const object = JSON.stringify(json.data);
            // setEmail(json)
-            await AsyncStorage.setItem('userData',object);
             // navigation.navigate('TabView');
             }
             else{
@@ -47,7 +44,6 @@ const LoginView = ({navigation = useNavigation()}) => {
             }
             
         } catch (error) {
-          console.error(error);
           toast.show(error, {duration: 3000});
         } finally {
           hideLoader();
@@ -70,6 +66,7 @@ const LoginView = ({navigation = useNavigation()}) => {
     return(
       <OverlayContainer>
             <AppBackgorund />
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
         <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
             <Text style={AuthStyle.viewTitile}>Login</Text>
             <View style={AuthStyle.CardmainContainer}> 
@@ -114,6 +111,7 @@ const LoginView = ({navigation = useNavigation()}) => {
                 />
             </View>
         </View>
+        </KeyboardAwareView>
         </OverlayContainer>
     );
 };

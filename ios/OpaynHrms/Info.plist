@@ -43,6 +43,8 @@
 	<string>To get user current location</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>To set profile image</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To have video access</string>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

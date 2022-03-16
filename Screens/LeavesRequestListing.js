@@ -12,12 +12,14 @@ import { StyleSheet } from "react-native";
 import { types } from "@babel/core";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import fonts from "../Common/fonts";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 
 const LeavesRequestListing = ({navigation=useNavigation()}) => {
     const [userData] = useContext(UserContext);
     const [isLoading, setLoading] = useState(true);
     const [LeavesData, setLeavesData] = useState([]);
+    const [showNoData, setShowNoData] = useState(false);
     const toast = useToast();
     const LeaveSummary = [{id: 1, count: 18, type: "Casual Leave"}, {id: 2, count: 18, type: "Casual Leave"}, {id: 3, count: 18, type: "Casual Leave"}]
     const leaveTypes = [{value: "Single Day", id: 1}, {value: "Multiple Day", id: 2}, {value: "Short Leave", id: 4},
@@ -28,10 +30,18 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
     const getLeavesData = async() => {
         try {
                 const {data} = await apiCall("GET", apiEndPoints.LeaveListing);
-                console.log("Data" + data);
-                setLeavesData(data.data);
+                if (data.hasOwnProperty("data")){
+                    setLeavesData(data.data);
+                    if (data.data.length == 0){
+                        setShowNoData(true);
+                    }else{
+                        setShowNoData(false);
+                    }
+                }
+                else{
+                    toast.show(data.message, {duration: 3000});
+                }
             } catch (error) {
-                console.error("EER: "+error);
                 toast.show(error, { duration: 3000 })
             } finally {
                 setLoading(false);
@@ -39,7 +49,7 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
             }
     }
     useEffect(() => {
-        showLoader();
+        setLoading(true);
         getLeavesData();
     }, []);
 
@@ -66,19 +76,15 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
     const updateStatus = async(id, userid, status) => {
         try {
             const {data} = await apiCall("POST", apiEndPoints.UpdateLeaveStatus, {user_id: userid, id: id, status: status});
-            console.log(data);
-            console.log(data.hasOwnProperty("data"));
+            
            if (data.hasOwnProperty("data")){
-               console.log("Hello")
                 var leaves = [...LeavesData];
                 var index = leaves.findIndex(item => item.id == id);
-                console.log(index);
                 leaves[index].status = status;
                 setLeavesData(leaves);
            }
            toast.show(data.message, {duration: 4000});
         } catch (error) {
-            console.error(error);
             toast.show(error, { duration: 3000 })
         } finally {
             hideLoader();
@@ -86,10 +92,8 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
     }
 
     const updateData = (item) => {
-        console.log("Upadte data")
         var leaves = [...LeavesData];
         var index = leaves.findIndex(leave => leave.id == item.id);
-        console.log(index);
         let leaveData = {...leaves[index]};
         leaveData["status"] = item.status;
         leaves[index] = {...leaveData};
@@ -99,7 +103,40 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
     return(
         <OverlayContainer>
             <AppBackgorund />
-            {isLoading ? <ActivityIndicator /> :
+            {isLoading ? <SkeletonPlaceholder speed={700} backgroundColor= {color.skeletonGray}>
+            
+            <View style={{height: '100%'}}>
+            {[...Array(10)].map((elementInArray, index) => ( 
+      <View style={[{ flexDirection: "column",marginHorizontal: 16, marginVertical: 8,
+              padding: 8,
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: color.lightGray, }]}>
+      
+              <View style={{  width: "100%", flexDirection: "row" }}>
+                  <View style={{width: '50%', alignItems: "flex-start"}}>
+                <View style={{ width: 120, height: 16, borderRadius: 4}} />
+                </View>
+                <View style={{width: '50%', alignItems: "flex-end"}}>
+                <View
+                  style={{ width: 120, height: 20, borderRadius: 4 }}
+                />
+                </View>
+              </View>
+          
+                <View style={{ width: 120, height: 16, borderRadius: 4, marginTop: 8 }} />
+                <View style={{ marginLeft: 8, width: "100%", flexDirection: "row", marginTop: 8 }}>
+                    <View  style={{ width: 20, height: 16, borderRadius: 4 }}/>
+                    <View  style={{ width: 80, height: 16, borderRadius: 4, marginLeft: 4 }}/>
+                    <View  style={{ width: 110, height: 16, borderRadius: 4, marginLeft: 4 }}/>
+                </View>
+                <View
+                  style={{ marginTop: 8, marginLeft: 8, width: '90%', height: 16, borderRadius: 4 }}
+                />
+            </View>
+            ))}
+            </View>
+            </SkeletonPlaceholder>  :
                 <View style={{flex: 1}}>
                     {(userData.user.id != 1) ? <View style={{backgroundColor: color.white, marginTop: 12, paddingVertical: 8}}>
                         <FlatList
@@ -121,8 +158,7 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
 
                         />
                     </View> : null}
-                    {/* <Text style={{color: '#fff'}}>{LeavesData}</Text> */}
-                    <FlatList 
+                    {(!showNoData) ? <FlatList 
                         data={LeavesData}
                         keyExtractor={({id}, index) => id}
 
@@ -180,7 +216,7 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
                                 </TouchableOpacity>
                             )}
                              style={{marginTop: 24, marginBottom: 4}}
-                        />
+                        /> : <Text style={CustomStyling.NoDataLabel}>No Data Found</Text>}
                 </View>
             }
         </OverlayContainer>

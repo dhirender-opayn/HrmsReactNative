@@ -23,6 +23,7 @@ import ClickabletextField from "../helper/ClickableTextField";
 import ImagesPath from "../images/ImagesPath";
 import { MainButton } from "../components/mainButton";
 import fonts from "../Common/fonts";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const [userData, setUserData] = useContext(UserContext);
@@ -66,7 +67,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             setStartTime(moment(selectedDate).format("HH:mm"));
         }
         else{
-            setEndTime(moment(selectedDate).format("HH: mm"));
+            setEndTime(moment(selectedDate).format("HH:mm"));
         }
         setShow(false);
     };
@@ -94,19 +95,13 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const selectOneFile = async () => {
         //Opening Document Picker for selection of one file
         try {
-            console.log("Hello")
             const result = await DocumentPicker.pick({
                 type: [DocumentPicker.types.pdf, DocumentPicker.types.docx],
             });
             let res = result[0];
-            console.log('res : ' + JSON.stringify(res));
-            console.log('URI : ' + res.uri);
-            console.log('Type : ' + res.type);
-            console.log('File Name : ' + res.name);
-            console.log('File Size : ' + res.size);
           //Setting the state to show single file attributes\
-            setFileName("HRMS-"+res.name);
-            let data = {uri: res.uri, name: "HRMS-"+res.name, type: res.type};
+            setFileName((res.name.includes("pdf")) ? "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".pdf" : "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".docx");
+            let data = {uri: res.uri, name: (res.name.includes("pdf")) ? "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".pdf" : "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".docx", type: res.type};
             setDocData(data);
             addEventListener;
         } catch (err) {
@@ -149,7 +144,6 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
            }, body: formData});
            try{
                const response = await fetch(request)
-               console.log(response);
                const json = await response.json();
                console.log(json);
                toast.show(json.message, {duration:4000});
@@ -157,10 +151,10 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                    navigation.goBack();
                }
            } catch (error) {
-           console.error(error);
-           toast.show(error, {duration: 3000})
+            console.log(JSON.stringify(error));
+                toast.show(JSON.stringify(error), {duration: 3000})
            } finally {
-           hideLoader();
+                hideLoader();
            }
        };
     const onsubmit = () => {
@@ -183,9 +177,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             else{
                 let from = new Date(startDate);
                 let to  = new Date(endDate);
-                console.log(from);
                 let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
-                console.log(sDate);
                 let eDate = moment(to).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
@@ -206,18 +198,16 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             else{
                 let from = startDate + " " + startTime;
                 let to = startDate + " " + endTime;
-                let sDate = moment(new Date(from)).format("yyyy-MM-DD HH:mm:ss");
-                let eDate = moment(new Date(to)).format("yyyy-MM-DD HH:mm:ss");
+                let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
+                let eDate = moment(to).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
                 showLoader();
-                AddLeaveAPI();
+               AddLeaveAPI();
             }
         }
         else {
-            console.log("SD: "+new Date(startDate));
             let sDate = moment(new Date(startDate)).format("yyyy-MM-DD HH:mm:ss");
-            console.log("stat: "+sDate);
             fromDate = sDate;
             toDate = sDate;
             showLoader();
@@ -227,6 +217,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     return (
         <OverlayContainer>
             <AppBackgorund />
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
             <ScrollView>
                 <View style={{ padding: 16, marginTop: 20, justifyContent: "center" }}>
 
@@ -347,6 +338,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                     mode={mode}
                                     open={show}
                                     date={date}
+                                    minimumDate={date}
                                     onConfirm={(selectedDate) => {
                                         onDateSelected(selectedDate);
                                     }}
@@ -384,6 +376,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
 
                 </View>
             </ScrollView>
+            </KeyboardAwareView>
+
         </OverlayContainer>
     );
 };

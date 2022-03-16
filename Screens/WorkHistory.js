@@ -16,42 +16,72 @@ import apiEndPoints from "../utils/apiEndPoints";
 import { StyleSheet } from "react-native";
 import moment from 'moment';
 import fonts from "../Common/fonts";
-// import SkeletonContent from 'react-native-skeleton-content';
+ import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const WorkHistory = ({navigation=useNavigation(), route}) => {
     const [clockifyData, setClockifyData] = useState([]);
+
     const { showLoader, hideLoader } = useContext(LoaderContext);
-    const {isLoading, setLoading} = useState(true);
+    const [isLoading, setLoading] = useState(true);
     const toast = useToast();
        
         const getlockifyData = async() => {
             try {
                     const {data} = await apiCall("GET", apiEndPoints.GetClockifyData);
-                     console.log(data);
-                   
-                     setClockifyData(data.data);
+                    if (data.hasOwnProperty("data")){
+                        setClockifyData(data.data);
+                    }
+                    else{
+                        
+                        toast.show(data.message, {duration: 3000})
+                    }
                     
                 } catch (error) {
-                    console.error(error);
                     toast.show(error, { duration: 3000 })
                 } finally {
+                    setLoading(false);
                     hideLoader();
                 }
         };
 
         useEffect(() => {
+            setLoading(true);
             getlockifyData();
-            showLoader();
         }, []);
     
     return(
         <OverlayContainer>
             <AppBackgorund />
                 
-                {/* <SkeletonContent 
-                    isLoading={isLoading}
-                > */}
-               
+            { isLoading ?
+
+                <SkeletonPlaceholder speed={700} backgroundColor={color.skeletonGray}>
+                    <View style={{height: '100%'}}>
+                    {[...Array(10)].map((elementInArray, index) => ( 
+                    <View style={[{ flexDirection: "column", marginHorizontal: 16, marginVertical: 8,
+                    padding: 16,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: color.lightGray}]}>
+
+                        <View style={{flexDirection: "row", width: '100%'}}>
+                            <View  style={{ width: 60, height: 16, borderRadius: 4 }}/>
+                            <View style={{width: '80%'}}>
+                                <View  style={{  height: 16, borderRadius: 4, marginLeft: 4, width: '100%' }} />
+                            </View>
+                        </View>
+                        <View style={{ width: "100%", flexDirection: "row", marginTop: 8}}>
+                            <View  style={{ width: 20, height: 16, borderRadius: 4 }}/>
+                            <View style={{width: '90%'}}>
+                                <View  style={{  height: 16, borderRadius: 4, marginLeft: 4, width: '50%' }} />
+                            </View>
+                        </View>
+                    </View>
+                    ))}
+                    </View>
+                </SkeletonPlaceholder> :
+                <View>
+                 {(clockifyData.length != null && clockifyData.length != 0) ?
                     <FlatList 
                             data={clockifyData}
                             keyExtractor={({id}, index) => id}
@@ -81,9 +111,10 @@ const WorkHistory = ({navigation=useNavigation(), route}) => {
                                 }
                             }}
                             onEndReachedThreshold ={0.1}
-                     />
-                
-                {/* </SkeletonContent> */}
+                    /> :
+                    <Text style={CustomStyling.NoDataLabel}>No Data Found</Text>}
+                    </View>
+            }
                    
         </OverlayContainer>
     );

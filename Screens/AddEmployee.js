@@ -18,6 +18,7 @@ import DropDownPicker from "../helper/DropDownPicker";
 import ImagesPath from "../images/ImagesPath";
 import FloatTextField from "../helper/FloatTextField";
 import { MainButton } from "../components/mainButton";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const AddEmployee = ({navigation = useNavigation()}) => {
     const [userdata, setUserData] = useContext(UserContext);
@@ -35,10 +36,8 @@ const AddEmployee = ({navigation = useNavigation()}) => {
     const getRolesData = async() => {
         try {
                 const {data} = await apiCall("GET", apiEndPoints.Roles);
-                console.log("Data: "+data);
                 setRolesData(data.data);
             } catch (error) {
-                console.error("ERR: "+error);
                 toast.show(error, { duration: 3000 })
             } finally {
                 setLoading(false);
@@ -62,7 +61,6 @@ const AddEmployee = ({navigation = useNavigation()}) => {
               name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",
             } );
         }
-        console.log(form);
         const request = new Request(Global.projct.ios.BASE_URL+apiEndPoints.addUser, {method: 'POST', headers: {
           Accept: 'application/json',
           Authorization: `Bearer ${userdata.token}`
@@ -70,7 +68,9 @@ const AddEmployee = ({navigation = useNavigation()}) => {
           try{
               const response = await fetch(request)
               const json = await response.json();
-              console.log(json);
+              if (json.message.toLowerCase().includes("success")){
+                navigation.goBack();
+              }
               toast.show(json.message, {duration:4000});
           } catch (error) {
           console.error(error);
@@ -149,100 +149,101 @@ const AddEmployee = ({navigation = useNavigation()}) => {
 
     return(
       <OverlayContainer>
-            <AppBackgorund />
-      <ScrollView>
-          {(isLoad) ? <ActivityIndicator /> :
-          (//<OverlayContainer>
-          
-        <View style={{padding: 16, zIndex: 50, justifyContent: "center"}}>
-            <View style={[AuthStyle.CardmainContainer, {zIndex: 100}]}> 
-                <Text style={CustomStyling.containerTitle}>Add User</Text>
-                { (selectdImageData.path != null || selectdImageData.path != undefined) ?
-                 (<Image 
-                  source={{
-                      uri: selectdImageData.path,
-                      //method: 'GET'
-                  }}
-                  style={[CustomStyling.editImageView, {marginTop: 16}]}
-                  />) :
-                  
+        <AppBackgorund />
+        <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
+          <ScrollView>
+            {(isLoad) ? <ActivityIndicator /> :
+              (//<OverlayContainer>
+              
+            <View style={{padding: 16, zIndex: 50, justifyContent: "center"}}>
+                <View style={[AuthStyle.CardmainContainer, {zIndex: 100}]}> 
+                    <Text style={CustomStyling.containerTitle}>Add User</Text>
+                    { (selectdImageData.path != null || selectdImageData.path != undefined) ?
                     (<Image 
-                        source={require('../images/userwhite.png')}
-                        style={[CustomStyling.editImageView, {marginTop: 16}]}
-                    />)
-                }
-                <TouchableOpacity onPress={() => {
-                    //navigation.navigate('picker');
-                    setShowPicker(true);
-                    }}
-                    style={CustomStyling.editImageBtn}>
-                    <Image source={require("../images/camera.png")}
-                        style={CustomStyling.camerImageStyle}
-                    />
-                </TouchableOpacity>
-                
-                <FloatTextField 
-                    placeholder="Enter Name"
-                    pickerLabel="Name"
-                    onTextChange={(val) => onTextChange("name", val)}
-                    leftImagePath={ImagesPath.activeUserImg}
-                    containerStyle={{marginTop: 32}}
-                />
-                
-                <FloatTextField 
-                    placeholder="Enter Email"
-                    pickerLabel="Email"
-                    onTextChange={(val) => onTextChange("email", val)}
-                    leftImagePath={ImagesPath.emailImg}
-                />
-               
-                <FloatTextField 
-                    placeholder="Enter Mobile"
-                    pickerLabel="Mobile"
-                    onTextChange={(val) => onTextChange("mobile", val)}
-                    leftImagePath={ImagesPath.phoneImg}
-                />
-
-                <FloatTextField 
-                    placeholder="Enter Password"
-                    pickerLabel="Password"
-                    onTextChange={(val) => onTextChange("password", val)}
-                    leftImagePath={ImagesPath.lockImg}
-                    isPasswordField={true}
-                />
-                <DropDownPicker
-                            containerStyle={AuthStyle.inputText}
-                            //style={{marginTop: opened ? 175 : 20}}
-                            nestedScroll={false}
-                            pickerdrop={{height: 140}}
-                            pickerPlaceholder={"Select Role"}
-                            pickerData={rolesData}
-                            value={empRole}
-                            passID={(val) => {
-                                setEmpRoleId(val)
-                            }}
-                            onSelectValue={(text) => setEmpRole(text)}
+                      source={{
+                          uri: selectdImageData.path,
+                          //method: 'GET'
+                      }}
+                      style={[CustomStyling.editImageView, {marginTop: 16}]}
+                      />) :
+                      
+                        (<Image 
+                            source={require('../images/userwhite.png')}
+                            style={[CustomStyling.editImageView, {marginTop: 16}]}
+                        />)
+                    }
+                    <TouchableOpacity onPress={() => {
+                        //navigation.navigate('picker');
+                        setShowPicker(true);
+                        }}
+                        style={CustomStyling.editImageBtn}>
+                        <Image source={require("../images/camera.png")}
+                            style={CustomStyling.camerImageStyle}
                         />
+                    </TouchableOpacity>
+                    
+                    <FloatTextField 
+                        placeholder="Enter Name"
+                        pickerLabel="Name"
+                        onTextChange={(val) => onTextChange("name", val)}
+                        leftImagePath={ImagesPath.activeUserImg}
+                        containerStyle={{marginTop: 32}}
+                    />
+                    
+                    <FloatTextField 
+                        placeholder="Enter Email"
+                        pickerLabel="Email"
+                        onTextChange={(val) => onTextChange("email", val)}
+                        leftImagePath={ImagesPath.emailImg}
+                    />
+                  
+                    <FloatTextField 
+                        placeholder="Enter Mobile"
+                        pickerLabel="Mobile"
+                        onTextChange={(val) => onTextChange("mobile", val)}
+                        leftImagePath={ImagesPath.phoneImg}
+                    />
+
+                    <FloatTextField 
+                        placeholder="Enter Password"
+                        pickerLabel="Password"
+                        onTextChange={(val) => onTextChange("password", val)}
+                        leftImagePath={ImagesPath.lockImg}
+                        isPasswordField={true}
+                    />
+                    <DropDownPicker
+                                containerStyle={AuthStyle.inputText}
+                                //style={{marginTop: opened ? 175 : 20}}
+                                nestedScroll={false}
+                                pickerdrop={{height: 140}}
+                                pickerPlaceholder={"Select Role"}
+                                pickerData={rolesData}
+                                value={empRole}
+                                passID={(val) => {
+                                    setEmpRoleId(val)
+                                }}
+                                onSelectValue={(text) => setEmpRole(text)}
+                            />
+                </View>
+              
+                    <MainButton 
+                      text={'Add User'}
+                      onPress={() => {onsubmit();}}
+                      viewStyle={{marginHorizontal: 24, marginBottom: 32}}
+                    />
             </View>
-           
-                <MainButton 
-                  text={'Add User'}
-                  onPress={() => {onsubmit();}}
-                  viewStyle={{marginHorizontal: 24, marginBottom: 32}}
-                />
-        </View>
-      
-        )}
-        {showPickerModal && (
-        <PopUpModal
-          onPressCamera={openCamera}
-          onPressGallery={openImagePicker}
-          onPressCancel={() => setShowPicker(false)}
-        />
-      )}
-        {/* {(selectImage) ? <ImagePickerView selectImage={selectedImage}/> : null} */}
-        </ScrollView>
-        </OverlayContainer>
+          
+            )}
+            {showPickerModal && (
+              <PopUpModal
+                onPressCamera={openCamera}
+                onPressGallery={openImagePicker}
+                onPressCancel={() => setShowPicker(false)}
+              />
+            )}
+          </ScrollView>     
+        </KeyboardAwareView>
+      </OverlayContainer>
     );
 };
 

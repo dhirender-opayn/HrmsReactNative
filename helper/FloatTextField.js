@@ -28,7 +28,6 @@ const FloatTextField = ({
   pickerLabel,
   pickerLabelStyle,
 }) => {
-  // console.log('PICKER DATA', pickerData);
   const [hidePswrdText, setHidePswrdText] = useState(true);
   const [textValue, setTextValue] = useState(defaultValue);
   return (

@@ -16,6 +16,7 @@ import { apiCall } from "../utils/httpClient";
 import FloatTextField from "../helper/FloatTextField";
 import { MainButton } from "../components/mainButton";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const AddTicketView = ({navigation = useNavigation()}) => {
     const [formData, setFormData] = useState({});
@@ -34,7 +35,6 @@ const AddTicketView = ({navigation = useNavigation()}) => {
       }
       try {
               const {data} = await apiCall("POST", apiEndPoints.AddTicket, param);
-              console.log("Data: "+data);
               toast.show(data.message, {duration: 4000});
               navigation.goBack();
           } catch (error) {
@@ -66,32 +66,34 @@ const AddTicketView = ({navigation = useNavigation()}) => {
     return(
       <OverlayContainer>
             <AppBackgorund />
-        <View style={{padding: 16, marginTop: 40, justifyContent: "center"}}>
-            <View style={AuthStyle.CardmainContainer}> 
-                <Text style={CustomStyling.containerTitle}>Add Ticket</Text>
-                
-                <FloatTextField 
-                  placeholder="Enter Title"
-                  pickerLabel="Title"
-                  onTextChange={(val) => onTextChange('title', val)}
-                />
-               
-                <FloatTextField 
-                  placeholder="Enter Description"
-                  pickerLabel="Description"
-                  onTextChange={(val) => onTextChange('description', val)}
-                  textInputMultiline={true}
-                  containerStyle={{height: 250}}
-                  textInputStyle={{height: 250}}
-                />
-                
-                <MainButton 
-                  text={'Add Ticket'}
-                  onPress={() => {onsubmit()}}
-                />
-                
-            </View>
-        </View>
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
+              <View style={{padding: 16, marginTop: 40, justifyContent: "center"}}>
+                  <View style={AuthStyle.CardmainContainer}> 
+                      <Text style={CustomStyling.containerTitle}>Add Ticket</Text>
+                      
+                      <FloatTextField 
+                        placeholder="Enter Title"
+                        pickerLabel="Title"
+                        onTextChange={(val) => onTextChange('title', val)}
+                      />
+                    
+                      <FloatTextField 
+                        placeholder="Enter Description"
+                        pickerLabel="Description"
+                        onTextChange={(val) => onTextChange('description', val)}
+                        textInputMultiline={true}
+                        containerStyle={{height: 250}}
+                        textInputStyle={{height: 250}}
+                      />
+                      
+                      <MainButton 
+                        text={'Add Ticket'}
+                        onPress={() => {onsubmit()}}
+                      />
+                      
+                  </View>
+              </View>
+            </KeyboardAwareView>
         </OverlayContainer>
     );
 };

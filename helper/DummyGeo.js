@@ -54,7 +54,6 @@ const GeoLocationHelper = ({setCurrentLatLocation, setCurrentLongLocation}) => {
   }, []);
 
   const getOneTimeLocation = () => {
-    console.log("=====>>>>>>>>>>>>>>>>", currentLatitude )
     setLocationStatus('Getting Location ...');
     Geolocation.getCurrentPosition(
       //Will give you the current location

@@ -12,7 +12,7 @@ import { StyleSheet } from "react-native";
 import { types } from "@babel/core";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import fonts from "../Common/fonts";
-
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const EmployeeList = ({navigation=useNavigation()}) => {
     const [userData] = useContext(UserContext);
@@ -23,18 +23,14 @@ const EmployeeList = ({navigation=useNavigation()}) => {
     const { showLoader, hideLoader } = useContext(LoaderContext);
    
     const getTeamData = async() => {
-        console.log("refresh");
         try {
                 const {data} = await apiCall("GET", apiEndPoints.Team);
-                console.log("Data: "+data);
                 setTeamData(data.data);
             } catch (error) {
-                console.error("ERR: "+error);
                 toast.show(error, { duration: 3000 })
             } finally {
                 setLoading(false);
                 setRefreshing(false);
-                console.log("Refreshed");
                 hideLoader();
             }
     };
@@ -45,14 +41,37 @@ const EmployeeList = ({navigation=useNavigation()}) => {
       }, []);
 
     useEffect(() => {
-        showLoader();
+        setLoading(true);
         getTeamData();
     }, []);
 
     return(
         <OverlayContainer>
             <AppBackgorund />
-            {isLoading ? <ActivityIndicator /> :
+            {isLoading ? <SkeletonPlaceholder speed={700} backgroundColor={color.skeletonGray}>
+            
+            <View style={{height: '100%'}}>
+            {[...Array(10)].map((elementInArray, index) => ( 
+                <View style={[{ flexDirection: "row", alignItems: "center",marginHorizontal: 16, marginVertical: 8,
+                    padding: 8,
+                    borderRadius: 8,
+                    borderWidth: 1,
+                    borderColor: color.lightGray, }]}>
+      
+                    <View style={{ marginLeft: 4, }}>
+                        <View style={empStyle.imageStyle} />
+                    </View>
+                
+                    <View style={{ marginLeft: 8, }}>
+                        <View style={{ width: 120, height: 16, borderRadius: 4, alignSelf: "flex-end" }} />
+                        <View
+                        style={{ marginTop: 6, width: 80, height: 16, borderRadius: 4 }}
+                        />
+                    </View>
+                </View>
+            ))}
+                </View>
+            </SkeletonPlaceholder>  :
                 <View>
                     <FlatList 
                         data={teamData}
@@ -90,7 +109,7 @@ const EmployeeList = ({navigation=useNavigation()}) => {
                             </View>
                             </TouchableOpacity>
                             )}
-                            style={{marginTop: 24}}
+                            style={{marginTop: 8}}
                             refreshControl={
                                 <RefreshControl refreshing= {refershing} onRefresh={onRefresh} />
                               }

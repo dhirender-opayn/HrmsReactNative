@@ -7,7 +7,6 @@ module.exports = {
       return {headerStyle: {
           backgroundColor: color.backgroundBlack,
           shadowOpacity: 0,
-          marginHorizontal:24,
         }, 
         headerShadowVisible: false, 
         headerBackTitleVisible: false, 

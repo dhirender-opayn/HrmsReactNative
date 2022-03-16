@@ -15,6 +15,7 @@ import { MainButton } from "../components/mainButton";
 import { TextButton } from "../components/TextButton";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import { LoaderContext } from "../utils/context";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const ContactAdminView = ({navigation = useNavigation()}) => {
     const [isLoading, setLoading] = useState(false);
@@ -82,76 +83,78 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
     }
     return(
       <OverlayContainer>
-            <AppBackgorund />
-      <ScrollView>
-        <View style={{padding: 16, marginTop: 8, justifyContent: "center"}}>
-            <Text style={AuthStyle.viewTitile}>Contact Admin</Text>
-            <View style={AuthStyle.CardmainContainer}> 
-                
-                <FloatTextField 
-                    placeholder="Enter Name"
-                    defaultValue={name}
-                    pickerLabel="Name"
-                    onTextChange={(val) => setName(val)}
-                    leftImagePath={ImagesPath.activeUserImg}
+        <AppBackgorund />
+        <ScrollView>
+          <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
+            <View style={{padding: 16, marginTop: 8, justifyContent: "center"}}>
+                <Text style={AuthStyle.viewTitile}>Contact Admin</Text>
+                <View style={AuthStyle.CardmainContainer}> 
+                    
+                    <FloatTextField 
+                        placeholder="Enter Name"
+                        defaultValue={name}
+                        pickerLabel="Name"
+                        onTextChange={(val) => setName(val)}
+                        leftImagePath={ImagesPath.activeUserImg}
 
-                />
-                
-                <FloatTextField 
-                    placeholder="Enter Email"
-                    defaultValue={emailId}
-                    pickerLabel="Email"
-                    onTextChange={(val) => setEmail(val)}
-                    leftImagePath={ImagesPath.emailImg}
+                    />
+                    
+                    <FloatTextField 
+                        placeholder="Enter Email"
+                        defaultValue={emailId}
+                        pickerLabel="Email"
+                        onTextChange={(val) => setEmail(val)}
+                        leftImagePath={ImagesPath.emailImg}
 
-                />
-                
-                <FloatTextField 
-                    placeholder="Enter Mobile"
-                    defaultValue={mobile}
-                    pickerLabel="Mobile"
-                    onTextChange={(val) => setMobile(val)}
-                    leftImagePath={ImagesPath.phoneImg}
+                    />
+                    
+                    <FloatTextField 
+                        placeholder="Enter Mobile"
+                        defaultValue={mobile}
+                        pickerLabel="Mobile"
+                        onTextChange={(val) => setMobile(val)}
+                        leftImagePath={ImagesPath.phoneImg}
 
-                />
-               
-                <FloatTextField 
-                    placeholder="Enter Subject"
-                    defaultValue={subject}
-                    pickerLabel="Subject"
-                    onTextChange={(val) => setSubject(val)}
-                    leftImagePath={ImagesPath.subjectImg}
-                />
-                
-                <FloatTextField 
-                    placeholder="Enter Description"
-                    defaultValue={description}
-                    pickerLabel="Description"
-                    leftImagePath={ImagesPath.descriptionImg}
-                    onTextChange={(val) => setDescription(val)}
-                    textInputMultiline={true}
-                    containerStyle={{height: 160}}
-                    textInputStyle={{height: 150 }}
-                />
-                
-                <MainButton 
-                  text={'Make Request'}
-                  onPress={() => onsubmit()}
-                  viewStyle={{marginBottom: 12}}
-                />
-                <View style={{padding:0, flexDirection:"row", alignItems:"center", alignSelf:"center"}}>
-                  <Text style={CustomStyling.regular16Text}>Already Approved </Text>
-                  <TextButton 
-                    text={'Login'}
-                    onPress={() => {navigation.goBack();}}
-                  />
+                    />
+                  
+                    <FloatTextField 
+                        placeholder="Enter Subject"
+                        defaultValue={subject}
+                        pickerLabel="Subject"
+                        onTextChange={(val) => setSubject(val)}
+                        leftImagePath={ImagesPath.subjectImg}
+                    />
+                    
+                    <FloatTextField 
+                        placeholder="Enter Description"
+                        defaultValue={description}
+                        pickerLabel="Description"
+                        leftImagePath={ImagesPath.descriptionImg}
+                        onTextChange={(val) => setDescription(val)}
+                        textInputMultiline={true}
+                        containerStyle={{height: 160}}
+                        textInputStyle={{height: 150 }}
+                    />
+                    
+                    <MainButton 
+                      text={'Make Request'}
+                      onPress={() => onsubmit()}
+                      viewStyle={{marginBottom: 12}}
+                    />
+                    <View style={{padding:0, flexDirection:"row", alignItems:"center", alignSelf:"center"}}>
+                      <Text style={CustomStyling.regular16Text}>Already Approved </Text>
+                      <TextButton 
+                        text={'Login'}
+                        onPress={() => {navigation.goBack();}}
+                      />
+                    </View>
+                    
                 </View>
                 
             </View>
-            
-        </View>
+          </KeyboardAwareView>
         </ScrollView>
-        </OverlayContainer>
+      </OverlayContainer>
     );
 };
 

@@ -18,19 +18,21 @@ import moment from 'moment';
 import AttendanceFilterModal from "./AttendanceFilter";
 import ImagesPath from "../images/ImagesPath";
 import fonts from "../Common/fonts";
+import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const AttendanceList = ({navigation=useNavigation(), route}) => {
     const [attendanceData, setAttendanceData] = useState({});
     const [isLoading, setLoading] = useState(true);
+    const [showNoData, setShowNoData] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [listPage, setListPage] = useState(1);
     const [showFilter, setShowFilter] = useState(false);
     const toast = useToast();
     const [params, setParams] = useState({type: "", startDate: "", endDate: ""});
     const { showLoader, hideLoader } = useContext(LoaderContext);
+    var ttl = 20;
 
         const getAttendanceData = async(pageNum, params) => {
-            console.log(params);
             var urlEndPoint = apiEndPoints.AttendanceList+"?page="+pageNum;
             if (params.type != ""){
                 urlEndPoint += "&type="+params.type.toLowerCase();
@@ -38,20 +40,35 @@ const AttendanceList = ({navigation=useNavigation(), route}) => {
             if (params.startDate != ""){
                 urlEndPoint += "&start_date="+params.startDate+"&end_date="+params.endDate;
             }
-            console.log(urlEndPoint);
             try {
                     const {data} = await apiCall("GET", urlEndPoint);
-                    // console.log(data);
-                    if (pageNum == 1){
-                        setAttendanceData(data.data);
-                    }else{
-                        let newData = {...attendanceData};
-                        newData["data"] = [...newData.data, ...data.data.data];
-                        setAttendanceData(newData);
-                        console.log(newData);
+                    if (data.hasOwnProperty("data")){
+                        if (data.data.hasOwnProperty("data")){
+                            if (pageNum == 1){
+                                setAttendanceData(data.data);
+                            }else{
+                                let newData = {...attendanceData};
+                                newData["data"] = [...newData.data, ...data.data.data];
+                                setAttendanceData(newData);
+                            }
+                            if (data.data.data.length > 0 || attendanceData?.data?.length > 0){
+                                setShowNoData(false);
+                            }else{
+                                setShowNoData(true);
+                            }
+                        }
+                        else{
+                            if (attendanceData?.data?.length > 0){
+                                setShowNoData(false);
+                            }else{
+                                setShowNoData(true);
+                            }
+                        }
                     }
+                    else{
+                        toast.show(data.message, {duration: 3000});
+                    }           
                 } catch (error) {
-                    console.error(error);
                     toast.show(error, { duration: 3000 })
                 } finally {
                     setLoading(false);
@@ -68,7 +85,7 @@ const AttendanceList = ({navigation=useNavigation(), route}) => {
           }, []);
 
         useEffect(() => {
-            showLoader();
+            setLoading(true);
             getAttendanceData(listPage, params);
         }, []);
     
@@ -86,46 +103,72 @@ const AttendanceList = ({navigation=useNavigation(), route}) => {
     return(
         <OverlayContainer>
             <AppBackgorund />
-                { isLoading ? <ActivityIndicator /> :
-                    <View>
-                    <FlatList 
-                            data={attendanceData.data}
-                            keyExtractor={({id}, index) => id}
-                            renderItem={({item}) => ( <View style = {CustomStyling.cardStyle}>
-                                    <View style={{ flexDirection: "row", margin: 8}}>
-                                        <Text style={CustomStyling.attendanceLabel}>Date</Text>
-                                        <Text style={[CustomStyling.attendanceLabel, {textAlign: "right"}]}>{moment.utc(item.timing).local().format("DD MMM, YYYY")}</Text>
-                                    </View>
-                                    <View style={CustomStyling.seperatorStyle}>
-                                    </View>
-                                    <View style={{flexDirection: "row", margin: 8}}>
-                                        <Text style={CustomStyling.attendanceLabel}>{(item.type == "IN") ? "Check in" : "Checkt out"}</Text>
-                                        <Text style={[CustomStyling.attendanceLabel, {textAlign: "right", color: (item.type == "IN") ? color.green : color.darkRed}]}>{moment.utc(item.timing).format("hh: mm a")}</Text>
-                                    </View>
-                                </View>)
+            { isLoading ? <SkeletonPlaceholder speed={700} backgroundColor={color.skeletonGray}>
+                    <View style={{height: '100%'}}>
+                        {[...Array(10)].map((elementInArray, index) => ( 
+                            <View style={[{ flexDirection: "row", alignItems: "center",marginHorizontal: 16, marginVertical: 8,
+                                    padding: 8,
+                                    borderRadius: 8,
+                                    borderWidth: 1,
+                                    borderColor: color.lightGray, }]}>
+      
+                                <View style={{ marginLeft: 4, width: "50%" }}>
+                                    <View style={{ width: 120, height: 16, borderRadius: 4 }} />
+                                    <View
+                                    style={{ marginTop: 6, width: 80, height: 16, borderRadius: 4 }}
+                                    />
+                                </View>
+                            
+                                <View style={{ marginRight: 8, width: "50%", alignItems: "flex-end" }}>
+                                    <View style={{ width: 120, height: 16, borderRadius: 4, alignSelf: "flex-end" }} />
+                                    <View
+                                    style={{ marginTop: 6, width: 80, height: 16, borderRadius: 4 }}
+                                    />
+                                </View>
+                            </View>
+                        ))}
+                    </View>
+                </SkeletonPlaceholder> 
+                :
+                <View>
+                    {(!showNoData) ? <FlatList 
+                        data={attendanceData.data}
+                        keyExtractor={({id}, index) => id}
+                        renderItem={({item}) => ( <View style = {CustomStyling.cardStyle}>
+                                <View style={{ flexDirection: "row", margin: 8}}>
+                                    <Text style={CustomStyling.attendanceLabel}>Date</Text>
+                                    <Text style={[CustomStyling.attendanceLabel, {textAlign: "right"}]}>
+                                        {moment.utc(item.timing).local().format("DD MMM, YYYY")}
+                                    </Text>
+                                </View>
+                                <View style={CustomStyling.seperatorStyle}>
+                                </View>
+                                <View style={{flexDirection: "row", margin: 8}}>
+                                    <Text style={CustomStyling.attendanceLabel}>{(item.type == "IN") ? "Check in" : "Checkt out"}</Text>
+                                    <Text style={[CustomStyling.attendanceLabel, {textAlign: "right", color: (item.type == "IN") ? color.green : color.darkRed}]}>{moment.utc(item.timing).format("hh: mm a")}</Text>
+                                </View>
+                            </View>
+                        )}
+                        onEndReached={() => {
+                            if (listPage < attendanceData.last_page){
+                                setListPage(listPage+1);
+                                getAttendanceData(listPage+1, params);
                             }
-                            onEndReached={() => {
-                                if (listPage < attendanceData.last_page){
-                                    setListPage(listPage+1);
-                                    getAttendanceData(listPage+1, params);
-                                }
-                            }}
-                            onEndReachedThreshold ={0.1}
-                            refreshControl = {
-                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
-                            }
-                     />
-                     {(showFilter) ? <AttendanceFilterModal onPressSubmit={(type, startDate, endDate) => {
-                         setShowFilter(false);
-                         setListPage(1);
-                         let newParams = {type: type, startDate: startDate, endDate: endDate};
-                         setParams(newParams)
-                         getAttendanceData(1, newParams);
-                     }}/> : null}
-                     </View>
-                } 
-                        
-                   
+                        }}
+                        onEndReachedThreshold ={0.1}
+                        refreshControl = {
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+                        }
+                    /> : <Text style={CustomStyling.NoDataLabel}>No Data Found</Text>}
+                    {(showFilter) ? <AttendanceFilterModal onPressSubmit={(type, startDate, endDate) => {
+                        setShowFilter(false);
+                        setListPage(1);
+                        let newParams = {type: type, startDate: startDate, endDate: endDate};
+                        setParams(newParams)
+                        getAttendanceData(1, newParams);
+                    }}/> : null}
+                </View>
+            }                  
         </OverlayContainer>
     );
 };

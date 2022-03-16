@@ -26,6 +26,7 @@ import ImagePicker from "react-native-image-crop-picker";
 import PopUpModal from "../helper/PopUpModal";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import fonts from "../Common/fonts";
+import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 export const AddHoliday = ({ navigation = useNavigation() }) => {
     const [userData, setUserData] = useContext(UserContext);
@@ -55,7 +56,6 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
     var fromDate = "";
     var toDate = ""
     var formData = new FormData();
-   //console.log( "date getting now day =====> ",date.getDate.toString)  
    function stringToDate(_date,_format,_delimiter)
    {
                var formatLowerCase=_format.toLowerCase();
@@ -160,9 +160,7 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
             else{
                 let from = new Date(startDate);
                 let to  = new Date(endDate);
-                console.log(from);
                 let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
-                console.log(sDate);
                 let eDate = moment(to).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
@@ -192,9 +190,7 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
             }
         }
         else {
-            console.log("SD: "+new Date(startDate));
             let sDate = moment(new Date(startDate)).format("yyyy-MM-DD HH:mm:ss");
-            console.log("stat: "+sDate);
             fromDate = sDate;
             toDate = sDate;
             setLoading(true);
@@ -210,7 +206,6 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
         
           .then((I) => {
            setShowPicker(false);
-           console.log(I);
            setSelectedImgData(I);
           })
           .catch((error) => {     
@@ -237,6 +232,7 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
     return (
         <OverlayContainer>
             <AppBackgorund />
+            <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
             <ScrollView>
                 <View style={{ padding: 16, marginTop: 20, justifyContent: "center" }}>
 
@@ -406,6 +402,7 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
 
                 </View>
             </ScrollView>
+            </KeyboardAwareView>
         </OverlayContainer>
     );
 };

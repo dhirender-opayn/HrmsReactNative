@@ -2,14 +2,16 @@ import React, { useEffect, useRef } from "react";
 import { ActivityIndicator, SafeAreaView, Text, View, StyleSheet, BackgroundView } from "react-native";
 import Colors, { color } from "../Common/Colors";
 import { Dimensions } from "react-native";
- 
+import LinearGradient from 'react-native-linear-gradient';
+
  const AppBackgorund = () => {
     return(
     <View  style={{ flex: 1}}>
         <View style={styles.parent}>
             <View style={{position: 'absolute', top: 0, width: "67%", bottom: 0, justifyContent: "flex-end", backgroundColor:color.backgroundBlack, alignSelf: "center"}}></View>
-  </View>
-</View>
+            {/* <LinearGradient colors={['#4c669f', '#3b5998', '#192f6a']} style={{position: 'absolute', top: 0, width: "67%", bottom: 0, justifyContent: "flex-end", backgroundColor:color.backgroundBlack, alignSelf: "center"}}/> */}
+        </View>
+    </View>
 
     ); 
 
