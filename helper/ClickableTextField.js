@@ -10,13 +10,15 @@ import {
 } from "react-native";
 import Colors, { color } from "../Common/Colors";
 import fonts from "../Common/fonts";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
 import ImagesPath from "../images/ImagesPath";
 
 const ClickabletextField = ({
   containerStyle,
   textInputStyle,
   imageStyle,
-  leftImagePath,
+  showError,
+  errorText,
   rightImagePath,
   defaultValue,
   isPasswordField,
@@ -28,13 +30,14 @@ const ClickabletextField = ({
   const [hidePswrdText, setHidePswrdText] = useState(true);
   const [textValue, setTextValue] = useState(value);
   return (
-    <View style={[styles.container, containerStyle]}>
-        {(textValue != "" && textValue != undefined) ? <View style={{ marginLeft: 14, fontFamily: fonts.regular,
+    <View style ={[{ marginBottom: 24 }, containerStyle]}>
+    <View style={[styles.container, {borderColor: (showError) ? color.darkRed : color.lightGray}]}>
+        {(value != "" && value != undefined) ? <View style={{ marginLeft: 14, fontFamily: fonts.regular,
     marginTop: -8, alignItems: "baseline"}}><Text style={[styles.LabelStyle, pickerLabelStyle]}> {pickerLabel} </Text>
         </View> : null}
 
         <TouchableOpacity style={{borderColor: color.red, borderWidth: 0, paddingHorizontal: 8, 
-          marginTop: (textValue != "" && textValue != undefined) ? -2 : 4, flexDirection: "row", justifyContent: "center", width: '100%'}}
+          marginTop: (value != "" && value != undefined) ? -2 : 4, flexDirection: "row", justifyContent: "center", width: '100%'}}
           onPress = {() => {onTouch()}}  
         >
             <View style={{width: (rightImagePath != null) ? '90%' : '100%', height: 40, justifyContent: "center"}}>
@@ -52,6 +55,8 @@ const ClickabletextField = ({
             }
       </TouchableOpacity>
     </View>
+    {(showError) ? <Text style={CustomStyling.ErrorText}>{errorText}</Text>: null}
+    </View>
   );
 };
 
@@ -64,7 +69,6 @@ const styles = StyleSheet.create({
     borderWidth:1, 
     borderColor: Colors.color.lightGray, 
     borderRadius: 8, 
-    marginBottom: 24,
     minHeight: 50,
     maxHeight: 200,
   },
@@ -108,9 +112,8 @@ const styles = StyleSheet.create({
   },
   LabelStyle: {
     fontSize: 12,
-   // fontFamily: fonts.InterMedium,
+    fontFamily: fonts.medium,
     color: color.black,
-    
     backgroundColor: color.white,
   },
 });

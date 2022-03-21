@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {Text, StyleSheet, FlatList, View, Modal, TouchableOpacity, Image} from 'react-native';
 import DatePicker from "react-native-date-picker";
-import { useToast } from 'react-native-toast-notifications';
 import moment from 'moment';
 import Colors, {color} from '../Common/Colors';
 import { projct } from '../Common/Global';
@@ -9,7 +8,7 @@ import { MainButton } from '../components/mainButton';
 import { CustomStyling } from '../CustomStyle/CustomStyling';
 import ClickabletextField from '../helper/ClickableTextField';
 import ImagesPath from '../images/ImagesPath';
-
+import Validations from '../Common/Validations';
 
 const AttendanceFilterModal = ({onPressSubmit = () => {}}) => {
     const [modalVisible, setModalVisible] = useState(false);
@@ -20,8 +19,8 @@ const AttendanceFilterModal = ({onPressSubmit = () => {}}) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [show, setShow] = useState(false);
-    const toast = useToast();
     const [date, setDate] = useState(new Date());
+    const [showErrMsg, setShowErrMsg] = useState(false);
 
     const onDateSelected = (selectedDate) => {
         setDate(selectedDate)
@@ -47,13 +46,11 @@ const AttendanceFilterModal = ({onPressSubmit = () => {}}) => {
     
     const onClickSubmit = () => {
         if (selectedFilter == 3){
-            if (startDate == ""){
-                toast.show("Please select start date", {duration: 3000});
-            }
-            else if (endDate == ""){
-                toast.show("Please select end date", {duration: 3000});
+            if (startDate == "" || endDate == ""){
+                setShowErrMsg(true);
             }
             else{
+                setShowErrMsg(false);
                 let from = new Date(startDate);
                 let to  = new Date(endDate);
                 let fromDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
@@ -67,7 +64,11 @@ const AttendanceFilterModal = ({onPressSubmit = () => {}}) => {
         else{
             onPressSubmit("", "", "");
         }
-    }
+    };
+
+    useEffect(() => {
+        setShowErrMsg(false);
+    }, []);
 
     return (
         <Modal
@@ -111,6 +112,8 @@ const AttendanceFilterModal = ({onPressSubmit = () => {}}) => {
                                 onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
                                 pickerLabel='Start Date'
                                 rightImagePath={ImagesPath.plainCalendarImg}
+                                showError={(showErrMsg && startDate == "")}
+                                errorText={Validations.UnselectFieldStr("start date")}
                             />
                         
                             <ClickabletextField 
@@ -121,6 +124,8 @@ const AttendanceFilterModal = ({onPressSubmit = () => {}}) => {
                                 onTouch={() => {showDatepicker(projct.leaveDateTypes.EndDate)}}
                                 pickerLabel='End Date'
                                 rightImagePath={ImagesPath.plainCalendarImg}
+                                showError={(showErrMsg && endDate == "")}
+                                errorText={Validations.UnselectFieldStr("end date")}
                             />
                         </View>
                         : null

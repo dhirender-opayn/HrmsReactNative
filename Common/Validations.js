@@ -15,7 +15,7 @@ module.exports = {
     },
     PasswordValidation: password =>{
       if(!password) return "Please enter password."
-      if(password.length < 5) return "Please enter a valid passworder of atleast 5 charaters."
+      if(password.length < 5) return "Please enter a valid password of atleast 5 charaters."
       return ''
     },
     NameValidation:name =>{
@@ -45,5 +45,8 @@ module.exports = {
     },
     EmptyFieldStr : fieldName => {
       return "Please enter "+fieldName
+    },
+    UnselectFieldStr : fieldName => {
+      return "Please select "+fieldName
     }
 }

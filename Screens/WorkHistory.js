@@ -8,12 +8,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors, { color }  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
-import Global from "../Common/Global";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { AuthContext, LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
-import { StyleSheet } from "react-native";
 import moment from 'moment';
 import fonts from "../Common/fonts";
  import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -23,7 +21,6 @@ const WorkHistory = ({navigation=useNavigation(), route}) => {
 
     const { showLoader, hideLoader } = useContext(LoaderContext);
     const [isLoading, setLoading] = useState(true);
-    const toast = useToast();
        
         const getlockifyData = async() => {
             try {
@@ -32,12 +29,11 @@ const WorkHistory = ({navigation=useNavigation(), route}) => {
                         setClockifyData(data.data);
                     }
                     else{
-                        
-                        toast.show(data.message, {duration: 3000})
+                        Toast.show({type: "error", text1: data.message});
                     }
                     
                 } catch (error) {
-                    toast.show(error, { duration: 3000 })
+                    Toast.show({type: "error", text1: error});
                 } finally {
                     setLoading(false);
                     hideLoader();

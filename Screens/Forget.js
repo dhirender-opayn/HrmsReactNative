@@ -1,9 +1,9 @@
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View } from "react-native";
-import React, { useState, useContext } from "react";
+import { SafeAreaView, Text, TextInput, ScrollView, View } from "react-native";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
 import { MainButton } from "../components/mainButton";
 import { EmailValidation } from "../helper/Validation";
-import String from "../Common/String";
+import String, { strings } from "../Common/String";
 import { useNavigation } from "@react-navigation/native";
 import Global, { projct } from "../Common/Global";
 import { OverlayContainer } from "../Common/OverlayContainer";
@@ -12,22 +12,23 @@ import Colors from "../Common/Colors";
 import FloatTextField from "../helper/FloatTextField";
 import { LoaderContext } from "../utils/context";
 import { KeyboardAwareView } from "react-native-keyboard-aware-view";
- 
+import Toast from 'react-native-toast-message';
 
 export const Forget = ({ navigation = useNavigation() }) => {
     const [email, setEmail] = useState("");
-    const [message, setMsg] = useState("");
-    const [data, setData] = useState({});
+    const [showErrMsg, setShowErrMsg] = useState(false);
     const { showLoader, hideLoader } = useContext(LoaderContext);
-
     let formData = new FormData()
 
     const onButtonPress = () => {
 
-        if (!EmailValidation(email)) {
+        if (EmailValidation(email)) {
+            setShowErrMsg(true);
+        }
+        else{
+            setShowErrMsg(false)
             showLoader();
             forgetApi();
-
         }
     }
    
@@ -43,23 +44,31 @@ export const Forget = ({ navigation = useNavigation() }) => {
         try {
             const response = await fetch(request)
             const json = await response.json();
-            setMsg(json.message);
-            setData(json.data);
-            const object = JSON.stringify(json.data);
-            navigation.navigate('OtpVerify');
+            console.log(json);
+            if (json.hasOwnProperty("data")){
+                navigation.navigate('OtpVerify');
+            }
+            else{
+                Toast.show({type: "error", text1: json.message});
+            }
         } catch (error) {
+            Toast.show({type: "error", text1: error});
         } finally {
             hideLoader();
         }
     };
 
+    useEffect(() => {
+        setShowErrMsg(false);
+    }, [])
+
     return (
         <OverlayContainer>
             <AppBackgorund />
             <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
-            <SafeAreaView style={{padding: 16, marginTop: 40, justifyContent: "center", flex: 1}}>
-                <View style={{flex: 1}}>
-                    <View style={{ marginTop: 0 }}>
+            <ScrollView style={{padding: 16, marginTop: 40, flex: 1}}>
+                <View style={{flex: 1, height: "100%"}}>
+                    <View style={{ marginTop: 0, height: "50%" }}>
                         <Text style={AuthStyle.viewSubTitile} >{String.strings.title}</Text>
                         <Text style={AuthStyle.medium16Text} >{String.strings.forgetMsg}</Text>
                     </View>
@@ -67,17 +76,19 @@ export const Forget = ({ navigation = useNavigation() }) => {
                     </View>
                     <View style={{flex: 1}}> 
 
-                    <View style={{ marginTop: 16 ,marginHorizontal:25}}>
+                    <View style={[AuthStyle.CardmainContainer, {paddingVertical: 32, marginTop: 48}]}> 
                         <FloatTextField 
                             placeholder="Enter Your Email"
                             defaultValue={email}
-                            pickerLabel="Email"
+                            pickerLabel={strings.email}
                             onTextChange={(val) => setEmail(val)}
+                            showError={(showErrMsg && EmailValidation(email))}
+                            errorText={EmailValidation(email)}
                         />
                         <MainButton text={'Submit'} onPress={onButtonPress} />
                     </View>
                 </View>
-            </SafeAreaView>
+            </ScrollView>
             </KeyboardAwareView>
         </OverlayContainer>
 

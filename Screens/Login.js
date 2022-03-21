@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
@@ -7,20 +7,22 @@ import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
 import { AuthContext, LoaderContext } from "../utils/context";
 import FloatTextField from "../helper/FloatTextField";
 import { MainButton } from "../components/mainButton";
 import { TextButton } from "../components/TextButton";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import { KeyboardAwareView } from 'react-native-keyboard-aware-view';
+import { strings } from "../Common/String";
+import { color } from "../Common/Colors";
+import Toast from 'react-native-toast-message';
 
 const LoginView = ({navigation = useNavigation()}) => {
     const [emailId, setEmail] = useState("");
     const [password, setPswrd] = useState("");
     const { showLoader, hideLoader } = useContext(LoaderContext);
+    const [showErrMsg, setShowErrMsg] = useState(false);
 
-    const toast = useToast();
     const { signIn } = useContext(AuthContext);
     let formData = new FormData()
     
@@ -34,35 +36,34 @@ const LoginView = ({navigation = useNavigation()}) => {
             const response = await fetch(request)
             const json = await response.json();
             if (json.hasOwnProperty("data")){
-            signIn(json);
-            const object = JSON.stringify(json.data);
-           // setEmail(json)
-            // navigation.navigate('TabView');
+              signIn(json);
+              const object = JSON.stringify(json.data);
+              // Toast.show({type: "success", text1: json.message});
             }
             else{
-              toast.show(json.message, {duration:4000});
+             Toast.show({type: "error", text1: json.message});
             }
             
         } catch (error) {
-          toast.show(error, {duration: 3000});
+            Toast.show({type: "error", text1: error});
         } finally {
           hideLoader();
         }
     };
     const onsubmit = () => {
-      if (Validations.EmailValidation(emailId)){
-        toast.show(Validations.EmailValidation(emailId), {duration: 3000});
-        return
-      }
-        if (Validations.PasswordValidation(password)){
-        toast.show(Validations.PasswordValidation(password), {duration: 3000});
-        return
+      if (Validations.EmailValidation(emailId) || Validations.PasswordValidation(password)){
+        setShowErrMsg(true);
       }
       else{
+        setShowErrMsg(false);
         showLoader();
         LoginApi();
       }
     }
+    useEffect(() => {
+      setShowErrMsg(false);
+  }, []);
+
     return(
       <OverlayContainer>
             <AppBackgorund />
@@ -75,15 +76,19 @@ const LoginView = ({navigation = useNavigation()}) => {
                 <FloatTextField 
                     placeholder="Enter Email"
                     defaultValue={emailId}
-                    pickerLabel="Email"
+                    pickerLabel={strings.email}
                     onTextChange={(val) => setEmail(val)}
+                    showError={(showErrMsg && Validations.EmailValidation(emailId)) ? true : false}
+                    errorText={Validations.EmailValidation(emailId)}
                 />
                 <FloatTextField 
                     placeholder="Enter Password"
                     defaultValue={password}
-                    pickerLabel="Password"
+                    pickerLabel={strings.password}
                     onTextChange={(val) => setPswrd(val)}
                     isPasswordField={true}
+                    showError={(showErrMsg && Validations.PasswordValidation(password)) ? true : false}
+                    errorText={Validations.PasswordValidation(password)}
                 />
                 
                 <MainButton 

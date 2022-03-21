@@ -1,23 +1,18 @@
 import React, { useContext } from "react";
 import { useState, useEffect } from "react";
 import { OverlayContainer } from "../Common/OverlayContainer";
-import { View, Text, ActivityIndicator, FlatList, Image, TouchableOpacity, RefreshControl } from "react-native";
-import { AuthStyle } from "../CustomStyle/AuthStyle";
+import { View, Text, FlatList, Image, TouchableOpacity, RefreshControl } from "react-native";
 import AppBackgorund from "./BackgroundView";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors, { color }  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
-import Global from "../Common/Global";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { AuthContext, LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
-import { StyleSheet } from "react-native";
 import moment from 'moment';
 import AttendanceFilterModal from "./AttendanceFilter";
 import ImagesPath from "../images/ImagesPath";
-import fonts from "../Common/fonts";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
 
 const AttendanceList = ({navigation=useNavigation(), route}) => {
@@ -27,7 +22,6 @@ const AttendanceList = ({navigation=useNavigation(), route}) => {
     const [refreshing, setRefreshing] = useState(false);
     const [listPage, setListPage] = useState(1);
     const [showFilter, setShowFilter] = useState(false);
-    const toast = useToast();
     const [params, setParams] = useState({type: "", startDate: "", endDate: ""});
     const { showLoader, hideLoader } = useContext(LoaderContext);
     var ttl = 20;
@@ -66,10 +60,10 @@ const AttendanceList = ({navigation=useNavigation(), route}) => {
                         }
                     }
                     else{
-                        toast.show(data.message, {duration: 3000});
+                        Toast.show({type: "error", text1: data.message});
                     }           
                 } catch (error) {
-                    toast.show(error, { duration: 3000 })
+                    Toast.show({type: "error", text1: error});
                 } finally {
                     setLoading(false);
                     setRefreshing(false);
@@ -94,9 +88,11 @@ const AttendanceList = ({navigation=useNavigation(), route}) => {
               headerRight: () => 
             //   <Button onPress={() => setShowFilter(true)} title="change" />
             <TouchableOpacity onPress={() => setShowFilter(true)}>
-              <Image onPress={() => {setShowFilter(true); toast.show("Pressed");}} source={ImagesPath.filterImg} style={{width: 20, height: 20, tintColor: color.white}}/>
+                <Image 
+                    source={ImagesPath.filterImg} 
+                    style={{width: 20, height: 20, tintColor: color.white}}
+                />
               </TouchableOpacity>
-              ,
             });
           }, [navigation]);
 

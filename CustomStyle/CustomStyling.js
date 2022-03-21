@@ -138,7 +138,7 @@ export const CustomStyling = StyleSheet.create({
         width:100, 
         height: 100, 
         borderRadius: 50, 
-        marginTop: -110, 
+        marginTop: -80, 
         borderWidth: 1, 
         borderColor: color.red, 
         alignSelf: "center"
@@ -264,4 +264,11 @@ export const CustomStyling = StyleSheet.create({
         alignSelf: "center", 
         marginTop: "60%"
      },
+     ErrorText: {
+        fontSize: 12, 
+        fontFamily: fonts.medium, 
+        color: color.darkRed, 
+        marginTop: 4,
+        marginLeft: 4 
+    }
 });

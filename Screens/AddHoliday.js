@@ -1,36 +1,33 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
-import { View, Text, TextInput, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import Colors, { color } from "../Common/Colors";
 import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
-import ContactAdminView from "./ContactAdmin";
+import Toast from "react-native-toast-message";
 import DatePicker from "react-native-date-picker";
 import DropDownPicker from "../helper/DropDownPicker"
 import moment from 'moment';
 import DocumentPicker from 'react-native-document-picker';
-import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
-import { UserContext } from "../utils/context";
+import { LoaderContext, UserContext } from "../utils/context";
 import FloatTextField from "../helper/FloatTextField";
 import ClickabletextField from "../helper/ClickableTextField";
+import ImagePicker from "react-native-image-crop-picker";
 import ImagesPath from "../images/ImagesPath";
 import { MainButton } from "../components/mainButton";
-import ImagePicker from "react-native-image-crop-picker";
-import PopUpModal from "../helper/PopUpModal";
-import { CustomStyling } from "../CustomStyle/CustomStyling";
 import fonts from "../Common/fonts";
 import { KeyboardAwareView } from "react-native-keyboard-aware-view";
+import { strings } from "../Common/String";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
+import PopUpModal from "../helper/PopUpModal";
 
 export const AddHoliday = ({ navigation = useNavigation() }) => {
     const [userData, setUserData] = useContext(UserContext);
-    const [isLoading, setLoading] = useState(false);
     const [title, setTitle] = useState("");
     const [leaveType, setLeaveType] = useState("");
     const [leaveTypeId, setLeaveTypeId] = useState("1");
@@ -40,12 +37,14 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
     const [endTime, setEndTime] = useState('');
     const [description, setDescription] = useState("");
     const [forDateType, setForDateType] = useState("");
-    const toast = useToast();
+    const {showLoader, hideLoader} = useContext(LoaderContext);
     const [selectdImageData, setSelectedImgData] = useState({});
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
     const [showPickerModal, setShowPicker] = useState(false);
+    const [showErrMsg, setShowErrMsg] = useState(false);
+
     const leaveTypes = [
         {name: "Short Leave", id: 4},
         {name: "Half Day", id: 3}, 
@@ -56,19 +55,6 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
     var fromDate = "";
     var toDate = ""
     var formData = new FormData();
-   function stringToDate(_date,_format,_delimiter)
-   {
-               var formatLowerCase=_format.toLowerCase();
-               var formatItems=formatLowerCase.split(_delimiter);
-               var dateItems=_date.split(_delimiter);
-               var monthIndex=formatItems.indexOf("mm");
-               var dayIndex=formatItems.indexOf("dd");
-               var yearIndex=formatItems.indexOf("yyyy");
-               var month=parseInt(dateItems[monthIndex]);
-               month-=1;
-               var formatedDate = new Date(dateItems[yearIndex],month,dateItems[dayIndex]);
-               return formatedDate;
-   }
 
     const onDateSelected = (selectedDate) => {
         setDate(selectedDate)
@@ -82,14 +68,11 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
             setStartTime(moment(selectedDate).format("HH:mm"));
         }
         else{
-            setEndTime(moment(selectedDate).format("HH: mm"));
+            setEndTime(moment(selectedDate).format("HH:mm"));
         }
         setShow(false);
     };
-    const showMode = (currentMode) => {
-        setShow(true);
-        setMode(currentMode);
-    };
+    
 
     const showDatepicker = (dateType) => {
         setForDateType(dateType);
@@ -110,16 +93,20 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
         }
     }
 
-    
       
     const AddHolidayAPI = async() => {
-        // // var param = {};
+        // var param = {};
         // formData.append('user_id',  String(userData.user.id) );
-        // formData.append('start_date', startDate );
-        // formData.append('end_date', endDate );
+        // formData.append('start_date', fromDate );
+        // formData.append('end_date', toDate );
         // formData.append('reason', description );
         // formData.append('type',leaveTypeId);
         //  if (fileName != ""){
+        //     // formData.append('file', {
+        //     //    uri: Platform.OS === 'android' ? `${fileData}` : fileData.replace('file://',''),
+        //     //    type: fileMimetype,
+        //     //    name: fileName,
+        //     //  } );
         //     formData.append("file", DocsData);
         //  }
         //  console.log(formData);
@@ -129,106 +116,102 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
         //    }, body: formData});
         //    try{
         //        const response = await fetch(request)
-        //        console.log(response);
         //        const json = await response.json();
         //        console.log(json);
-        //        toast.show(json.message, {duration:4000});
+               
+        //        if (json.message.toLowerCase().includes('success')){
+        //            navigation.goBack();
+        //            Toast.show({type: "success", text1: json.message});
+        //        }
+        //        else{
+        //         Toast.show({type: "error", text1: json.message})
+        //        }
         //    } catch (error) {
-        //    console.error(error);
-        //    toast.show(error, {duration: 3000})
+        //         console.log(JSON.stringify(error));
+        //         Toast.show({type: "success", text1: error})
         //    } finally {
-        //    setLoading(false);
+        //         hideLoader();
         //    }
        };
     const onsubmit = () => {
-        if (Validations.FieldValidation(title)) {
-            toast.show(Validations.EmptyFieldStr("title"), { duration: 3000 });
-        }
-        else if (Validations.FieldValidation(leaveType)) {
-            toast.show(Validations.EmptyFieldStr("leave type"), { duration: 3000 });
-        }
-        else if (startDate == "") {
-            toast.show("Please select start date", { duration: 3000 });
-        }
-        else if (Validations.FieldValidation(description)) {
-            toast.show(Validations.EmptyFieldStr("description"), { duration: 3000 });
+        if (Validations.FieldValidation(title) || Validations.FieldValidation(leaveType) || (startDate == "") || Validations.FieldValidation(description)) {
+            setShowErrMsg(true);
         }
         else if (leaveTypeId == '2'){
             if (endDate == ""){
-                toast.show("Please select end date", {duration: 3000});
+                setShowErrMsg(true);
             }
             else{
+                setShowErrMsg(false);
                 let from = new Date(startDate);
                 let to  = new Date(endDate);
                 let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
                 let eDate = moment(to).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
-                setLoading(true);
+                showLoader();
                 AddHolidayAPI();
             }
         }
         else if (leaveTypeId == '3'){
-            toast.show("Please select first or second half", {duration: 3000});
+            setShowErrMsg(true);
         }
         else if (leaveTypeId == '4'){
-            if (startTime == ""){
-                toast.show("Please select start time", {duration: 3000});
-            }
-            else if (endTime == ""){
-                toast.show("Please select end time", {duration: 3000});
+            if (startTime == "" || endTime == ""){
+                setShowErrMsg(true);
             }
             else{
+                setShowErrMsg(false);
                 let from = startDate + " " + startTime;
                 let to = startDate + " " + endTime;
-                let sDate = moment(new Date(from)).format("yyyy-MM-DD HH:mm:ss");
-                let eDate = moment(new Date(to)).format("yyyy-MM-DD HH:mm:ss");
+                let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
+                let eDate = moment(to).format("yyyy-MM-DD HH:mm:ss");
                 fromDate = sDate;
                 toDate = eDate;
-                setLoading(true);
+                showLoader();
                 AddHolidayAPI();
             }
         }
         else {
+            setShowErrMsg(false);
             let sDate = moment(new Date(startDate)).format("yyyy-MM-DD HH:mm:ss");
             fromDate = sDate;
             toDate = sDate;
-            setLoading(true);
+            showLoader();
             AddHolidayAPI();
         }
     };
-    const openImagePicker = () => {
-        ImagePicker.openPicker({
-         
-          cropping: true,
-          includeBase64: true,
-        })
-        
-          .then((I) => {
-           setShowPicker(false);
-           setSelectedImgData(I);
-          })
-          .catch((error) => {     
-           setShowPicker(false);
-          });
-       
-      };
-    
-      const openCamera = () => {
-        ImagePicker.openCamera({
- 
-          cropping: true,
-          includeBase64: true,
-        })
-          .then((I) => {
-           setShowPicker(false);
-           setSelectedImgData(I);
-          })
-          .catch((error) => {
-           setShowPicker(false);
-          });
-      };
 
+    const openImagePicker = () => {
+        ImagePicker.openPicker({         
+            cropping: true,
+          includeBase64: true,
+        })
+                
+        .then((I) => {
+            setShowPicker(false);
+            setSelectedImgData(I);
+        })
+        .catch((error) => {     
+            setShowPicker(false);
+        });
+               
+    };
+            
+    const openCamera = () => {
+        ImagePicker.openCamera({ 
+            cropping: true,
+            includeBase64: true,
+        })
+        .then((I) => {
+            setShowPicker(false);
+            setSelectedImgData(I);
+        })
+        .catch((error) => {
+            setShowPicker(false);
+        });
+    };
+    useEffect
     return (
         <OverlayContainer>
             <AppBackgorund />
@@ -237,7 +220,6 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                 <View style={{ padding: 16, marginTop: 20, justifyContent: "center" }}>
 
                     <View style={AuthStyle.CardmainContainer}>
-
                     { (selectdImageData.path != null || selectdImageData.path != undefined) ?
                     (<Image 
                     source={{
@@ -261,34 +243,38 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                         style={CustomStyling.camerImageStyle}
                         />
                 </TouchableOpacity>
-                        
                         <FloatTextField 
                             placeholder="Enter Title"
                             defaultValue={title}
                             pickerLabel="Title"
                             onTextChange={(val) => setTitle(val)}
                             containerStyle={{marginTop: 32}}
+                            showError={(showErrMsg && Validations.FieldValidation(title))}
+                            errorText={Validations.EmptyFieldStr("title")}
                         />
                         
                         <View style={{zIndex: 1000}}>
                         <DropDownPicker
-                            containerStyle={styles.TextfieldContainer}
-                            //style={{marginTop: opened ? 175 : 20}}
                             nestedScroll={false}
                             pickerdrop={{height: 160}}
                             pickerPlaceholder={"Select Leave"}
+                            pickerLabel={"Slect Leave"}
                             pickerData={leaveTypes}
                             value={leaveType}
                             passID={(val) => {
                                 setLeaveTypeId(val)
                             }}
                             onSelectValue={(text) => setLeaveType(text)}
+                            showError={(showErrMsg && Validations.FieldValidation(leaveType))}
+                            errorText={Validations.UnselectFieldStr("leave type")}
                         />
                         </View>
 
                         {(leaveTypeId == "2") ? 
                             <View style={{flex: 1, flexDirection: "row"}}>
-                                
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}  style={{flex: 1}}  >
+                                <Text style={[styles.TextfieldContainer, { paddingTop:13, marginEnd: 4}]}>{startDate}</Text>
+                                </TouchableOpacity> */}
                                 <ClickabletextField 
                                     containerStyle={{flex: 1, marginEnd: 4}}
                                     imageStyle={{marginEnd: 8}}
@@ -297,8 +283,12 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
                                     pickerLabel='Start Date'
                                     rightImagePath={ImagesPath.plainCalendarImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(startDate))}
+                                    errorText={Validations.UnselectFieldStr("start date")}
                                 />
-                                
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndDate)}  style={{flex: 1}}  >
+                                    <Text style={[styles.TextfieldContainer, { paddingTop:13, marginLeft: 4}]}>{endDate}</Text>
+                                </TouchableOpacity> */}
                                 <ClickabletextField 
                                     containerStyle={{flex: 1, marginLeft: 4}}
                                     imageStyle={{marginEnd: 8}}
@@ -307,21 +297,31 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.EndDate)}}
                                     pickerLabel='End Date'
                                     rightImagePath={ImagesPath.plainCalendarImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(endDate))}
+                                    errorText={Validations.UnselectFieldStr("end date")}
                                 />
                             </View> :
-                            
+                            // <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}    >
+                            //     {/* <Button onPress={showDatepicker} title="Show date picker!" /> */}
+
+                            //     <Text style={[styles.TextfieldContainer, { paddingTop:13}]}>{startDate}</Text>
+                            // </TouchableOpacity>
                             <ClickabletextField 
                                 defaultValue='Start Date'
                                 value={startDate}
                                 onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
                                 pickerLabel='Start Date'
                                 rightImagePath={ImagesPath.plainCalendarImg}
+                                showError={(showErrMsg && Validations.FieldValidation(startDate))}
+                                errorText={Validations.UnselectFieldStr("start date")}
                             />
                         }
 
                         {(leaveTypeId == '4') ?  
                             <View style={{flex: 1, flexDirection: "row"}}>
-                               
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartTime)}  style={{flex: 1}}  >
+                                    <Text style={[styles.TextfieldContainer, { paddingTop:13, marginEnd: 4}]}>{startTime}</Text>
+                                </TouchableOpacity> */}
                                 <ClickabletextField 
                                     containerStyle={{flex: 1, marginEnd: 4}}
                                     imageStyle={{marginEnd: 8}}
@@ -330,8 +330,12 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.StartTime)}}
                                     pickerLabel='From'
                                     rightImagePath={ImagesPath.clockImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(startTime))}
+                                    errorText={Validations.UnselectFieldStr("start time")}
                                 />
-                               
+                                {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndTime)}  style={{flex: 1}}  >
+                                    <Text style={[styles.TextfieldContainer, { paddingTop:13, marginLeft: 4}]}>{endTime}</Text>
+                                </TouchableOpacity> */}
                                 <ClickabletextField 
                                     containerStyle={{flex: 1, marginLeft: 4}}
                                     imageStyle={{marginEnd: 8}}
@@ -340,11 +344,14 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.EndTime)}}
                                     pickerLabel='To'
                                     rightImagePath={ImagesPath.clockImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(endTime))}
+                                    errorText={Validations.UnselectFieldStr("end time")}
                                 />
                             </View> : null
                         }
 
                         {(leaveTypeId == "3" || leaveTypeId == "5" || leaveTypeId == "6") ?
+                        <View style={{marginBottom: 24}}>
                             <View style={styles.HalfLeaveView}>
                                 <TouchableOpacity onPress={() => setHalfDayLeave(true)}  style={[
                                     (leaveTypeId == '5') ? styles.SelectedHalfView : styles.UnselectedHalfView, 
@@ -358,6 +365,8 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                                 ]}>
                                     <Text style={(leaveTypeId == '6') ? styles.selectedText : styles.UnselectedText}>Second Half</Text>
                                 </TouchableOpacity>
+                                </View>
+                                {(showErrMsg && leaveTypeId == 3) ? <Text style={CustomStyling.ErrorText}>Please select first or second half</Text> : null}
                             </View> : null
                         }    
                         {show && (
@@ -366,6 +375,7 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                                     mode={mode}
                                     open={show}
                                     date={date}
+                                    minimumDate={date}
                                     onConfirm={(selectedDate) => {
                                         onDateSelected(selectedDate);
                                     }}
@@ -391,6 +401,8 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                             //textInputLines={4}
                             containerStyle={{height: 160}}
                             textInputStyle={{height: 150}}
+                            showError={(showErrMsg && Validations.FieldValidation(description))}
+                            errorText={Validations.EmptyFieldStr("reason")}
                         />
 
                         <MainButton
@@ -403,6 +415,7 @@ export const AddHoliday = ({ navigation = useNavigation() }) => {
                 </View>
             </ScrollView>
             </KeyboardAwareView>
+
         </OverlayContainer>
     );
 };
@@ -419,7 +432,6 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     HalfLeaveView: {
-        marginBottom: 16,
         flex: 1,
         flexDirection: "row",
     },

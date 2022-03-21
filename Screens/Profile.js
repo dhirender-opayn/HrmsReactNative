@@ -9,45 +9,49 @@ import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
 import Global from "../Common/Global";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { AuthContext, LoaderContext, UserContext } from "../utils/context";
 
 const ProfileView = ({navigation=useNavigation()}) => {
     const [userdata, setData] = useContext(UserContext);
     const [ListData, setListData] = useState([]);
-    const toast = useToast();
     const { signOut } = useContext(AuthContext);
     const { showLoader, hideLoader } = useContext(LoaderContext);
 
     const LogoutAPI = async() => {
         
-        const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.LogoutAPI, {method: 'POST', headers: {
-          Accept: 'application/json',
-          Authorization: 'Bearer '+userdata.token,
-          }});
-          try{
-              const response = await fetch(request)
-              const json = await response.json();
-              signOut();
+        const request = new Request(Global.projct.ios.BASE_URL+Global.projct.apiSuffix.logout, {method: 'POST', headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer '+userdata.token,
+        }});
+        try{
+            const response = await fetch(request)
+            const json = await response.json();
+            console.log(json);
+            signOut();
             
-          } catch (error) {
-          console.error(error);
-          toast.show(error, {duration: 3000})
-          } finally {
-          hideLoader();
-          }
-      };
+        } 
+        catch (error) {
+            console.error(error);
+            Toast.show({type: "error", text1: error});
+        } 
+        finally {
+            hideLoader();
+        }
+    };
+
     const setViewData = async() => {
-        
-            const listing = [{id:  0, title: "Change Password", view: "ChangePassword"}, 
+        const listing = [{id:  0, title: "Change Password", view: "ChangePassword"}, 
                         {id:  1, title: "Notification", view: "Notifications"}, 
                         {id:  2, title: "Add Ticket", view: "AddTicket"}];
-            setListData(listing);
+        setListData(listing);
        
     };
+
     useEffect(() =>{ 
         setViewData();
     }, []);
+
     return(
         <OverlayContainer>
             <AppBackgorund />

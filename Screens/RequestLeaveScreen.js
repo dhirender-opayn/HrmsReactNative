@@ -7,15 +7,12 @@ import Colors, { color } from "../Common/Colors";
 import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
-import ContactAdminView from "./ContactAdmin";
+import Toast from "react-native-toast-message";
 import DatePicker from "react-native-date-picker";
 import DropDownPicker from "../helper/DropDownPicker"
 import moment from 'moment';
 import DocumentPicker from 'react-native-document-picker';
-import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
 import { LoaderContext, UserContext } from "../utils/context";
 import FloatTextField from "../helper/FloatTextField";
@@ -24,6 +21,8 @@ import ImagesPath from "../images/ImagesPath";
 import { MainButton } from "../components/mainButton";
 import fonts from "../Common/fonts";
 import { KeyboardAwareView } from "react-native-keyboard-aware-view";
+import { strings } from "../Common/String";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
 
 export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const [userData, setUserData] = useContext(UserContext);
@@ -36,12 +35,12 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
     const [endTime, setEndTime] = useState('');
     const [description, setDescription] = useState("");
     const [fileName, setFileName] = useState("");
-    const toast = useToast();
     const [forDateType, setForDateType] = useState(projct.leaveDateTypes.StartDate);
     const [date, setDate] = useState(new Date());
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
     const { showLoader, hideLoader } = useContext(LoaderContext);
+    const [showErrMsg, setShowErrMsg] = useState(false);
 
     const leaveTypes = [
         {name: "Short Leave", id: 4},
@@ -100,8 +99,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             });
             let res = result[0];
           //Setting the state to show single file attributes\
-            setFileName((res.name.includes("pdf")) ? "HRMS_"+new Date().getUTCMilliseconds()+".pdf" : "HRMS_"+new Date().getUTCMilliseconds()+".docx");
-            let data = {uri: res.uri, name: (res.name.includes("pdf")) ? "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".pdf" : "HRMS_"+Math.floor(date.getTime() + date.getSeconds() / 2)+".docx", type: res.type};
+            setFileName((res.name.includes("pdf")) ? strings.uniqueFileName+".pdf" : strings.uniqueFileName+".docx");
+            let data = {uri: res.uri, name: (res.name.includes("pdf")) ? strings.uniqueFileName+".pdf" : strings.uniqueFileName+".docx", type: res.type};
             setDocData(data);
             addEventListener;
         } catch (err) {
@@ -146,35 +145,31 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                const response = await fetch(request)
                const json = await response.json();
                console.log(json);
-               toast.show(json.message, {duration:4000});
+               
                if (json.message.toLowerCase().includes('success')){
                    navigation.goBack();
+                   Toast.show({type: "success", text1: json.message});
+               }
+               else{
+                Toast.show({type: "error", text1: json.message})
                }
            } catch (error) {
-            console.log(JSON.stringify(error));
-                toast.show(JSON.stringify(error), {duration: 3000})
+                console.log(JSON.stringify(error));
+                Toast.show({type: "success", text1: error})
            } finally {
                 hideLoader();
            }
        };
     const onsubmit = () => {
-        if (Validations.FieldValidation(title)) {
-            toast.show(Validations.EmptyFieldStr("title"), { duration: 3000 });
-        }
-        else if (Validations.FieldValidation(leaveType)) {
-            toast.show(Validations.EmptyFieldStr("leave type"), { duration: 3000 });
-        }
-        else if (startDate == "") {
-            toast.show("Please select start date", { duration: 3000 });
-        }
-        else if (Validations.FieldValidation(description)) {
-            toast.show(Validations.EmptyFieldStr("description"), { duration: 3000 });
+        if (Validations.FieldValidation(title) || Validations.FieldValidation(leaveType) || (startDate == "") || Validations.FieldValidation(description)) {
+            setShowErrMsg(true);
         }
         else if (leaveTypeId == '2'){
             if (endDate == ""){
-                toast.show("Please select end date", {duration: 3000});
+                setShowErrMsg(true);
             }
             else{
+                setShowErrMsg(false);
                 let from = new Date(startDate);
                 let to  = new Date(endDate);
                 let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
@@ -186,16 +181,14 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             }
         }
         else if (leaveTypeId == '3'){
-            toast.show("Please select first or second half", {duration: 3000});
+            setShowErrMsg(true);
         }
         else if (leaveTypeId == '4'){
-            if (startTime == ""){
-                toast.show("Please select start time", {duration: 3000});
-            }
-            else if (endTime == ""){
-                toast.show("Please select end time", {duration: 3000});
+            if (startTime == "" || endTime == ""){
+                setShowErrMsg(true);
             }
             else{
+                setShowErrMsg(false);
                 let from = startDate + " " + startTime;
                 let to = startDate + " " + endTime;
                 let sDate = moment(from).format("yyyy-MM-DD HH:mm:ss");
@@ -207,6 +200,7 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
             }
         }
         else {
+            setShowErrMsg(false);
             let sDate = moment(new Date(startDate)).format("yyyy-MM-DD HH:mm:ss");
             fromDate = sDate;
             toDate = sDate;
@@ -228,21 +222,24 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                             defaultValue={title}
                             pickerLabel="Title"
                             onTextChange={(val) => setTitle(val)}
+                            showError={(showErrMsg && Validations.FieldValidation(title))}
+                            errorText={Validations.EmptyFieldStr("title")}
                         />
                         
                         <View style={{zIndex: 1000}}>
                         <DropDownPicker
-                            containerStyle={styles.TextfieldContainer}
-                            //style={{marginTop: opened ? 175 : 20}}
                             nestedScroll={false}
                             pickerdrop={{height: 160}}
                             pickerPlaceholder={"Select Leave"}
+                            pickerLabel={"Slect Leave"}
                             pickerData={leaveTypes}
                             value={leaveType}
                             passID={(val) => {
                                 setLeaveTypeId(val)
                             }}
                             onSelectValue={(text) => setLeaveType(text)}
+                            showError={(showErrMsg && Validations.FieldValidation(leaveType))}
+                            errorText={Validations.UnselectFieldStr("leave type")}
                         />
                         </View>
 
@@ -259,6 +256,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
                                     pickerLabel='Start Date'
                                     rightImagePath={ImagesPath.plainCalendarImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(startDate))}
+                                    errorText={Validations.UnselectFieldStr("start date")}
                                 />
                                 {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndDate)}  style={{flex: 1}}  >
                                     <Text style={[styles.TextfieldContainer, { paddingTop:13, marginLeft: 4}]}>{endDate}</Text>
@@ -271,6 +270,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.EndDate)}}
                                     pickerLabel='End Date'
                                     rightImagePath={ImagesPath.plainCalendarImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(endDate))}
+                                    errorText={Validations.UnselectFieldStr("end date")}
                                 />
                             </View> :
                             // <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.StartDate)}    >
@@ -284,6 +285,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                 onTouch={() => {showDatepicker(projct.leaveDateTypes.StartDate)}}
                                 pickerLabel='Start Date'
                                 rightImagePath={ImagesPath.plainCalendarImg}
+                                showError={(showErrMsg && Validations.FieldValidation(startDate))}
+                                errorText={Validations.UnselectFieldStr("start date")}
                             />
                         }
 
@@ -300,6 +303,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.StartTime)}}
                                     pickerLabel='From'
                                     rightImagePath={ImagesPath.clockImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(startTime))}
+                                    errorText={Validations.UnselectFieldStr("start time")}
                                 />
                                 {/* <TouchableOpacity onPress={() => showDatepicker(projct.leaveDateTypes.EndTime)}  style={{flex: 1}}  >
                                     <Text style={[styles.TextfieldContainer, { paddingTop:13, marginLeft: 4}]}>{endTime}</Text>
@@ -312,11 +317,14 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                     onTouch={() => {showDatepicker(projct.leaveDateTypes.EndTime)}}
                                     pickerLabel='To'
                                     rightImagePath={ImagesPath.clockImg}
+                                    showError={(showErrMsg && Validations.FieldValidation(endTime))}
+                                    errorText={Validations.UnselectFieldStr("end time")}
                                 />
                             </View> : null
                         }
 
                         {(leaveTypeId == "3" || leaveTypeId == "5" || leaveTypeId == "6") ?
+                        <View style={{marginBottom: 24}}>
                             <View style={styles.HalfLeaveView}>
                                 <TouchableOpacity onPress={() => setHalfDayLeave(true)}  style={[
                                     (leaveTypeId == '5') ? styles.SelectedHalfView : styles.UnselectedHalfView, 
@@ -330,6 +338,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                                 ]}>
                                     <Text style={(leaveTypeId == '6') ? styles.selectedText : styles.UnselectedText}>Second Half</Text>
                                 </TouchableOpacity>
+                                </View>
+                                {(showErrMsg && leaveTypeId == 3) ? <Text style={CustomStyling.ErrorText}>Please select first or second half</Text> : null}
                             </View> : null
                         }    
                         {show && (
@@ -365,6 +375,8 @@ export const RequestLeaveScreen = ({ navigation = useNavigation() }) => {
                             //textInputLines={4}
                             containerStyle={{height: 160}}
                             textInputStyle={{height: 150}}
+                            showError={(showErrMsg && Validations.FieldValidation(description))}
+                            errorText={Validations.EmptyFieldStr("reason")}
                         />
 
                         <MainButton
@@ -394,7 +406,6 @@ const styles = StyleSheet.create({
         fontSize: 16
     },
     HalfLeaveView: {
-        marginBottom: 16,
         flex: 1,
         flexDirection: "row",
     },

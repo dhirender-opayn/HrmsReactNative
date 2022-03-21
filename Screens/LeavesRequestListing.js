@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, View, Text, Image, FlatList, TouchableOpacity } from "react-native";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import Colors, { color } from "../Common/Colors";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import apiEndPoints from "../utils/apiEndPoints";
@@ -8,8 +8,6 @@ import { LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import AppBackgorund from "./BackgroundView";
 import moment from 'moment';
-import { StyleSheet } from "react-native";
-import { types } from "@babel/core";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import fonts from "../Common/fonts";
 import SkeletonPlaceholder from "react-native-skeleton-placeholder";
@@ -20,7 +18,6 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
     const [isLoading, setLoading] = useState(true);
     const [LeavesData, setLeavesData] = useState([]);
     const [showNoData, setShowNoData] = useState(false);
-    const toast = useToast();
     const LeaveSummary = [{id: 1, count: 18, type: "Casual Leave"}, {id: 2, count: 18, type: "Casual Leave"}, {id: 3, count: 18, type: "Casual Leave"}]
     const leaveTypes = [{value: "Single Day", id: 1}, {value: "Multiple Day", id: 2}, {value: "Short Leave", id: 4},
          {value: "First Half", id: 5}, {value: "Second Half", id: 6}, {value: "", id: 0}, {value: "", id: 3}];
@@ -39,10 +36,10 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
                     }
                 }
                 else{
-                    toast.show(data.message, {duration: 3000});
+                    Toast.show({type: "error", text1: data.message});
                 }
             } catch (error) {
-                toast.show(error, { duration: 3000 })
+                Toast.show({type: "error", text1: error});
             } finally {
                 setLoading(false);
                 hideLoader();
@@ -83,9 +80,11 @@ const LeavesRequestListing = ({navigation=useNavigation()}) => {
                 leaves[index].status = status;
                 setLeavesData(leaves);
            }
-           toast.show(data.message, {duration: 4000});
+           else{
+            Toast.show({type: "error", text1: data.message});
+           }
         } catch (error) {
-            toast.show(error, { duration: 3000 })
+            Toast.show({type: "error", text1: error});
         } finally {
             hideLoader();
         }

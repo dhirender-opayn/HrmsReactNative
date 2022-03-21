@@ -8,8 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors, { color }  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
-import Global from "../Common/Global";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { AuthContext, LoaderContext, UserContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
@@ -21,7 +20,6 @@ const NotificationView = ({navigation=useNavigation(), route}) => {
     const [noticeData, setNoticeData] = useState([]);
     const [isLoading, setLoading] = useState(false);
     const [listPage, setListPage] = useState(1);
-    const toast = useToast();
     const { showLoader, hideLoader } = useContext(LoaderContext);
 
     const setData = () => {
@@ -44,7 +42,7 @@ const NotificationView = ({navigation=useNavigation(), route}) => {
                     
             //     } catch (error) {
             //         console.error(error);
-            //         toast.show(error, { duration: 3000 })
+            //         Toast.show({type: "error", text1: error});
             //     } finally {
             //         setLoading(false);
             //     }

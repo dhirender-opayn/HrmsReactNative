@@ -5,7 +5,7 @@ import AppBackgorund from "./BackgroundView";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import  Colors, { color }  from "../Common/Colors";
 import { useNavigation } from "@react-navigation/native";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { LoaderContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
@@ -23,14 +23,18 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
     const leaveStatus = [{value: "Pending", id: 0}, {value: "Approved", id: 1}, {value: "Rejected", id: 2}];
     const { showLoader, hideLoader } = useContext(LoaderContext);
    
-    const toast = useToast();
        
         const getTeamData = async() => {
             try {
                     const {data} = await apiCall("GET", apiEndPoints.Team+"?user_id="+route.params.id);
-                    setUserData(data.data);
+                    if (data.hasOwnProperty("data")){
+                        setUserData(data.data);
+                    }
+                    else{
+                        Toast.show({type: "error", text1: data.message});
+                    }
                 } catch (error) {
-                    toast.show(error, { duration: 3000 })
+                    Toast.show({type: "error", text1: error});
                 } finally {
                     setLoading(false);
                     hideLoader();
@@ -65,10 +69,10 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
     return(
         <OverlayContainer>
             <AppBackgorund />
-            <View style={{padding: 16}}>
+            <View>
                 { isLoading ? <SkeletonPlaceholder speed={700} backgroundColor={color.skeletonGray}>
             
-                    <View style={{height: '100%'}}>
+                    <View style={{height: '100%', padding: 8}}>
                         <View style={[{ flexDirection: "row", alignItems: "center", marginVertical: 8, padding: 8}]}>
                             <View >
                                 <View style={empStyle.imageStyle} />
@@ -104,9 +108,9 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
                         ))}
                     </View>
                 </SkeletonPlaceholder> :
-                (<ScrollView style={{}}>
-                   <View style={{}}>
-                        <View style={{flexDirection: "row", marginTop: 8, left: 0, right: 0}}>
+                (<ScrollView style={{padding: 8}}>
+                    <View>
+                        <View style={{flexDirection: "row", marginTop: 8, padding: 8}}>
                             {(userData.profile.image != null) ? 
                                 (<Image 
                                 source={{
@@ -126,7 +130,7 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
                                 <Text style={[CustomStyling.subTitle, {paddingVertical:4, alignSelf: "flex-start"}]} numberOfLines={2}>{userData.roles[0].name}</Text>
                             </View>
                         </View>
-                        <View style = {{marginTop: 24}}>
+                        <View style = {{marginTop: 24, paddingHorizontal: 8}}>
                             <Text style = {[CustomStyling.subTitle, {alignSelf: "flex-start"}]}>Basic Information</Text>
                             <View style = {[CustomStyling.cardStyle, {marginTop: 12, marginHorizontal: 0}]}>
                                 <View style={{ flexDirection: "row", margin: 8}}>
@@ -142,27 +146,27 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
                             </View>
                         </View>
                     </View>
-                    <View style={empStyle.HalfLeaveView}>
-                                <TouchableOpacity onPress={() => {setShowAttend(true)}}  style={[
-                                    (showAttendance) ? empStyle.SelectedHalfView : empStyle.UnselectedHalfView, 
-                                    {borderTopLeftRadius: 0, borderBottomLeftRadius: 0}
-                                ]}>
-                                    <Text style={(showAttendance) ? empStyle.selectedText : empStyle.UnselectedText}>Attendance</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => setShowAttend(false)}  style={[
-                                    (!showAttendance) ? empStyle.SelectedHalfView : empStyle.UnselectedHalfView,
-                                    {borderTopRightRadius: 0, borderBottomRightRadius: 0}
-                                ]}>
-                                    <Text style={(!showAttendance) ? empStyle.selectedText : empStyle.UnselectedText}>Leaves</Text>
-                                </TouchableOpacity>
-                            </View>
+                    <View style={[empStyle.HalfLeaveView, {paddingHorizontal: 8, marginBottom: 8}]}>
+                        <TouchableOpacity onPress={() => {setShowAttend(true)}}  style={[
+                            (showAttendance) ? empStyle.SelectedHalfView : empStyle.UnselectedHalfView, 
+                            {borderTopLeftRadius: 0, borderBottomLeftRadius: 0}
+                        ]}>
+                            <Text style={(showAttendance) ? empStyle.selectedText : empStyle.UnselectedText}>Attendance</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => setShowAttend(false)}  style={[
+                            (!showAttendance) ? empStyle.SelectedHalfView : empStyle.UnselectedHalfView,
+                            {borderTopRightRadius: 0, borderBottomRightRadius: 0}
+                        ]}>
+                            <Text style={(!showAttendance) ? empStyle.selectedText : empStyle.UnselectedText}>Leaves</Text>
+                        </TouchableOpacity>
+                    </View>
                     {/* <View style={{  marginVertical: 4}}>
                         <FlatList 
                             data={showAttendance ? userData.attandances : userData.leaves}
                             keyExtractor={({id}, index) => id}
                             renderItem={({item}) => ( showAttendance ? */}
-                                {(showAttendance) ? userData.attandances.map((item, index) => {
-                                return (<View style = {[CustomStyling.cardStyle, {marginHorizontal: 0}]}>
+                    {(showAttendance) ? userData.attandances.map((item, index) => {
+                                return (<View style = {[CustomStyling.cardStyle, {marginHorizontal: 8}]}>
                                     <View style={{ flexDirection: "row", margin: 8}}>
                                         <Text style={CustomStyling.attendanceLabel}>Date</Text>
                                         <Text style={[CustomStyling.attendanceLabel, {textAlign: "right"}]}>{moment.utc(item.timing).local().format("DD MMM, YYYY")}</Text>
@@ -175,7 +179,7 @@ const EmployeeDetail = ({navigation=useNavigation(), route}) => {
                                     </View>
                                 </View>);
                             }) : userData.leaves.map((item, index) => {
-                                    return (<View style={[CustomStyling.cardStyle, {marginHorizontal: 0}]}>
+                                    return (<View style={[CustomStyling.cardStyle, {marginHorizontal: 8}]}>
                                     <View style={{flex: 1, flexDirection: 'row'}}>
                                         <View style={{flex: 2, flexDirection: 'column'}}>
                                             <Text style={{fontSize: 16, fontFamily: fonts.semiBold}}>{userData.name}</Text>

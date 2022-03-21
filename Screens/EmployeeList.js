@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ActivityIndicator, View, Text, Image, FlatList, TouchableOpacity, RefreshControl } from "react-native";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import Colors, { color } from "../Common/Colors";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import apiEndPoints from "../utils/apiEndPoints";
@@ -19,15 +19,19 @@ const EmployeeList = ({navigation=useNavigation()}) => {
     const [isLoading, setLoading] = useState(true);
     const [refershing, setRefreshing] = useState(false);
     const [teamData, setTeamData] = useState([]);
-    const toast = useToast();
     const { showLoader, hideLoader } = useContext(LoaderContext);
    
     const getTeamData = async() => {
         try {
                 const {data} = await apiCall("GET", apiEndPoints.Team);
-                setTeamData(data.data);
+                if (data.hasOwnProperty("data")){
+                    setTeamData(data.data);
+                }
+                else{
+                    Toast.show({type: "error", text1: data.message});
+                }
             } catch (error) {
-                toast.show(error, { duration: 3000 })
+                Toast.show({type: "error", text1: error});
             } finally {
                 setLoading(false);
                 setRefreshing(false);

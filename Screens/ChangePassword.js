@@ -5,7 +5,7 @@ import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { LoaderContext } from "../utils/context";
 import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
@@ -14,10 +14,10 @@ import { MainButton } from "../components/mainButton";
 import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const ChangePasswordView = ({navigation = useNavigation()}) => {
-    const toast = useToast();
+
     const [formData, setFormData] = useState({});
     const { showLoader, hideLoader } = useContext(LoaderContext);
-
+    const [showErrMsg, setShowErrMsg] = useState(false);
       
     const ChangePasswordApi = async() => {
       let param = {
@@ -26,27 +26,27 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
       }
       try {
               const {data} = await apiCall("POST", apiEndPoints.ChangePassword, param);
-              toast.show(data.message, {duration: 4000});
-              navigation.goBack();
+              if (data.hasOwnProperty("data")){
+                Toast.show({type: "success", text1: data.message});
+                navigation.goBack();
+              }
+              else{
+                Toast.show({type: "error", text1: data.message});
+              }
           } catch (error) {
               console.error("ERR: "+error);
-              toast.show(error, { duration: 3000 })
+              Toast.show({type: "error", text1: error});
           } finally {
               hideLoader()
           }
   };
 
     const onsubmit = () => {
-      if (Validations.PasswordValidation((formData.CurrentPswrd == undefined) ? "" : formData.CurrentPswrd)){
-        toast.show("Please enter valid current password", {duration: 3000});
-      }
-      else if (Validations.PasswordValidation((formData.NewPswrd == undefined) ? "" : formData.NewPswrd)){
-        toast.show("Please enter valid new password", {duration: 3000});
-      }
-      else if (formData.ConfirmPswrd == undefined || formData.ConfirmPswrd != formData.NewPswrd){
-          toast.show("Please enter confirm password same as new password", {duration: 3000});
+      if (Validations.PasswordValidation(formData?.CurrentPswrd) || Validations.PasswordValidation(formData?.NewPswrd) || formData?.ConfirmPswrd != formData?.NewPswrd){
+          setShowErrMsg(true);
       }
       else{
+        setShowErrMsg(false);
         showLoader();
         ChangePasswordApi();
       }
@@ -57,6 +57,10 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
       data[key] = value;
       setFormData(data);
     };
+
+    useEffect(() => {
+      setShowErrMsg(false);
+    }, []);
     
     return(
       <OverlayContainer>
@@ -72,6 +76,8 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
                     pickerLabel="Current Password"
                     onTextChange={(val) => onTextChange('CurrentPswrd', val)}
                     isPasswordField={true}
+                    showError={(showErrMsg && Validations.PasswordValidation(formData?.CurrentPswrd))}
+                    errorText={Validations.PasswordValidation(formData?.CurrentPswrd)}
                 />
                 <FloatTextField 
                     placeholder="Enter New Password"
@@ -79,6 +85,8 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
                     pickerLabel="New Password"
                     onTextChange={(val) => onTextChange('NewPswrd', val)}
                     isPasswordField={true}
+                    showError={(showErrMsg && Validations.PasswordValidation(formData?.NewPswrd))}
+                    errorText={Validations.PasswordValidation(formData?.NewPswrd)}
                 />
                 <FloatTextField 
                     placeholder="Re-Enter New Password"
@@ -86,6 +94,8 @@ const ChangePasswordView = ({navigation = useNavigation()}) => {
                     pickerLabel="Confirm New Password"
                     onTextChange={(val) => onTextChange('ConfirmPswrd', val)}
                     isPasswordField={true}
+                    showError={(showErrMsg && formData?.ConfirmPswrd != formData?.NewPswrd)}
+                    errorText={"Please enter confirm password same as new password"}
                 />
                 <MainButton
                   text={'Change Password'}

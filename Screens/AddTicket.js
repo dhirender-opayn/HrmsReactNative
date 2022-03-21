@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
-import FormData from "form-data";
-import Global, { projct } from "../Common/Global";
-import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
-import  Colors  from "../Common/Colors";
+import { View, Text, ScrollView } from "react-native";
 import Validations from "../Common/Validations";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { LoaderContext, UserContext } from "../utils/context";
 import apiEndPoints from "../utils/apiEndPoints";
 import { apiCall } from "../utils/httpClient";
@@ -20,7 +16,7 @@ import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const AddTicketView = ({navigation = useNavigation()}) => {
     const [formData, setFormData] = useState({});
-    const toast = useToast();
+    const [showErrMsg, setShowErrMsg] = useState(false);
     const [userdata, setUserData] = useContext(UserContext);
     const { showLoader, hideLoader } = useContext(LoaderContext);
     
@@ -35,23 +31,26 @@ const AddTicketView = ({navigation = useNavigation()}) => {
       }
       try {
               const {data} = await apiCall("POST", apiEndPoints.AddTicket, param);
-              toast.show(data.message, {duration: 4000});
-              navigation.goBack();
+              if (data.hasOwnProperty("data")){
+                navigation.goBack();
+                Toast.show({type: "success", text1: data.message});
+              }
+              else{
+                Toast.show({type: "error", text1: data.message});
+              }
           } catch (error) {
               console.error("ERR: "+error);
-              toast.show(error, { duration: 3000 })
+              Toast.show({type: "error", text1: error})
           } finally {
               hideLoader();
           }
   };
     const onsubmit = () => {
-      if (Validations.FieldValidation((formData.title == undefined) ? "" : formData.title)){
-        toast.show(Validations.EmptyFieldStr("title"), {duration: 3000});
-      }
-      else if (Validations.FieldValidation((formData.description == undefined) ? "" : formData.description)){
-        toast.show(Validations.EmptyFieldStr("description"), {duration: 3000});
+      if (Validations.FieldValidation(formData.title) || Validations.FieldValidation(formData?.description)){
+        setShowErrMsg(true);
       }
       else{
+        setShowErrMsg(false);
         showLoader();
         addTicket();
       }
@@ -62,12 +61,16 @@ const AddTicketView = ({navigation = useNavigation()}) => {
       data[key] = value;
       setFormData(data);
     };
+
+    useEffect(() => {
+      setShowErrMsg(false);
+    }, [])
     
     return(
       <OverlayContainer>
             <AppBackgorund />
             <KeyboardAwareView doNotForceDismissKeyboardWhenLayoutChanges={true} animated={true}>
-              <View style={{padding: 0, marginTop: 0, justifyContent: "center"}}>
+              <ScrollView style={{padding: 0, marginTop: 0}}>
                   <View style={AuthStyle.CardmainContainer}> 
                       <Text style={CustomStyling.containerTitle}>Add Ticket</Text>
                       
@@ -75,6 +78,8 @@ const AddTicketView = ({navigation = useNavigation()}) => {
                         placeholder="Enter Title"
                         pickerLabel="Title"
                         onTextChange={(val) => onTextChange('title', val)}
+                        showError={(showErrMsg && Validations.FieldValidation(formData?.title))}
+                        errorText={Validations.EmptyFieldStr("title")}
                       />
                     
                       <FloatTextField 
@@ -84,6 +89,8 @@ const AddTicketView = ({navigation = useNavigation()}) => {
                         textInputMultiline={true}
                         containerStyle={{height: 250}}
                         textInputStyle={{height: 250}}
+                        showError={(showErrMsg && Validations.FieldValidation(formData?.description))}
+                        errorText={Validations.EmptyFieldStr("description")}
                       />
                       
                       <MainButton 
@@ -92,7 +99,7 @@ const AddTicketView = ({navigation = useNavigation()}) => {
                       />
                       
                   </View>
-              </View>
+              </ScrollView>
             </KeyboardAwareView>
         </OverlayContainer>
     );

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 import FormData from "form-data";
 import Global, { projct } from "../Common/Global";
@@ -8,7 +8,7 @@ import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import FloatTextField from "../helper/FloatTextField";
 import ImagesPath from "../images/ImagesPath";
 import { MainButton } from "../components/mainButton";
@@ -24,11 +24,10 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
     const [mobile, setMobile] = useState("");
     const [subject, setSubject] = useState("");
     const [description, setDescription] = useState("");
-    const toast = useToast();
+    const [showErrMsg, setShowErrMsg] = useState(false);
     const { showLoader, hideLoader } = useContext(LoaderContext);
 
     let formData = new FormData()
-    
     
     const ContactAdminAPI = async() => {
       formData.append('user_id', '');
@@ -43,16 +42,16 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
         try{
             const response = await fetch(request)
             const json = await response.json();
-             toast.show(json.message, {duration: 4000});
-             setName("");
-             setEmail("");
-             setMobile("");
-             setSubject("");
-             setDescription("");
-            //  navigation.goBack();
+            if (json.hasOwnProperty("data")){
+              navigation.goBack();
+              Toast.show({type: "success", text1: json.message});
+            }
+            else{
+              Toast.show({type: "error", text1: json.message});
+            }
         } catch (error) {
           console.error(error);
-          toast.show(error, {duration: 3000});
+          Toast.show({type: "error", text1: error})
         } finally {
           setLoading(false);
           hideLoader()
@@ -60,27 +59,22 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
     };
 
     const onsubmit = () => {
-      if (Validations.NameValidation(name)){
-        toast.show(Validations.NameValidation(name), {duration: 3000});
-      }
-      else if (Validations.EmailValidation(emailId)){
-        toast.show(Validations.EmailValidation(emailId), {duration: 3000});
-      }
-      else if (Validations.MobileValidation(mobile)){
-        toast.show(Validations.MobileValidation(mobile), {duration: 3000});
-      }
-      else if (Validations.SubjectValidation(subject)){
-        toast.show(Validations.SubjectValidation(subject), {duration: 3000});
-      }
-      else if (Validations.DescriptonValidation(description)){
-        toast.show(Validations.DescriptonValidation(description), {duration: 3000});
+      if (Validations.NameValidation(name) || Validations.EmailValidation(emailId) || Validations.MobileValidation(mobile) ||Validations.SubjectValidation(subject)
+          || Validations.DescriptonValidation(description)){
+        setShowErrMsg(true);
       }
       else{
+        setShowErrMsg(false);
         setLoading(true);
         showLoader();
         ContactAdminAPI();
       }
-    }
+    };
+
+    useEffect(() => {
+      setShowErrMsg(false);
+    }, []);
+
     return(
       <OverlayContainer>
         <AppBackgorund />
@@ -96,7 +90,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                         pickerLabel="Name"
                         onTextChange={(val) => setName(val)}
                         leftImagePath={ImagesPath.activeUserImg}
-
+                        showError={(showErrMsg && Validations.NameValidation(name))}
+                        errorText={Validations.NameValidation(name)}
                     />
                     
                     <FloatTextField 
@@ -105,7 +100,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                         pickerLabel="Email"
                         onTextChange={(val) => setEmail(val)}
                         leftImagePath={ImagesPath.emailImg}
-
+                        showError={(showErrMsg && Validations.EmailValidation(emailId))}
+                        errorText={Validations.EmailValidation(emailId)}
                     />
                     
                     <FloatTextField 
@@ -114,7 +110,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                         pickerLabel="Mobile"
                         onTextChange={(val) => setMobile(val)}
                         leftImagePath={ImagesPath.phoneImg}
-
+                        showError={(showErrMsg && Validations.MobileValidation(mobile))}
+                        errorText={Validations.MobileValidation(mobile)}
                     />
                   
                     <FloatTextField 
@@ -123,6 +120,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                         pickerLabel="Subject"
                         onTextChange={(val) => setSubject(val)}
                         leftImagePath={ImagesPath.subjectImg}
+                        showError={(showErrMsg && Validations.SubjectValidation(subject))}
+                        errorText={Validations.SubjectValidation(subject)}
                     />
                     
                     <FloatTextField 
@@ -134,6 +133,8 @@ const ContactAdminView = ({navigation = useNavigation()}) => {
                         textInputMultiline={true}
                         containerStyle={{height: 160}}
                         textInputStyle={{height: 150 }}
+                        showError={(showErrMsg && Validations.DescriptonValidation(description))}
+                        errorText={Validations.DescriptonValidation(description)}
                     />
                     
                     <MainButton 
@@ -184,7 +185,6 @@ const styles = StyleSheet.create({
     highlight: {
       fontWeight: '700',
     },
-  
     shadowContainerStyle: {   //<--- Style with elevation
      
       shadowColor: Colors.color.darkGray,
@@ -204,7 +204,6 @@ const styles = StyleSheet.create({
       shadowRadius: 0,
       paddingVertical: 24, paddingHorizontal: 16, margin: 16
     },
-    
-  });
+});
 
 export default ContactAdminView;

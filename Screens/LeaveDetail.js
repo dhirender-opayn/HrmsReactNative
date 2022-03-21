@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { ActivityIndicator, View, Text, Image, FlatList, TouchableOpacity } from "react-native";
-import { useToast } from "react-native-toast-notifications";
+import { ActivityIndicator, View, Text, Image, TouchableOpacity } from "react-native";
+import Toast from "react-native-toast-message";
 import Colors, { color } from "../Common/Colors";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import apiEndPoints from "../utils/apiEndPoints";
@@ -19,8 +19,6 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
     const [isLoading, setLoading] = useState(true);
     const [item, setLeaveData] = useState({});
     var fileUrl = ""
-    const toast = useToast();
-    const LeaveSummary = [{id: 1, count: 18, type: "Casual Leave"}, {id: 2, count: 18, type: "Casual Leave"}, {id: 3, count: 18, type: "Casual Leave"}]
     const leaveTypes = [{value: "Single Day", id: 1}, {value: "Multiple Day", id: 2}, {value: "Short Leave", id: 4},
          {value: "First Half", id: 5}, {value: "Second Half", id: 6}, {value: "", id: 0}, {value: "", id: 3}];
     const leaveStatus = [{value: "Pending", id: 0}, {value: "Approved", id: 1}, {value: "Rejected", id: 2}];
@@ -48,17 +46,19 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
 
     const updateLeaveStatus = async(id, userid, status) => {
         try {
-            const {data} = await apiCall("POST", apiEndPoints.UpdateLeaveStatus, {user_id: userid, id: id, status: status});
-           if (data.hasOwnProperty("data")){
+          const {data} = await apiCall("POST", apiEndPoints.UpdateLeaveStatus, {user_id: userid, id: id, status: status});
+          if (data.hasOwnProperty("data")){
                 var leave = {...item};
                 leave["status"] = status;
                 setLeaveData(leave);
                 route.params.updatedData(leave);
                 //navigation.goBack();
-           }
-           toast.show(data.message, {duration: 3000});
-        } catch (error) {
-            toast.show(error, { duration: 3000 });
+          }else{
+              Toast.show({type: "error", text1: data.message});
+          }
+        } 
+        catch (error) {
+            Toast.show({type: "error", text1: error});
         } finally {
             hideLoader();
         }
@@ -150,8 +150,8 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
          
         })
         .catch(errorMessage => {
-          this.setState({overLoader: false});
-          this.refs.toast.show(errorMessage,2000);
+          //this.setState({overLoader: false});
+          Toast.show({type: "error", text1: data.errorMessage});
         });
     } else {
       console.log("Start Download");
@@ -160,14 +160,13 @@ const LeaveDetail = ({navigation=useNavigation(), route, updatedData = () => {}}
         .then(res => {
           console.log("Succes: "+res);
           RNFetchBlob.android.actionViewIntent(res.path());
-          this.setState({overLoader: false});
-          this.refs.toast.show('File download successfully',2000);
-         
+          //this.setState({overLoader: false});
+          Toast.show({type: "success", text1: "File downloaded successfully"});
         })
         .catch((errorMessage, statusCode) => {
           console.log(errorMessage);
-          this.setState({overLoader: false});
-          this.refs.toast.show(errorMessage,2000);
+          //this.setState({overLoader: false});
+          Toast.show({type: "error", text1: errorMessage});
         });
     }
      

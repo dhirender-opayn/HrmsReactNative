@@ -41,10 +41,17 @@
 	<string>To upload file</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>To get user current location</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>To set profile image</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>To have video access</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To set profile image</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Asap-Bold.ttf</string>
+		<string>Asap-Medium.ttf</string>
+		<string>Asap-Regular.ttf</string>
+		<string>Asap-SemiBold.ttf</string>
+	</array>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -61,12 +68,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Asap-Bold.ttf</string>
-		<string>Asap-Medium.ttf</string>
-		<string>Asap-Regular.ttf</string>
-		<string>Asap-SemiBold.ttf</string>
-	</array>
 </dict>
 </plist>

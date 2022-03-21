@@ -13,7 +13,7 @@ import { AuthStyle } from "../CustomStyle/AuthStyle";
 import Colors, { color } from "../Common/Colors";
 import GeoLocationHelper from "../helper/GeoLocationHelper";
 import Global from "../Common/Global";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import moment from 'moment';
 import {getDistance, getPreciseDistance} from 'geolib';
 import { LoaderContext, UserContext } from "../utils/context";
@@ -29,7 +29,6 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
    const [currentLongLocation, setCurrentLongLocation] = useState('');
    const { showLoader, hideLoader } = useContext(LoaderContext);
    var InOutClick = "";
-   const toast = useToast();
 
    let topdatalist = [
       { key: strings.checkin, imagepath: ImagesPath.checkInImage }, { key: strings.checkout, imagepath: ImagesPath.checkOutImage }, { key: strings.qr_code_scanner, imagepath: ImagesPath.barCodeScanner }
@@ -96,7 +95,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
             showLoader();
             AttendenceApi();
          } else {
-            toast.show("Attendance can me marked between 20 meters of distance. You are at distance "+calculateDistance()+"m.", {duration: 4000})
+            Toast.show({type: "error", text1: "Attendance can me marked between 20 meters of distance. You are "+calculateDistance()+"m away from office area."});
          }
       }
       if(selectedData.key == (strings.checkout)){
@@ -105,7 +104,7 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
             showLoader();
             AttendenceApi();
          } else {
-            toast.show("Attendance can me marked between 20 meters of distance. You are at distance "+calculateDistance()+"m.", {duration: 4000})
+            Toast.show({type: "error", text1: "Attendance can me marked between 20 meters of distance. You are "+calculateDistance()+"m away from office area."});
          }
       }
    }
@@ -116,9 +115,14 @@ const HomeScreen = ({ navigation = useNavigation() }) => {
 
       try {
          const {data} = await apiCall("POST", apiEndPoints.MarkAttendance, {lat: currentLatLocation, lng: currentLongLocation, timing: date, type: InOutClick});
-         toast.show(data.message, {duration: 3000});
+         if (data.hasOwnProperty("data")){
+            Toast.show({type: "success", text1: data.message});
+         }
+         else{
+            Toast.show({type: "error", text1: data.message});
+         }
       } catch (error) {
-         toast.show(error, { duration: 3000 });
+         Toast.show({type: "error", text1: error});
       } finally {
          hideLoader();
       }

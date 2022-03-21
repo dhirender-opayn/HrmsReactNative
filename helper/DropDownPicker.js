@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { color } from "../Common/Colors";
 import fonts from "../Common/fonts";
+import { CustomStyling } from "../CustomStyle/CustomStyling";
 import ImagesPath from "../images/ImagesPath";
 
 const DropDownPicker = ({
@@ -26,17 +27,24 @@ const DropDownPicker = ({
   passID = () => {},
   pickerLabel,
   pickerLabelStyle,
-  dropDownType,
+  showError,
+  errorText,
 }) => {
   const [showPicker, setShowPicker] = useState(false);
   return (
-    <View style={[styles.container, containerStyle]}>
+    <View style={{ marginBottom: 24}}>
+    <View style={[styles.container, containerStyle, {borderColor: (showError) ? color.darkRed : color.lightGray}]}>
       <View>
-        <Text style={[styles.LabelStyle, pickerLabelStyle]}>{pickerLabel}</Text>
+      {(value != "" && value != undefined) ? <View style={{ marginLeft: 4,
+            marginTop: -10, alignItems: "baseline"}}>
+              <Text style={[styles.LabelStyle, pickerLabelStyle]}> 
+                {pickerLabel} 
+              </Text>
+          </View> : null}
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => setShowPicker(!showPicker)}
-          style={[styles.pickerView, pickerStyle]}
+          style={[styles.pickerView, pickerStyle, {marginTop: (value != "" && value != undefined) ? 0 : 4}]}
         >
           {value !== "" && (
             <Text style={[styles.selectedText, selectedTextStyle]}>
@@ -84,6 +92,8 @@ const DropDownPicker = ({
         )}
       </View>
     </View>
+    {(showError) ? <Text style={CustomStyling.ErrorText}>{errorText}</Text>: null}
+    </View>
   );
 };
 
@@ -92,12 +102,18 @@ const styles = StyleSheet.create({
     // elevation: 1,
    // width: '19%',
     // zIndex: 1000,
+    height: 50,
+        borderWidth: 1,
+        borderColor: color.lightGray,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        justifyContent: "center"
   },
   pickerView: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: -8,
-  
+    marginTop: -4,
+    height: 40
   },
   pickerContainer: {
     width: '100%',
@@ -109,7 +125,7 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 1,
     position: "absolute",
-    top: 40,
+    top: 45,
   },
   pickerItemStyle: {
     borderTopWidth: 1,
@@ -134,9 +150,10 @@ const styles = StyleSheet.create({
   },
   LabelStyle: {
     fontSize: 12,
-   // fontFamily: fonts.InterMedium,
-    color: color.black,
-    marginLeft: 8,
+    fontFamily: fonts.medium,
+     color: color.titleBlack,
+     
+     backgroundColor: color.white,
   },
 });
 

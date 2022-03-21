@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { LoaderContext, UserContext } from "../utils/context";
 import apiEndPoints from "../utils/apiEndPoints";
 import { apiCall } from "../utils/httpClient";
@@ -20,7 +20,7 @@ import { KeyboardAwareView } from "react-native-keyboard-aware-view";
 
 const AddAnnouncementView = ({navigation = useNavigation()}) => {
     const [formData, setFormData] = useState({});
-    const toast = useToast();
+    const [showErrMsg, setShowErrMsg] = useState(false);
     const [userdata, setUserData] = useContext(UserContext);
     const [isLoad, setLoad] = useState(false);
     const { showLoader, hideLoader } = useContext(LoaderContext);
@@ -38,24 +38,22 @@ const AddAnnouncementView = ({navigation = useNavigation()}) => {
     //   try {
     //           const {data} = await apiCall("POST", apiEndPoints.AddTicket, param);
     //           console.log("Data: "+data);
-    //           toast.show(data.message, {duration: 4000});
+    //           Toast.show({type: "error", text1: data.message});
     //           navigation.goBack();
     //       } catch (error) {
     //           console.error("ERR: "+error);
-    //           toast.show(error, { duration: 3000 })
+    //           Toast.show({type: "error", text1: error});
     //       } finally {
     //           setLoad(false);
     //       }
   };
     const onsubmit = () => {
-      if (Validations.FieldValidation((formData.title == undefined) ? "" : formData.title)){
-        toast.show(Validations.EmptyFieldStr("title"), {duration: 3000});
-      }
-      else if (Validations.FieldValidation((formData.description == undefined) ? "" : formData.description)){
-        toast.show(Validations.EmptyFieldStr("description"), {duration: 3000});
+      if (Validations.FieldValidation(formData?.title) || Validations.FieldValidation(formData?.description)){
+        setShowErrMsg(true);
       }
       else{
-        setLoad(true);
+        setShowErrMsg(false);
+        //setLoad(true);
         addAnnouncement();
       }
     }
@@ -65,6 +63,10 @@ const AddAnnouncementView = ({navigation = useNavigation()}) => {
       data[key] = value;
       setFormData(data);
     };
+
+    useEffect(() => {
+      setShowErrMsg(false);
+    }, []);
     
     return(
       <OverlayContainer>
@@ -81,6 +83,8 @@ const AddAnnouncementView = ({navigation = useNavigation()}) => {
                   placeholder="Enter Title"
                   pickerLabel="Title"
                   onTextChange={(val) => onTextChange('title', val)}
+                  showError={(showErrMsg && Validations.FieldValidation(formData.title))}
+                  errorText={Validations.EmptyFieldStr("title")}
                 />
                
                 <FloatTextField 
@@ -90,6 +94,8 @@ const AddAnnouncementView = ({navigation = useNavigation()}) => {
                   textInputMultiline={true}
                   containerStyle={{height: 250}}
                   textInputStyle={{height: 240}}
+                  showError={(showErrMsg && Validations.FieldValidation(formData.description))}
+                  errorText={Validations.EmptyFieldStr("description")}
                 />
                 
                 <MainButton 

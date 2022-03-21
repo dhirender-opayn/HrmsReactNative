@@ -26,7 +26,9 @@ module.exports = {
              emergencyLeave: "Emergency Leaves",
              addHoliday: "Add Holiday",
 
-                        
-
+             uniqueFileName: "HRMS_"+Math.floor(new Date().getTime() + new Date().getSeconds() / 2),
+        //TextField
+        email: "Email",  
+        password: "Password",        
     }
 }

@@ -1,30 +1,30 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigation } from "@react-navigation/native";
 import Global, { projct } from "../Common/Global";
-import { View, Text, TextInput,  Button, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator, Image } from "react-native";
-import  Colors, { color }  from "../Common/Colors";
+import { View, TouchableOpacity, ScrollView, Image } from "react-native";
 import Validations from "../Common/Validations";
 import { OverlayContainer } from "../Common/OverlayContainer";
 import AppBackgorund from "./BackgroundView";
 import { AuthStyle } from "../CustomStyle/AuthStyle";
-import { useToast } from "react-native-toast-notifications";
+import Toast from "react-native-toast-message";
 import { CustomStyling } from "../CustomStyle/CustomStyling";
 import { LoaderContext, UserContext } from "../utils/context";
 import ImagePicker from "react-native-image-crop-picker";
 import PopUpModal from "../helper/PopUpModal";
-import { apiCall } from "../utils/httpClient";
 import apiEndPoints from "../utils/apiEndPoints";
+import FloatTextField from "../helper/FloatTextField";
+import { MainButton } from "../components/mainButton";
+import { strings } from "../Common/String";
 
 const EditProfileView = ({navigation = useNavigation()}) => {
     const [isLoading, setLoading] = useState(false);
-    const toast = useToast();
     const [userdata, setUserData] = useContext(UserContext);
     const [formData, setFormData] = useState({});
     const [imageData, setImageData] = useState({});
     const [showPickerModal, setShowPicker] = useState(false);
     const [selectdImageData, setSelectedImgData] = useState({});
     const { showLoader, hideLoader } = useContext(LoaderContext);
-
+    const [showErrMsg, setShowErrMsg] = useState(false);
   
     let form = new FormData()
     const UpdateProfile = async() => {
@@ -44,15 +44,24 @@ const EditProfileView = ({navigation = useNavigation()}) => {
           try{
               const response = await fetch(request)
               const json = await response.json();
-              var updatedData = {...userdata};
-              updatedData["user"] = {...json.data.user};
-              setUserData(updatedData);
-                toast.show(json.message, {duration:4000});
+              if (json.hasOwnProperty("data")){
+                if (json.data.hasOwnProperty("user")){
+                  var updatedData = {...userdata};
+                  updatedData["user"] = {...json.data.user};
+                  setUserData(updatedData);
+                  Toast.show({type: "success", text1: json.message});
+                }
+                else{
+                  Toast.show({type: "error", text1: json.message});
+                }
+              }
+              else{
+                Toast.show({type: "error", text1: json.message});
+              }
             
-              
           } catch (error) {
-          console.error(error);
-          toast.show(error, {duration: 3000})
+            console.error(error);
+            Toast.show({type: "error", text1: error})
           } finally {
             hideLoader();
           setLoading(false);
@@ -60,16 +69,11 @@ const EditProfileView = ({navigation = useNavigation()}) => {
       };
 
     const onsubmit = () => {
-      if (Validations.NameValidation((formData.name === undefined) ? userdata.user.name : formData.name)){
-        toast.show(Validations.NameValidation((formData.name === undefined) ? userdata.user.name : formData.name), {duration: 3000});
-      }
-      else if (Validations.MobileValidation((formData.mobile === undefined) ? userdata.user.mobile : formData.mobile)){
-        toast.show(Validations.MobileValidation((formData.mobile === undefined) ? userdata.user.mobile : formData.mobile), {duration: 3000});
-      }
-      else if (Validations.FieldValidation((formData.clockifyKey === undefined) ? userdata.user.profile.clockify_key : formData.clockifyKey)){
-        toast.show(Validations.EmptyFieldStr("clockify key"), {duration: 3000});
+      if (Validations.NameValidation(formData.name) || Validations.MobileValidation(formData.mobile) || Validations.FieldValidation(formData.clockifyKey)){
+        setShowErrMsg(true);
       }
       else{
+        setShowErrMsg(false);
         setLoading(true);
         showLoader();
         UpdateProfile();
@@ -94,7 +98,7 @@ const EditProfileView = ({navigation = useNavigation()}) => {
           setShowPicker(false);
           setSelectedImgData({ uri: ImgData.path,
           type: 'image/jpeg',
-          name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",});
+          name: strings.uniqueFileName+".jpeg",});
          })
          .catch((error) => {     
           setShowPicker(false);
@@ -102,29 +106,41 @@ const EditProfileView = ({navigation = useNavigation()}) => {
       
      };
    
-     const openCamera = () => {
-       ImagePicker.openCamera({
+    const openCamera = () => {
+      ImagePicker.openCamera({
 
-         cropping: true,
-         includeBase64: true,
-       })
-         .then((ImgData) => {
-          setShowPicker(false);
-          setSelectedImgData({ uri: ImgData.path,
+        cropping: true,
+        includeBase64: true,
+      })
+      .then((ImgData) => {
+        setShowPicker(false);
+        setSelectedImgData({ uri: ImgData.path,
           type: 'image/jpeg',
-          name: "HRMS-"+new Date().getUTCMilliseconds()+".jpeg",});
-          
-         })
-         .catch((error) => {
-          setShowPicker(false);
-         });
-     };
+          name: strings.uniqueFileName+".jpeg",}
+        );  
+      })
+      .catch((error) => {
+        setShowPicker(false);
+      });
+    };
+
+    const setPrevData = () => {
+      var data = {...formData};
+      data["name"] = userdata.user.name;
+      data["email"] = userdata.user.email;
+      data["mobile"] = userdata.user.mobile;
+      data["clockifyKey"] = userdata.user.profile.clockify_key;
+      setFormData(data);
+      setShowErrMsg(false);
+    };
+
+     useEffect(() => {setPrevData();}, []);
 
     return(
       <OverlayContainer>
             <AppBackgorund />
       <ScrollView>
-        <View style={{padding: 16, marginTop: 40, justifyContent: "center"}}>
+        <View style={{padding: 16, marginTop: 80, justifyContent: "center"}}>
             <View style={AuthStyle.CardmainContainer}> 
                 
                 { (selectdImageData.uri != null || selectdImageData.uri != undefined) ?
@@ -136,19 +152,20 @@ const EditProfileView = ({navigation = useNavigation()}) => {
                   style={CustomStyling.editImageView}
                   />) :
                   ((userdata.user.profile.image != null) ? 
-                                (<Image 
-                                source={{
-                                    uri: userdata.user.profile.image,
-                                    method: 'GET'
-                                }}
-                                style={CustomStyling.editImageView}
-                                />)
-                                :
-                                (<Image 
-                                source={require('../images/userwhite.png')}
-                                style={CustomStyling.editImageView}
-                                />))
-                            }
+                      (<Image 
+                          source={{
+                            uri: userdata.user.profile.image,
+                            method: 'GET'
+                          }}
+                          style={CustomStyling.editImageView}
+                      />)
+                      :
+                      (<Image 
+                          source={require('../images/userwhite.png')}
+                          style={CustomStyling.editImageView}
+                      />)
+                  )
+                }
                 <TouchableOpacity onPress={() => {
                     //navigation.navigate('picker');
                     setShowPicker(true);
@@ -158,45 +175,51 @@ const EditProfileView = ({navigation = useNavigation()}) => {
                         style={CustomStyling.camerImageStyle}
                     />
                 </TouchableOpacity>
-                <TextInput
-                    style={[AuthStyle.inputText, {marginTop: 32}]}
-                    placeholder="Name"
+                
+                <FloatTextField 
+                    placeholder="Enter Name"
                     defaultValue={userdata.user.name}
-                    onChangeText={(val) => onTextChange("name", val)}
+                    pickerLabel="Name"
+                    onTextChange={(val) => onTextChange("name", val)}
+                    showError={(showErrMsg && Validations.NameValidation(formData.name))}
+                    errorText={Validations.NameValidation(formData.name)}
+                    containerStyle={{marginTop: 32}}
                 />
-                <TextInput
-                    style={AuthStyle.inputText}
-                    placeholder="Email"
+                
+                <FloatTextField 
+                    placeholder="Enter Email"
                     defaultValue={userdata.user.email}
+                    pickerLabel="Email"
                     editable={false}
-                    onChangeText={(val) => onTextChange("email", val)}
+                    onTextChange={(val) => onTextChange("email", val)}
                 />
-                <TextInput
-                    style={AuthStyle.inputText}
-                    keyboardType='phone-pad'
-                    placeholder="Mobile"
+               
+                <FloatTextField 
+                    placeholder="Enter Mobile"
                     defaultValue={userdata.user.mobile}
-                    onChangeText={(val) => onTextChange("mobile", val)}
-
+                    pickerLabel="Mobile"
+                    keyboardType="phone-pad"
+                    onTextChange={(val) =>onTextChange("mobile", val)}
+                    showError={(showErrMsg && Validations.MobileValidation(formData.mobile))}
+                    errorText={Validations.MobileValidation(formData.mobile)}
                 />
-                <TextInput
-                    style={AuthStyle.inputText}
-                    placeholder="Clockify Key"
-                    editable={(userdata.user.profile.clockify_key != null) ? false : true}
-                    defaultValue={userdata.user.profile.clockify_key}
-                    onChangeText={(val) => onTextChange("clockifyKey", val)}
+               
+                <FloatTextField 
+                    placeholder="Enter Clockify Key"
+                    defaultValue={formData.clockifyKey}
+                    pickerLabel="Clockify Key"
+                    onTextChange={(val) => onTextChange("clockifyKey", val)}
+                    showError={(showErrMsg && Validations.FieldValidation(formData.clockifyKey))}
+                    errorText={Validations.EmptyFieldStr("clockify key")}
                 />
                 
             </View>
-            <TouchableOpacity onPress={() => {
-                onsubmit();
-                //navigation.navigate('User');
-            }}>
-                  <View style={{backgroundColor:Colors.color.red, borderRadius: 16, height: 50, justifyContent: "center", alignItems: "center", margin: 24}}>
-                    <Text style={{fontSize: 18, fontWeight: "bold", color: '#fff'}}>Save</Text>
-                    {isLoading ? <ActivityIndicator /> : null}
-                  </View>
-                </TouchableOpacity>
+           
+                <MainButton 
+                  text="Save"
+                  onPress= {() => {onsubmit();}}
+                  viewStyle={{marginHorizontal: 24}}
+                />
         </View>
       
         
